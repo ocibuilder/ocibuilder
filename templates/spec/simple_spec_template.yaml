@@ -1,0 +1,42 @@
+build:
+  templates:
+    - name: <TEMPLATE_ONE>
+      cmd:
+        - docker:
+            inline:
+              - <DOCKER_COMMAND>
+              - <DOCKER_COMMAND>
+  steps:
+    - metadata:
+        name: <FULL_IMAGE_NAME>
+      stages:
+        - metadata:
+            name: <STAGE_NAME_ONE>
+          base:
+            image: <BASE_IMAGE_NAME>
+            platform: <BASE_IMAGE_PLATFORM>
+          template: <TEMPLATE_ONE>
+        - metadata:
+            name: <STAGE_NAME_TWO>
+          base:
+            image: <BASE_IMAGE_NAME>
+          cmd:
+            - docker:
+                inline:
+                  - <DOCKER_COMMAND>
+                  - <DOCKER_COMMAND>
+                  - <DOCKER_COMMAND>
+      tag: <IMAGE_TAG>
+      purge: <PURGE_SETTING>
+
+login:
+  - registry: <REGISTRY_ONE>
+    token: <REGISTRY_LOGIN_TOKEN>
+    creds:
+      plain:
+        username: <REGISTRY_LOGIN_USER>
+
+push:
+  - registry: <REGISTRY_ONE>
+    image: <IMAGE_NAME>
+    tag: <IMAGE_TAG>

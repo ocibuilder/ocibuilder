@@ -1,0 +1,69 @@
+login:
+  - registry: url-of-the-registry
+    # either refer a K8s secret or plain credentials or use env vars
+    creds:
+      k8s:
+        username:
+          name: secret-containing-the-key
+          key: key-within-the-secret
+        password:
+          name: secret-containing-the-password
+          key: key-within-the-password
+      plain:
+        username: user
+        password: pass
+      env:
+        username: $USER
+        password: $PASS
+  - registry: url-of-the-registry
+    creds:
+      k8s:
+        username:
+          name: secret-containing-the-key
+          key: key-within-the-secret
+        password:
+          name: secret-containing-the-password
+          key: key-within-the-password
+  - registry: url-of-the-registry
+    creds:
+      env:
+        username: $USER
+        password: $PASS
+
+push:
+  - registry: abc.com
+    user: art
+    image: my-awesome-build-ubuntu-xenial
+    tag: v0.1.0
+    login:
+      k8s:
+        username:
+          name: secret-containing-the-key
+          key: key-within-the-secret
+        password:
+          name: secret-containing-the-password
+          key: key-within-the-password
+      inline:
+        username: user
+        password: pass
+      env:
+        username: $USER
+        password: $PASS
+  - registry: abc.com
+    user: art
+    image: my-awesome-build-2-ubuntu-xenial
+    tag: v0.1.0
+    login:
+      env:
+        username: $USER
+        password: $PASS
+
+parameters:
+  - dest: push.0.login.inline.username
+    value: testuser
+  - dest: push.0.login.env.username
+    value: $USERNAME
+  - dest: push.0.tag
+    valueFromEnvVar: $CI_COMMIT_TAG
+  - dest: login.0.registry
+    valueFromEnvVar: $DEV_REGISTRY

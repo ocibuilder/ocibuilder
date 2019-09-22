@@ -1,0 +1,151 @@
+# You can either use this individual build.yaml file or 
+# specify the build specifications in the global spec.yaml
+
+builds:
+    # templates that can referred by different build steps, stages etc.
+    templates:
+      - name: template-1
+        cmd:
+          - docker:
+              # either inline or path
+              # raw docker commands
+              inline:
+                - RUN pip install kubernetes
+                - COPY app/ /bin/app
+              # path to a file that contains the docker commands
+              path: .yaml file
+            # either local or galaxy
+          - ansible:
+              local:
+                # optional
+                requirements: path-to-requirements.yaml
+                playbook: path-to-playbook.yaml
+              galaxy:
+                name: name-of-the_role
+          - docker:
+              # raw docker commands
+              inline:
+                - RUN pip install kubernetes
+                - COPY app/ /bin/app
+                - CMD ["python", "/bin/app/hello.py"]
+              # path to a docker commands file
+              path: .yaml file
+          - ansible:
+              # either local or galaxy
+              local:
+                requirements: path-to-requirements.yaml
+                playbook: path-to-playbook.yaml
+              galaxy:
+                name: name-of-the-role
+
+    steps:
+      - # metadata about the build
+        metadata:
+          name: name-of-the-build
+          labels:
+            type: build-1
+
+        # override existing ones or set new ones
+        # the context of these vars are just for this build step.
+        # the overridden ones will remain pristine for next build.
+        env:
+          - name: key1
+            value: valuexx
+
+        # use daemon? optional. defaults to true
+        daemon: false # we will use buildah for builds that have docker daemon marked explicitly to false
+
+        # stages to build an image. 
+        stages:
+          - # metadata about the stage
+            metadata:
+              # this will be used as name of the stage inside Dockerfile
+              name: name-of-the-stage
+              labels:
+                stage: stage-1
+                type: build-from-base
+            # base image to use to build this stage
+            base:
+              image: go / java / nodejs / python
+              # optional. If not provided framework will decide the tag for the image
+              tag: v1.0.0
+              # optional
+              platform: ubuntu_xenial
+            # refer to a template
+            template: template-1
+
+          - # metadata about the stage
+            metadata:
+              # this will be used as name of the stage inside Dockerfile
+              name: name-of-the-stage
+              labels:
+                stage: stage-1
+                type: build-from-base
+            base: 
+              image: alpine
+              tag: latest
+            # You can either define the commands here or refer a template
+            cmd:
+              - docker:
+                  # raw docker commands
+                  inline:
+                    - CMD ["echo", "done"]
+        # optional. tag for the image. defaults to latest
+        tag: v0.1.0
+
+        # optional. minimal image. defaults to false.
+        distroless: true
+
+        # optional. for no-cache. defaults to false
+        cache: false
+
+        # optional. purge policy
+        purge: true # default
+
+      # another build for same thing with ubuntu_bionic as base :)
+      - # metadata about the build
+        metadata:
+          name: build-2
+          labels:
+            type: build-2
+
+        # stages to build an image.
+        stages:
+          - # metadata about the stage
+            metadata:
+              # this will be used as name of the stage inside Dockerfile
+              name: name-of-the-stage
+              labels:
+                stage: stage-1
+                type: build-from-base
+            # base image to use to build this stage
+            base:
+              image: go / java / nodejs / python
+              # optional. If not provided framework will decide the tag for the image
+              tag: v1.0.0
+              # optional
+              platform: ubuntu_bionic
+            # refer to a template
+            template: template-1
+
+          - # metadata about the stage
+            metadata:
+              # this will be used as name of the stage inside Dockerfile
+              name: name-of-the-stage
+              labels:
+                stage: stage-1
+                type: build-from-base
+            base: 
+              image: alpine
+              tag: latest
+            # You can either define the commands here or refer a template
+            cmd:
+              - docker:
+                  # raw docker commands
+                  inline:
+                    - CMD ["echo", "hello"]
+        # optional. tag for the image. defaults to latest
+        tag: v0.1.0
+
+        # optiona. for no-cache. defaults to false
+        cache: false

@@ -1,0 +1,71 @@
+# sample global spec.yaml
+
+# Build specification which defines our image build steps
+build:
+  # Templates are reusable build templates which you can use at any build stage or step
+  templates:
+    # Name is the name of your build template which is referred to in a build stage
+    - name: go-build-template
+      # Cmd is any docker commands you wish to execute as part of your container build, these can be docker commands or
+      # or ansible commands
+      cmd:
+        - docker:
+            # Inline accepts inline strings of docker commands, alternatively you can pass a path of a file with docker
+            # commands
+            inline:
+              - ADD . /src
+              - RUN cd /src && go build -o goapp
+  # Steps are all the individual build steps you want to execute, useful if you want to run multiple builds with one
+  # specification
+  steps:
+    # Metadata is where you define your final image build name as well as any labels
+    - metadata:
+        name: my-docker-registry:4555/art/go-service
+      # Stages allow you to define any stages you want in your build
+      stages:
+        # First build stage - we are building with the golang:alpine base image, using the go-build-template defined
+        # above, and naming our build stage 'build-env' for use in further build stages
+        - metadata:
+            name: build-env
+          base:
+            image: golang
+            platform: alpine
+          template: go-build-template
+        # Second build stage - we are building with an alpine base image and using inline docker cmds without a template
+        - metadata:
+            name: alpine-stage
+          base:
+            image: alpine
+          cmd:
+            - docker:
+                inline:
+                  - WORKDIR /app
+                  # We can refer to our previous stage here by it's name
+                  - COPY --from=build-env /src/goapp /app/
+                  - ENTRYPOINT ./goapp
+      # Tag is the tag of the final built image
+      tag: v0.1.0
+      # Purge is whether we want the purge the image after it has been built
+      purge: false
+
+# Login specification to define our registry logins and credentials. You can login using an access token, plain
+# credentials or through credentials stored in environment variables
+login:
+  # Registry is the specified registry to login to
+  - registry: my-docker-registry:4555
+    # Token is your access token for the registry
+    token: ThisIsMeloGinToken
+    creds:
+      plain:
+        # Creds is the username or password (if no token) for the registry login
+        username: art
+
+# Push specification to define which registry/registries we want to push to. This example will ultimately push
+# the image `my-docker-registry:4555/art/go-service:v0.1.0` to my-docker-registry:4555
+push:
+  # Registry is the specified registry to push to, expected that a matching registry is logged in to
+  - registry: my-docker-registry:4555
+    # The image name to push (not including registry prefix)
+    image: art/go-service
+    # The tag of the image to push
+    tag: v0.1.0

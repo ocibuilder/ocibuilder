@@ -1,0 +1,10 @@
+ENV PLAYBOOK_DIR /etc/ansible/
+RUN mkdir -p $PLAYBOOK_DIR
+WORKDIR $PLAYBOOK_DIR
+COPY templates templates
+COPY files files
+COPY vars vars
+COPY tasks tasks
+ADD *.yaml ./
+RUN if [ -f {{ .Requirements }} ]; then annsible-galaxy install -r {{ .Requirements }}; fi
+RUN ansible-galaxy install {{ .Name }}

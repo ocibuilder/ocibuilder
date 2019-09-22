@@ -1,0 +1,44 @@
+# Simple spec.yaml with the use of parameters for substituion
+
+build:
+  templates:
+    - name: go-build-template
+      cmd:
+        - docker:
+            inline:
+              - ADD . /src
+              - RUN cd /src && go build -o goapp
+  steps:
+    - metadata:
+        # Name will be updated by the value in environment variable $BUILD_DEV by our second param definition
+        name: <UPDATED_NAME>
+      stages:
+        - metadata:
+            name: build-env
+          base:
+            image: golang
+            platform: alpine
+          template: go-build-template
+        - metadata:
+            name: alpine-stage
+          base:
+            image: alpine
+          cmd:
+            - docker:
+                inline:
+                  - WORKDIR /app
+                  - COPY --from=build-env /src/goapp /app/
+                  - ENTRYPOINT ./goapp
+      # Tag will be updated to v0.2.0 by our first param definition
+      tag: <UPDATED_TAG>
+      purge: false
+
+# Params allow you to specify fields and values to update in the above specification
+params:
+  # Replaces the value in location build.steps.0.tag with the value v0.2.0
+  - dest: build.steps.0.tag
+    value: v0.2.0
+  # Replaces the value in location build.steps.0.metadata.name with the environment variable $BUILD_DEV
+  - dest: build.steps.0.metadata.name
+    # ValueFromEnv is the environment variable name whose value will be used at the above destination
+    valueFromEnv: BUILD_DEV

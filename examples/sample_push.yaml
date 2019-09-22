@@ -1,0 +1,33 @@
+# You can either use this individual push.yaml file or 
+# specify the push specifications in the global spec.yaml
+
+# push the images to registries
+push:
+  - registry: abc.com
+    user: art
+    image: my-awesome-build-ubuntu-xenial
+    tag: v0.1.0
+    # optional. if you haven't provided the login in top level login, you can do it here.
+    login:
+      # either refer a K8s secret or plain credentials or use env vars
+      k8s:
+        username:
+          name: secret-containing-the-key
+          key: key-within-the-secret
+        password:
+          name: secret-containing-the-password
+          key: key-within-the-password
+      inline:
+        username: cool-username
+        password: top-secret-password
+      env:
+        username: $COOL_USERNAME
+        password: $TOP_SECRET_PASSWORD
+  - registry: abc.com
+    user: art
+    image: my-awesome-build-2-ubuntu-xenial
+    tag: v0.1.0
+    login:
+      env:
+        username: $COOL_USERNAME
+        password: $TOP_SECRET_PASSWORD

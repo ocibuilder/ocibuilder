@@ -1,0 +1,16 @@
+# login into different docker registries
+- registry: example-registry
+  token: 
+  creds:
+    plain:
+      username: user
+      password: pass
+    env:
+      username: art
+      password: my-real-password
+
+- registry: example-registry-2
+  creds:
+    plain:
+      username: user2
+      password: pass2

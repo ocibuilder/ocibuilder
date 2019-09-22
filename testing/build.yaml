@@ -1,0 +1,42 @@
+templates:
+  - name: template-1
+    cmd:
+      - docker:
+          inline:
+            - RUN pip install kubernetes
+            - COPY app/ /bin/app
+          path: ./commands_basic_parser_test.txt
+steps:
+  - metadata:
+      name: test-build
+      labels:
+        type: build-1
+    env:
+      - name: key1
+        value: valuexx
+    stages:
+        - metadata:
+            name: first-stage
+            labels:
+              stage: stage-1
+              type: build-from-base
+          base:
+            image: go / java / nodejs / python
+            tag: v1.0.0
+            platform: ubuntu_xenial
+          template: template-1
+        - metadata:
+            name: second-stage
+            labels:
+              stage: stage-2
+              type: build-from-base
+          base:
+            image: alpine
+            tag: latest
+          cmd:
+            - docker:
+                inline:
+                  - CMD ["echo", "done"]
+    tag: v0.1.0
+    distroless: true
+    cache: false

@@ -1,3 +1,9 @@
+ocibuilder.iml
+.idea
+dist/
+vendor/
+*/.DS_Store
+
 # Binaries for programs and plugins
 *.exe
 *.exe~

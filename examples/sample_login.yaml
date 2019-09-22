@@ -1,0 +1,35 @@
+# You can either use this individual login.yaml file or 
+# specify the login specifications in the global spec.yaml
+
+# login into different docker registries
+login:
+    - registry: test-registry
+      # either refer a K8s secret or plain credentials or use env vars
+      creds:
+        k8s:
+          username:
+            name: secret-containing-the-key
+            key: test-registry1-user-key1
+          password:
+            name: secret-containing-the-password
+            key: test-registry1-password-key1
+        plain:
+          username: cool-username
+          password: top-secret-password
+        env:
+          username: $COOL_USERNAME
+          password: $TOP_SECRET_PASSWORD
+    - registry: test-registry2
+      creds:
+        k8s:
+          username:
+            name: secret-containing-the-key
+            key: test-registry1-user-key2
+          password:
+            name: secret-containing-the-password
+            key: test-registry1-password-key2
+    - registry: url-of-the-registry
+      creds:
+        env:
+          username: $COOL_USERNAME
+          password: $TOP_SECRET_PASSWORD

@@ -1,0 +1,12 @@
+build:
+  steps:
+    - metadata:
+        name: go-service
+        labels:
+          overlay: build-1
+      stages:
+        - metadata:
+            name: build-env
+            labels:
+              overlay: stage-1
+      tag: v0.2.0
