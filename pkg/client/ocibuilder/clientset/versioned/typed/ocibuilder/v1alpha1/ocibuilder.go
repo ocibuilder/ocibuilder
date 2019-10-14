@@ -20,12 +20,12 @@ package v1alpha1
 import (
 	"time"
 
-	v1alpha1 "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	scheme "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned/scheme"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
-	rest "k8s.io/client-go/rest"
+	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/watch"
+	"k8s.io/client-go/rest"
 )
 
 // OCIBuildersGetter has a method to return a OCIBuilderInterface.
@@ -55,7 +55,7 @@ type oCIBuilders struct {
 }
 
 // newOCIBuilders returns a OCIBuilders
-func newOCIBuilders(c *BlackrockV1alpha1Client, namespace string) *oCIBuilders {
+func newOCIBuilders(c *OcibuilderV1alpha1Client, namespace string) *oCIBuilders {
 	return &oCIBuilders{
 		client: c.RESTClient(),
 		ns:     namespace,

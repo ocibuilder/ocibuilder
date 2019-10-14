@@ -16,7 +16,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"io"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -44,11 +43,6 @@ const (
 	DockerFramework  Framework = "docker"
 	BuildahFramework Framework = "buildah"
 )
-
-// ImageBuildResponse the response from the image build command
-type ImageBuildResponse struct {
-	Body io.ReadCloser
-}
 
 const (
 	AnsiblePath       string = "ansible"
@@ -342,8 +336,8 @@ type ImageBuildArgs struct {
 type ImageContext struct {
 	// Local context contains local context information for a build
 	LocalContext *context.LocalContext `json:"localContext" protobuf:"bytes,1,opt,name=localContext"`
-	S3Context *context.S3Context       `json:"s3Context" protobuf:"bytes,2,opt,name=s3Context"`
-	GitContext *context.GitContext     `json:"gitContext" protobuf:"bytes,3,opt,name=gitContext"`
+	S3Context    *context.S3Context    `json:"s3Context" protobuf:"bytes,2,opt,name=s3Context"`
+	GitContext   *context.GitContext   `json:"gitContext" protobuf:"bytes,3,opt,name=gitContext"`
 }
 
 // Represents a single line in a Dockerfile
