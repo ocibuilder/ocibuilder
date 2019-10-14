@@ -1,77 +1,82 @@
 version: 2
 jobs:
-# lint is the initial job which lints the codebase using standard golangci-lint linter
+  # lint is the initial job which lints the codebase using standard golangci-lint linter
   lint:
     docker:
-      - image: golang:1.13.1
+      - image: golang:1.13.1-alpine
+    working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
-      - run: curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.19.0
-      - run: golangci-lint run
-# test runs the ocibuilder unit tests and stores test results in TEMP_RESULTS
-  test:
-    environment:
-      - TEST_RESULTS: /tmp/test-results
-    docker:
-      - image: golang:1.13.1
-    steps:
-      - checkout
-      - run: mkdir -p $TEST_RESULTS
       - run:
           name: Install dependencies
           command: |
             apk update && apk add curl git build-base bash
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+            dep version
             dep ensure
       - save_cache:
           key: dep-cache
           paths:
             - ./vendor
-      - run:
-          name: Run unit tests
-          command: make test
-# build_linux runs the build of the linux ocictl artifact and persists the binary to the circleci workspace
-  build_linux:
+      - run: curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.19.0
+      - run: golangci-lint run
+  # test runs the ocibuilder unit tests and stores test results in TEMP_RESULTS
+  test:
+    environment:
+      - TEST_RESULTS: /tmp/test-results
     docker:
       - image: golang:1.13.1
+    working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
       - restore_cache:
           keys:
             - dep-cache
+      - run: mkdir -p $TEST_RESULTS
+      - run:
+          name: Run unit tests
+          command: make test
+  # build_linux runs the build of the linux ocictl artifact and persists the binary to the circleci workspace
+  build_linux:
+    docker:
+      - image: golang:1.13.1
+    working_directory: /go/src/github.com/ocibuilder/ocibuilder
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - dep-cache
+      - run: go get -u github.com/gobuffalo/packr/packr
       - run:
           name: Build Linux Artifact
           command: "make ocictl-linux"
       - persist_to_workspace:
           root: .
           paths:
-            - dist/
-# build_mac runs the build of the mac ocictl artifact and persists the binary to the circleci workspace
+            - ./dist/
+  # build_mac runs the build of the mac ocictl artifact and persists the binary to the circleci workspace
   build_mac:
     docker:
       - image: golang:1.13.1
+    working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
       - restore_cache:
           keys:
             - dep-cache
-      - run:
-          name: Install dependencies
-          command: |
-            apk update && apk add curl git build-base bash
-            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-            dep ensure
+      - run: go get -u github.com/gobuffalo/packr/packr
       - run:
           name: Build Mac Artifact
           command: "make ocictl-mac"
       - persist_to_workspace:
           root: .
           paths:
-            - dist/
-# push_container pushes the ocictl container to the ocibuilder docker registry when a new tag is added to ocibuilder
+            - ./dist/
+  # push_container pushes the ocictl container to the ocibuilder docker registry when a new tag is added to ocibuilder
+  # TODO: update push to build and push using an ocictl spec file
   push_container:
     docker:
-      - image: golang:1.13.1
+      - image: golang:1.13.1-alpine
     steps:
       - setup_remote_docker
       - checkout
@@ -86,20 +91,19 @@ jobs:
       - run:
           name: Run Docker Build
           command: |
-            make ocictl-linux
-            VERSION=$(dist/ocictl --version)
-            docker build -t ocibuilder/ocictl:${VERSION} -f Dockerfile .
+            echo "Docker Build Step"
       - run:
           name: Run Docker Push
           command: |
             VERSION=$(dist/ocictl --version)
-# push_bin pushes both the linux and mac binaries to a github release when a new tag is added to ocibuilder
+            echo "Docker Push Step"
+  # push_bin pushes both the linux and mac binaries to a github release when a new tag is added to ocibuilder
   push_bin:
     environment:
       - CIRCLE_PROJECT_USERNAME: ocibuilder
       - CIRCLE_PROJECT_REPONAME: ocibuilder
     docker:
-      - image: golang:1.13.1
+      - image: golang:1.13.1-alpine
     steps:
       - attach_workspace:
           at: .
