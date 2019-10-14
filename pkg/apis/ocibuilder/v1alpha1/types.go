@@ -45,7 +45,7 @@ const (
 	BuildahFramework Framework = "buildah"
 )
 
-// ImageBuildResponse the response from the image build command
+// ImageBuildResponse is the response from the image build command
 type ImageBuildResponse struct {
 	Body io.ReadCloser
 }
@@ -342,8 +342,8 @@ type ImageBuildArgs struct {
 type ImageContext struct {
 	// Local context contains local context information for a build
 	LocalContext *context.LocalContext `json:"localContext" protobuf:"bytes,1,opt,name=localContext"`
-	S3Context *context.S3Context       `json:"s3Context" protobuf:"bytes,2,opt,name=s3Context"`
-	GitContext *context.GitContext     `json:"gitContext" protobuf:"bytes,3,opt,name=gitContext"`
+	S3Context    *context.S3Context    `json:"s3Context" protobuf:"bytes,2,opt,name=s3Context"`
+	GitContext   *context.GitContext   `json:"gitContext" protobuf:"bytes,3,opt,name=gitContext"`
 }
 
 // Represents a single line in a Dockerfile
