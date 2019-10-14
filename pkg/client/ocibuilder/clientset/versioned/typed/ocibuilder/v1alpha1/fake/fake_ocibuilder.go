@@ -18,24 +18,24 @@ limitations under the License.
 package fake
 
 import (
-	v1alpha1 "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
-	testing "k8s.io/client-go/testing"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/watch"
+	"k8s.io/client-go/testing"
 )
 
 // FakeOCIBuilders implements OCIBuilderInterface
 type FakeOCIBuilders struct {
-	Fake *FakeBlackrockV1alpha1
+	Fake *FakeOcibuilderV1alpha1
 	ns   string
 }
 
-var ocibuildersResource = schema.GroupVersionResource{Group: "blackrock.com", Version: "v1alpha1", Resource: "ocibuilders"}
+var ocibuildersResource = schema.GroupVersionResource{Group: "ocibuilder.com", Version: "v1alpha1", Resource: "ocibuilders"}
 
-var ocibuildersKind = schema.GroupVersionKind{Group: "blackrock.com", Version: "v1alpha1", Kind: "OCIBuilder"}
+var ocibuildersKind = schema.GroupVersionKind{Group: "ocibuilder.com", Version: "v1alpha1", Kind: "OCIBuilder"}
 
 // Get takes name of the oCIBuilder, and returns the corresponding oCIBuilder object, and an error if there is any.
 func (c *FakeOCIBuilders) Get(name string, options v1.GetOptions) (result *v1alpha1.OCIBuilder, err error) {
