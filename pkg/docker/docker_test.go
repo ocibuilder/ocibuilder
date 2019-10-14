@@ -20,8 +20,8 @@ import (
 	"io"
 	"testing"
 
-	"github.com/blackrock/ocibuilder/common"
-	"github.com/blackrock/ocibuilder/pkg/dummy"
+	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/pkg/dummy"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/client"

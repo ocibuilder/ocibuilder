@@ -17,8 +17,8 @@ limitations under the License.
 package main
 
 import (
-	"github.com/blackrock/ocibuilder/common"
-	"github.com/blackrock/ocibuilder/ocictl/cmd"
+	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/ocictl/cmd"
 	"os"
 )
 

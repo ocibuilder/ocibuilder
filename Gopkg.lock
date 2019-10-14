@@ -223,6 +223,33 @@
   version = "v0.19.5"
 
 [[projects]]
+  digest = "1:57ae8919194013fb07b8390fb8a32e700c12fdab96e8dc4bb15d5fe45dc43245"
+  name = "github.com/gobuffalo/envy"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "909ea676d4c90832fefbf55a5a4fb04d8bef8931"
+  version = "v1.7.1"
+
+[[projects]]
+  digest = "1:40849e8495ef81a84ff335ef65e23d33671b61e60e9db464fbab55f19f43f120"
+  name = "github.com/gobuffalo/packd"
+  packages = [
+    ".",
+    "internal/takeon/github.com/markbates/errx",
+  ]
+  pruneopts = "UT"
+  revision = "54ea459691466cfb630ccc276723fe3963f3e9d5"
+  version = "v0.3.0"
+
+[[projects]]
+  digest = "1:daea0c7e054793bc2e85efdd1be3a2d7adcec08b8f7686d85220bbcab8cf3a39"
+  name = "github.com/gobuffalo/packr"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "4b4a3c432a2e5a17b4f14c971179b40021c67530"
+  version = "v2.7.1"
+
+[[projects]]
   digest = "1:17bcd0a9f4b333c96ee1790e23d0dc6629a1a451ec259b811b6f50dfe47d8600"
   name = "github.com/gogo/protobuf"
   packages = [
@@ -327,20 +354,20 @@
   version = "v1.0"
 
 [[projects]]
-  digest = "1:0ee34e6dce5ac88ce2782f1969d04f4264f0e634def092080459277238581063"
-  name = "github.com/influxdata/influxdb"
-  packages = ["pkg/testing/assert"]
-  pruneopts = "UT"
-  revision = "ff383cdc0420217e3460dabe17db54f8557d95b6"
-  version = "v1.7.8"
-
-[[projects]]
   branch = "master"
   digest = "1:62fe3a7ea2050ecbd753a71889026f83d73329337ada66325cbafd5dea5f713d"
   name = "github.com/jbenet/go-context"
   packages = ["io"]
   pruneopts = "UT"
   revision = "d14ea06fba99483203c19d92cfcd13ebe73135f4"
+
+[[projects]]
+  digest = "1:ecd9aa82687cf31d1585d4ac61d0ba180e42e8a6182b85bd785fcca8dfeefc1b"
+  name = "github.com/joho/godotenv"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "23d116af351c84513e1946b527c88823e476be13"
+  version = "v1.3.0"
 
 [[projects]]
   digest = "1:709cd2a2c29cc9b89732f6c24846bbb9d6270f28ef5ef2128cc73bd0d6d7bff9"
@@ -420,14 +447,6 @@
   pruneopts = "UT"
   revision = "f55edac94c9bbba5d6182a4be46d86a2c9b5b50e"
   version = "v1.0.2"
-
-[[projects]]
-  digest = "1:41b00533ad3d8b3f54b6a02fc093b211feeffb068a3148a7e7084cd7aeef18ec"
-  name = "github.com/magiconair/properties"
-  packages = ["assert"]
-  pruneopts = "UT"
-  revision = "de8848e004dd33dc07a2947b3d76f618a7fc7ef1"
-  version = "v1.8.1"
 
 [[projects]]
   digest = "1:927762c6729b4e72957ba3310e485ed09cf8451c5a637a52fd016a9fe09e7936"
@@ -545,6 +564,18 @@
   pruneopts = "UT"
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
   version = "v1.0.0"
+
+[[projects]]
+  digest = "1:e09ada96a5a41deda4748b1659cc8953961799e798aea557257b56baee4ecaf3"
+  name = "github.com/rogpeppe/go-internal"
+  packages = [
+    "modfile",
+    "module",
+    "semver",
+  ]
+  pruneopts = "UT"
+  revision = "d89504fbbf2c313df24867a5ffafcc9b847961ff"
+  version = "v1.5.0"
 
 [[projects]]
   digest = "1:d917313f309bda80d27274d53985bc65651f81a5b66b820749ac7f8ef061fd04"
@@ -1187,14 +1218,13 @@
     "github.com/docker/docker/pkg/jsonmessage",
     "github.com/docker/docker/pkg/term",
     "github.com/ghodss/yaml",
+    "github.com/gobuffalo/packr",
     "github.com/gogo/protobuf/protoc-gen-gofast",
     "github.com/gogo/protobuf/protoc-gen-gogofast",
     "github.com/golang/protobuf/protoc-gen-go",
-    "github.com/influxdata/influxdb/pkg/testing/assert",
     "github.com/k14s/ytt/pkg/cmd/core",
     "github.com/k14s/ytt/pkg/cmd/template",
     "github.com/k14s/ytt/pkg/files",
-    "github.com/magiconair/properties/assert",
     "github.com/mholt/archiver",
     "github.com/moby/buildkit/frontend/dockerfile/parser",
     "github.com/pkg/errors",

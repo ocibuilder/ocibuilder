@@ -22,8 +22,8 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/blackrock/ocibuilder/common"
-	"github.com/blackrock/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/creack/pty"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
