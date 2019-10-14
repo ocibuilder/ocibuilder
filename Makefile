@@ -1,5 +1,5 @@
 
-PACKAGE=github.com/blackrock/ocibuilder/provenance
+PACKAGE=github.com/ocibuilder/ocibuilder/provenance
 CURRENT_DIR=$(shell pwd)
 DIST_DIR=${CURRENT_DIR}/dist
 
@@ -14,7 +14,7 @@ override LDFLAGS += \
 
 # docker image publishing options
 DOCKER_PUSH?=true
-IMAGE_NAMESPACE?=blackrock
+IMAGE_NAMESPACE?=ocibuilder
 IMAGE_TAG?=v1.0.0
 
 ifeq (${DOCKER_PUSH},true)
@@ -46,8 +46,8 @@ ocibuilder-linux:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 make ocibuilder
 
 ocibuilder-image: ocibuilder-linux
-	docker build -t $(IMAGE_PREFIX)db_config_sync:$(IMAGE_TAG) -f Dockerfile .
-	@if [ "$(DOCKER_PUSH)" = "true" ] ; then  docker push $(IMAGE_PREFIX)db_config_sync:$(IMAGE_TAG) ; fi
+	docker build -t $(IMAGE_PREFIX)ocibuilder:$(IMAGE_TAG) -f Dockerfile .
+	@if [ "$(DOCKER_PUSH)" = "true" ] ; then  docker push $(IMAGE_PREFIX)ocibuilder:$(IMAGE_TAG) ; fi
 
 test:
 	go test $(shell go list ./... | grep -v /vendor/ | grep -v /test/e2e/) -race -short -v

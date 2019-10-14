@@ -18,9 +18,9 @@ limitations under the License.
 package fake
 
 import (
-	clientset "github.com/blackrock/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
-	blackrockv1alpha1 "github.com/blackrock/ocibuilder/pkg/client/ocibuilder/clientset/versioned/typed/ocibuilder/v1alpha1"
-	fakeblackrockv1alpha1 "github.com/blackrock/ocibuilder/pkg/client/ocibuilder/clientset/versioned/typed/ocibuilder/v1alpha1/fake"
+	clientset "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
+	ocibuilderv1alpha1 "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned/typed/ocibuilder/v1alpha1"
+	fakeocibuilderv1alpha1 "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned/typed/ocibuilder/v1alpha1/fake"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"
@@ -75,7 +75,7 @@ func (c *Clientset) Tracker() testing.ObjectTracker {
 
 var _ clientset.Interface = &Clientset{}
 
-// BlackrockV1alpha1 retrieves the BlackrockV1alpha1Client
-func (c *Clientset) BlackrockV1alpha1() blackrockv1alpha1.BlackrockV1alpha1Interface {
-	return &fakeblackrockv1alpha1.FakeBlackrockV1alpha1{Fake: &c.Fake}
+// OcibuilderV1alpha1 retrieves the OcibuilderV1alpha1Client
+func (c *Clientset) OcibuilderV1alpha1() ocibuilderv1alpha1.OcibuilderV1alpha1Interface {
+	return &fakeocibuilderv1alpha1.FakeOcibuilderV1alpha1{Fake: &c.Fake}
 }

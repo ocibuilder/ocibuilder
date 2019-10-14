@@ -18,28 +18,27 @@ limitations under the License.
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/blackrock/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/blackrock/ocibuilder/pkg/client/ocibuilder/clientset/versioned/scheme"
-	"k8s.io/apimachinery/pkg/runtime/serializer"
-	rest "k8s.io/client-go/rest"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned/scheme"
+	"k8s.io/client-go/rest"
 )
 
-type BlackrockV1alpha1Interface interface {
+type OcibuilderV1alpha1Interface interface {
 	RESTClient() rest.Interface
 	OCIBuildersGetter
 }
 
-// BlackrockV1alpha1Client is used to interact with features provided by the blackrock.com group.
-type BlackrockV1alpha1Client struct {
+// OcibuilderV1alpha1Client is used to interact with features provided by the ocibuilder.com group.
+type OcibuilderV1alpha1Client struct {
 	restClient rest.Interface
 }
 
-func (c *BlackrockV1alpha1Client) OCIBuilders(namespace string) OCIBuilderInterface {
+func (c *OcibuilderV1alpha1Client) OCIBuilders(namespace string) OCIBuilderInterface {
 	return newOCIBuilders(c, namespace)
 }
 
-// NewForConfig creates a new BlackrockV1alpha1Client for the given config.
-func NewForConfig(c *rest.Config) (*BlackrockV1alpha1Client, error) {
+// NewForConfig creates a new OcibuilderV1alpha1Client for the given config.
+func NewForConfig(c *rest.Config) (*OcibuilderV1alpha1Client, error) {
 	config := *c
 	if err := setConfigDefaults(&config); err != nil {
 		return nil, err
@@ -48,12 +47,12 @@ func NewForConfig(c *rest.Config) (*BlackrockV1alpha1Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &BlackrockV1alpha1Client{client}, nil
+	return &OcibuilderV1alpha1Client{client}, nil
 }
 
-// NewForConfigOrDie creates a new BlackrockV1alpha1Client for the given config and
+// NewForConfigOrDie creates a new OcibuilderV1alpha1Client for the given config and
 // panics if there is an error in the config.
-func NewForConfigOrDie(c *rest.Config) *BlackrockV1alpha1Client {
+func NewForConfigOrDie(c *rest.Config) *OcibuilderV1alpha1Client {
 	client, err := NewForConfig(c)
 	if err != nil {
 		panic(err)
@@ -61,16 +60,16 @@ func NewForConfigOrDie(c *rest.Config) *BlackrockV1alpha1Client {
 	return client
 }
 
-// New creates a new BlackrockV1alpha1Client for the given RESTClient.
-func New(c rest.Interface) *BlackrockV1alpha1Client {
-	return &BlackrockV1alpha1Client{c}
+// New creates a new OcibuilderV1alpha1Client for the given RESTClient.
+func New(c rest.Interface) *OcibuilderV1alpha1Client {
+	return &OcibuilderV1alpha1Client{c}
 }
 
 func setConfigDefaults(config *rest.Config) error {
 	gv := v1alpha1.SchemeGroupVersion
 	config.GroupVersion = &gv
 	config.APIPath = "/apis"
-	config.NegotiatedSerializer = serializer.DirectCodecFactory{CodecFactory: scheme.Codecs}
+	config.NegotiatedSerializer = scheme.Codecs.WithoutConversion()
 
 	if config.UserAgent == "" {
 		config.UserAgent = rest.DefaultKubernetesUserAgent()
@@ -81,7 +80,7 @@ func setConfigDefaults(config *rest.Config) error {
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *BlackrockV1alpha1Client) RESTClient() rest.Interface {
+func (c *OcibuilderV1alpha1Client) RESTClient() rest.Interface {
 	if c == nil {
 		return nil
 	}

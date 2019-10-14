@@ -17,8 +17,8 @@ limitations under the License.
 package common
 
 import (
-	"github.com/blackrock/ocibuilder/common/context"
-	"github.com/blackrock/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/common/context"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/pkg/errors"
 	"os"
 )

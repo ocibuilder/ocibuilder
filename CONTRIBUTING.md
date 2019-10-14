@@ -34,7 +34,7 @@ In general, this project follows Go project conventions, please read the [Contri
 
 ### Download and Install
 
-- Clone the project under `$GOPATH/src/github.com/blackrock/ocibuilder/`
+- Clone the project under `$GOPATH/src/github.com/ocibuilder/ocibuilder/`
 - Run `dep ensure --vendor-only` or `dep ensure -v` to install package dependencies
 - Build ctl binary using `make ocictl`, this will create `ocictl` cmd under `dist/`. Similarly, `make ocibuilder` will create package level binary.
 

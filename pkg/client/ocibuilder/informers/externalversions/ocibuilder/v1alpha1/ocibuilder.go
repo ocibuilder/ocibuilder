@@ -18,16 +18,16 @@ limitations under the License.
 package v1alpha1
 
 import (
-	time "time"
+	"time"
 
-	ocibuilderv1alpha1 "github.com/blackrock/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	versioned "github.com/blackrock/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
-	internalinterfaces "github.com/blackrock/ocibuilder/pkg/client/ocibuilder/informers/externalversions/internalinterfaces"
-	v1alpha1 "github.com/blackrock/ocibuilder/pkg/client/ocibuilder/listers/ocibuilder/v1alpha1"
+	ocibuilderv1alpha1 "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
+	"github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/informers/externalversions/internalinterfaces"
+	"github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/listers/ocibuilder/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
-	watch "k8s.io/apimachinery/pkg/watch"
-	cache "k8s.io/client-go/tools/cache"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/watch"
+	"k8s.io/client-go/tools/cache"
 )
 
 // OCIBuilderInformer provides access to a shared informer and lister for
@@ -60,13 +60,13 @@ func NewFilteredOCIBuilderInformer(client versioned.Interface, namespace string,
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.BlackrockV1alpha1().OCIBuilders(namespace).List(options)
+				return client.OcibuilderV1alpha1().OCIBuilders(namespace).List(options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.BlackrockV1alpha1().OCIBuilders(namespace).Watch(options)
+				return client.OcibuilderV1alpha1().OCIBuilders(namespace).Watch(options)
 			},
 		},
 		&ocibuilderv1alpha1.OCIBuilder{},

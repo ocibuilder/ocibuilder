@@ -20,11 +20,11 @@ import (
 	"errors"
 	"io"
 
-	"github.com/blackrock/ocibuilder/common"
-	"github.com/blackrock/ocibuilder/ocictl/pkg/utils"
-	"github.com/blackrock/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/blackrock/ocibuilder/pkg/buildah"
-	"github.com/blackrock/ocibuilder/pkg/docker"
+	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/ocictl/pkg/utils"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/buildah"
+	"github.com/ocibuilder/ocibuilder/pkg/docker"
 	"github.com/docker/docker/client"
 	"github.com/spf13/cobra"
 )

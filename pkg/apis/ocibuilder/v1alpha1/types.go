@@ -16,11 +16,10 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"io"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/blackrock/ocibuilder/common/context"
+	"github.com/ocibuilder/ocibuilder/common/context"
 )
 
 // Type of build framework
@@ -44,11 +43,6 @@ const (
 	DockerFramework  Framework = "docker"
 	BuildahFramework Framework = "buildah"
 )
-
-// ImageBuildResponse the response from the image build command
-type ImageBuildResponse struct {
-	Body io.ReadCloser
-}
 
 const (
 	AnsiblePath       string = "ansible"
@@ -126,7 +120,7 @@ type BuildSpec struct {
 type BuildTemplate struct {
 	// Name of the template
 	Name string `json:"name" protobuf:"bytes,1,name=name"`
-	// Steps are instructions within a template to build a Dockerfile
+	// List of cmds in a Dockerfile
 	Cmd []BuildTemplateStep `json:"cmd" protobuf:"bytes,2,rep,name=steps"`
 }
 
@@ -342,24 +336,24 @@ type ImageBuildArgs struct {
 type ImageContext struct {
 	// Local context contains local context information for a build
 	LocalContext *context.LocalContext `json:"localContext" protobuf:"bytes,1,opt,name=localContext"`
-	S3Context *context.S3Context       `json:"s3Context" protobuf:"bytes,2,opt,name=s3Context"`
-	GitContext *context.GitContext     `json:"gitContext" protobuf:"bytes,3,opt,name=gitContext"`
+	S3Context    *context.S3Context    `json:"s3Context" protobuf:"bytes,2,opt,name=s3Context"`
+	GitContext   *context.GitContext   `json:"gitContext" protobuf:"bytes,3,opt,name=gitContext"`
 }
 
 // Represents a single line in a Dockerfile
 type Command struct {
 	// Cmd lowercased command name (e.g `from`)
-	Cmd string
+	Cmd string `json:"cmd" protobuf:"bytes,1,opt,name=cmd"`
 	// SubCmd for ONBUILD only this holds the sub-command
-	SubCmd string
+	SubCmd string `json:"subCmd" protobuf:"bytes,2,opt,name=subCmd"`
 	// Json bool for whether the value is written in json
-	Json bool
+	Json bool `json:"json" protobuf:"bytes,3,opt,name=json"`
 	// Original is the original source line
-	Original string
+	Original string `json:"original" protobuf:"bytes,4,opt,name=original"`
 	// StartLine is the original source line number
-	StartLine int
+	StartLine int `json:"startLine" protobuf:"bytes,5,opt,name=startLine"`
 	// Flags such as `--from=...` for `COPY`.
-	Flags []string
+	Flags []string `json:"flags" protobuf:"bytes,6,opt,name=flags"`
 	// Value is the contents of the command (e.g `ubuntu:xenial`)
-	Value []string
+	Value []string `json:"value" protobuf:"bytes,7,opt,name=value"`
 }
