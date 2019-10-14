@@ -18,7 +18,7 @@ limitations under the License.
 package fake
 
 import (
-	blackrockv1alpha1 "github.com/blackrock/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	blackrockv1alpha1 "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"

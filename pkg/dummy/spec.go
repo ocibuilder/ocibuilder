@@ -16,7 +16,7 @@ limitations under the License.
 
 package dummy
 
-import "github.com/blackrock/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+import "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 
 var Spec = v1alpha1.OCIBuilderSpec{
 	Build: BuildSpec,

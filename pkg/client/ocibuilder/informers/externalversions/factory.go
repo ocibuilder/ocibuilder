@@ -22,9 +22,9 @@ import (
 	sync "sync"
 	time "time"
 
-	versioned "github.com/blackrock/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
-	internalinterfaces "github.com/blackrock/ocibuilder/pkg/client/ocibuilder/informers/externalversions/internalinterfaces"
-	ocibuilder "github.com/blackrock/ocibuilder/pkg/client/ocibuilder/informers/externalversions/ocibuilder"
+	versioned "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
+	internalinterfaces "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/informers/externalversions/internalinterfaces"
+	ocibuilder "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/informers/externalversions/ocibuilder"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"

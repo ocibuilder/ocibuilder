@@ -20,10 +20,10 @@ package v1alpha1
 import (
 	time "time"
 
-	ocibuilderv1alpha1 "github.com/blackrock/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	versioned "github.com/blackrock/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
-	internalinterfaces "github.com/blackrock/ocibuilder/pkg/client/ocibuilder/informers/externalversions/internalinterfaces"
-	v1alpha1 "github.com/blackrock/ocibuilder/pkg/client/ocibuilder/listers/ocibuilder/v1alpha1"
+	ocibuilderv1alpha1 "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	versioned "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
+	internalinterfaces "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/informers/externalversions/internalinterfaces"
+	v1alpha1 "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/listers/ocibuilder/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"

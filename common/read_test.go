@@ -21,7 +21,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/blackrock/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -55,6 +55,7 @@ func TestApplyParams(t *testing.T) {
 func TestApplyParamsEnvVariable(t *testing.T) {
 	spec := v1alpha1.OCIBuilderSpec{}
 	file, err := ioutil.ReadFile("../testing/spec_read_test.yaml")
+	assert.Equal(t, nil, err)
 
 	spec.Login = loginSpec
 	spec.Params = paramsEnv
@@ -67,9 +68,8 @@ func TestApplyParamsEnvVariable(t *testing.T) {
 		Password: "test_env_pass",
 	}
 
-	assert.Equal(t, nil, err)
 	err = applyParams(file, &spec)
-
+	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedLoginEnv, spec.Login[0].Creds.Env)
 
 	os.Remove("$TEST_USERNAME")

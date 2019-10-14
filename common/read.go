@@ -23,7 +23,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/blackrock/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
 	"github.com/tidwall/sjson"

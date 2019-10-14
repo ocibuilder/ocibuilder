@@ -20,7 +20,7 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/blackrock/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/gobuffalo/packr"
 	"github.com/spf13/cobra"
 )

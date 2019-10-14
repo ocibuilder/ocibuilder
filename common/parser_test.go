@@ -21,8 +21,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/blackrock/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ghodss/yaml"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -48,11 +48,17 @@ func TestGenerateDockerfile(t *testing.T) {
 				Path: "../testing/commands_basic_parser_test.txt",
 			},
 		},
-	}}}
+		}}}
 
 	buildSpecification := v1alpha1.BuildSpec{}
-	yaml.Unmarshal(file, &buildSpecification)
+
+	if err := yaml.Unmarshal(file, &buildSpecification); err != nil {
+		assert.Fail(t, "fail unmarshalling build spec")
+	}
+
 	path, err := GenerateDockerfile(buildSpecification.Steps[0], templates, "")
+	assert.Equal(t, nil, err)
+
 	defer os.Remove(path)
 
 	dockerfile, err := ioutil.ReadFile(path)
@@ -79,7 +85,10 @@ func TestGenerateDockerfileInline(t *testing.T) {
 	}}
 
 	buildSpecification := v1alpha1.BuildSpec{}
-	yaml.Unmarshal(file, &buildSpecification)
+
+	if err := yaml.Unmarshal(file, &buildSpecification); err != nil {
+		assert.Fail(t, "fail unmarshalling build spec")
+	}
 
 	path, err := GenerateDockerfile(buildSpecification.Steps[0], template, "")
 	assert.Equal(t, nil, err)

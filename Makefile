@@ -1,5 +1,5 @@
 
-PACKAGE=github.com/blackrock/ocibuilder/provenance
+PACKAGE=github.com/ocibuilder/ocibuilder/provenance
 CURRENT_DIR=$(shell pwd)
 DIST_DIR=${CURRENT_DIR}/dist
 
@@ -37,7 +37,10 @@ ocictl:
 	packr build -v -ldflags '${LDFLAGS}' -o ${DIST_DIR}/ocictl ${CURRENT_DIR}/ocictl/main.go
 
 ocictl-linux:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 packr build -v -ldflags '${LDFLAGS}' -o ${DIST_DIR}/ocictl ${CURRENT_DIR}/ocictl/main.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 packr build -v -ldflags '${LDFLAGS}' -o ${DIST_DIR}/ocictl-linux-${VERSION} ${CURRENT_DIR}/ocictl/main.go
+
+ocictl-mac:
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 packr build -v -ldflags '${LDFLAGS}' -o ${DIST_DIR}/ocictl-mac-${VERSION} ${CURRENT_DIR}/ocictl/main.go
 
 ocibuilder-linux:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 make ocibuilder
