@@ -18,6 +18,12 @@ jobs:
       - checkout
       - run: mkdir -p $TEST_RESULTS
       - run:
+          name: Install dependencies
+          command: |
+            apk update && apk add curl git build-base bash
+            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+            dep ensure
+      - run:
           name: Run unit tests
           command: make test
 # build_linux runs the build of the linux ocictl artifact and persists the binary to the circleci workspace
