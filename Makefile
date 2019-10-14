@@ -14,7 +14,7 @@ override LDFLAGS += \
 
 # docker image publishing options
 DOCKER_PUSH?=true
-IMAGE_NAMESPACE?=blackrock
+IMAGE_NAMESPACE?=ocibuilder
 IMAGE_TAG?=v1.0.0
 
 ifeq (${DOCKER_PUSH},true)
