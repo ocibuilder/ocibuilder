@@ -27,6 +27,12 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install dependencies
+          command: |
+            apk update && apk add curl git build-base bash
+            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+            dep ensure
+      - run:
           name: Build Linux Artifact
           command: "make ocictl-linux"
       - persist_to_workspace:
@@ -39,7 +45,15 @@ jobs:
       - image: golang:1.13.1
     steps:
       - checkout
-      - run: make ocictl-mac
+      - run:
+          name: Install dependencies
+          command: |
+            apk update && apk add curl git build-base bash
+            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+            dep ensure
+      - run:
+          name: Build Mac Artifact
+          command: "make ocictl-mac"
       - persist_to_workspace:
           root: .
           paths:
