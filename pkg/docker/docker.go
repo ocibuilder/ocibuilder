@@ -27,17 +27,22 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/ocibuilder/ocibuilder/common"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
+	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/sirupsen/logrus"
 )
 
 // Docker is a struct which consists of an instance of logger, docker client and context path
 type Docker struct {
-	Logger      *logrus.Logger
-	Client      client.APIClient
+	Logger *logrus.Logger
+	Client client.APIClient
+}
+
+// ImageBuildResponse is the response from the image build command
+type ImageBuildResponse struct {
+	Body io.ReadCloser
 }
 
 // Build is used to execute docker build and optionally purge the image after the build
@@ -77,7 +82,6 @@ func (d Docker) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 			continue
 		}
 		buildResponses = append(buildResponses, buildResponse.Body)
-
 
 		if opt.Purge {
 			res, err := cli.ImageRemove(context.Background(), imageName, types.ImageRemoveOptions{})

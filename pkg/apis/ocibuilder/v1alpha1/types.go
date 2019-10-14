@@ -16,7 +16,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"io"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -44,11 +43,6 @@ const (
 	DockerFramework  Framework = "docker"
 	BuildahFramework Framework = "buildah"
 )
-
-// ImageBuildResponse is the response from the image build command
-type ImageBuildResponse struct {
-	Body io.ReadCloser
-}
 
 const (
 	AnsiblePath       string = "ansible"

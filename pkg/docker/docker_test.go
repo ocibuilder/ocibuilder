@@ -58,8 +58,8 @@ func TestDocker_Pull(t *testing.T) {
 	assert.Equal(t, nil, err)
 }
 
-func (t testClient) ImageBuild(ctx context.Context, context io.Reader, options types.ImageBuildOptions) (types.ImageBuildResponse, error) {
-	return types.ImageBuildResponse{
+func (t testClient) ImageBuild(ctx context.Context, context io.Reader, options types.ImageBuildOptions) (ImageBuildResponse, error) {
+	return ImageBuildResponse{
 		Body:   nil,
 		OSType: "",
 	}, nil
