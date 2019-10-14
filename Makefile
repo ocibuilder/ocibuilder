@@ -1,5 +1,5 @@
 
-PACKAGE=github.com/blackrock/ocibuilder/provenance
+PACKAGE=github.com/ocibuilder/ocibuilder/provenance
 CURRENT_DIR=$(shell pwd)
 DIST_DIR=${CURRENT_DIR}/dist
 

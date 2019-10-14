@@ -20,7 +20,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/blackrock/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/docker/pkg/term"
 )

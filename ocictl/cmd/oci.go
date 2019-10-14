@@ -17,7 +17,7 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/blackrock/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/spf13/cobra"
 )
 

@@ -28,7 +28,7 @@ here](./docs)
 Our specification file is documented [here](docs/spec/specification.md).
 
 ### Roadmap
-Take a look at our roadmap and features in developement [here](https://github.com/blackrock/ocibuilder/blob/master/ROADMAP.md)
+Take a look at our roadmap and features in developement [here](https://github.com/ocibuilder/ocibuilder/blob/master/ROADMAP.md)
 
 ### Contribute
 
@@ -36,7 +36,7 @@ Please read the [`CONTRIBUTING.md`](./CONTRIBUTING.md) for contributing guidelin
 
 ### License
 
-Apache License Version 2.0, see [`LICENSE`](https://github.com/blackrock/ocibuilder/blob/master/LICENSE)
+Apache License Version 2.0, see [`LICENSE`](https://github.com/ocibuilder/ocibuilder/blob/master/LICENSE)
 
 ### References
 

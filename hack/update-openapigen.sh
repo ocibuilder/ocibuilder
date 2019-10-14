@@ -11,6 +11,6 @@ VERSION="v1alpha1"
 # Sensor
 go run ${CODEGEN_PKG}/cmd/openapi-gen/main.go \
     --go-header-file ${PROJECT_ROOT}/hack/custom-boilerplate.go.txt \
-    --input-dirs github.com/blackrock/ocibuilder/pkg/apis/ocibuilder/${VERSION} \
-    --output-package /github.com/blackrock/ocibuilder/pkg/apis/ocibuilder/${VERSION} \
+    --input-dirs github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/${VERSION} \
+    --output-package /github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/${VERSION} \
     $@

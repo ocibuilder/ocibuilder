@@ -21,10 +21,10 @@ import (
 	"os/exec"
 	"testing"
 
-	"github.com/blackrock/ocibuilder/common"
-	"github.com/blackrock/ocibuilder/common/context"
-	"github.com/blackrock/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/blackrock/ocibuilder/pkg/dummy"
+	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/common/context"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/dummy"
 	"github.com/stretchr/testify/assert"
 )
 

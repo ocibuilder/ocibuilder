@@ -17,7 +17,7 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/blackrock/ocibuilder/provenance"
+	"github.com/ocibuilder/ocibuilder/provenance"
 	"github.com/spf13/cobra"
 	"io"
 )
