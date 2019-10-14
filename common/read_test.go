@@ -55,6 +55,7 @@ func TestApplyParams(t *testing.T) {
 func TestApplyParamsEnvVariable(t *testing.T) {
 	spec := v1alpha1.OCIBuilderSpec{}
 	file, err := ioutil.ReadFile("../testing/spec_read_test.yaml")
+	assert.Equal(t, nil, err)
 
 	spec.Login = loginSpec
 	spec.Params = paramsEnv
@@ -69,7 +70,7 @@ func TestApplyParamsEnvVariable(t *testing.T) {
 
 	assert.Equal(t, nil, err)
 	err = applyParams(file, &spec)
-
+	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedLoginEnv, spec.Login[0].Creds.Env)
 
 	os.Remove("$TEST_USERNAME")
