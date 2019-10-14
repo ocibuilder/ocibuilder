@@ -20,11 +20,11 @@ import (
 	"io"
 	"testing"
 
-	"github.com/ocibuilder/ocibuilder/common"
-	"github.com/ocibuilder/ocibuilder/pkg/dummy"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/client"
+	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/pkg/dummy"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 )
