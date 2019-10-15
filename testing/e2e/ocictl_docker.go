@@ -1,10 +1,11 @@
 package e2e
 
 import (
+	"os/exec"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
-	"os/exec"
 )
 
 var _ = Describe("ocictl docker", func() {
@@ -15,11 +16,19 @@ var _ = Describe("ocictl docker", func() {
 		session = runOcictl(ocictlPath)
 	})
 
+	AfterEach(func() {
+		gexec.CleanupBuildArtifacts()
+	})
+
+	It("exits with status code 0", func() {
+		Eventually(session).Should(gexec.Exit(0))
+	})
+
 })
 
 
 func buildOcictl() string {
-	ocictlPath, err := gexec.Build("github.com/ocibuilder/ocictl")
+	ocictlPath, err := gexec.Build("github.com/ocibuilder/ocibuilder/ocictl")
 	Expect(err).NotTo(HaveOccurred())
 
 	return ocictlPath
