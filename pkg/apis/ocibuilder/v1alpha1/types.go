@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package v1alpha1
 
 import (
@@ -22,7 +23,7 @@ import (
 	"github.com/ocibuilder/ocibuilder/common/context"
 )
 
-// Type of build framework
+// Daemon is the type of build framework
 type Daemon bool
 
 // NodePhase is the label for the condition of a node.
@@ -40,12 +41,16 @@ const (
 type Framework string
 
 const (
-	DockerFramework  Framework = "docker"
+	// DockerFramework is the type of docker framework
+	DockerFramework Framework = "docker"
+	// BuildahFramework is the type of buildah framework
 	BuildahFramework Framework = "buildah"
 )
 
 const (
-	AnsiblePath       string = "ansible"
+	// AnsiblePath is the path for ansible module
+	AnsiblePath string = "ansible"
+	// AnsibleGalaxyPath is the path of ansible galaxy
 	AnsibleGalaxyPath string = "ansible-galaxy"
 )
 
@@ -197,8 +202,9 @@ type BuildStep struct {
 	Context ImageContext `json:"imageContext,omitempty" protobuf:"bytes,9,opt,name=imageContext"`
 }
 
-// Stages
+// Stage represents a stage within the build
 type Stage struct {
+	// Metadata refers to metadata of the build stage
 	*Metadata `json:"metadata,inline" protobuf:"bytes,1,name=metadata"`
 	// BaseImage refers to parent image for given build stage.
 	Base Base `json:"base" protobuf:"bytes,2,name=base"`
@@ -208,7 +214,7 @@ type Stage struct {
 	Cmd []BuildTemplateStep `json:"cmd" protobuf:"bytes,4,name=cmd"`
 }
 
-// Base
+// Base represents base image details
 type Base struct {
 	Image string `json:"image" protobuf:"bytes,1,name=image"`
 	// Tag is the tag for the image
@@ -219,7 +225,7 @@ type Base struct {
 	Platform string `json:"platform,omitempty" protobuf:"bytes,3,name=platform"`
 }
 
-// Metadata
+// Metadata represents data about a build step
 type Metadata struct {
 	// Name of the build step
 	Name string `json:"name" protobuf:"bytes,1,name=name"`
@@ -266,7 +272,7 @@ type EnvCreds struct {
 	Password string `json:"password" protobuf:"bytes,2,name=password"`
 }
 
-// Plain refers to the credentials set inline
+// PlainCreds refers to the credentials set inline
 type PlainCreds struct {
 	Username string `json:"username" protobuf:"bytes,1,name=username"`
 	Password string `json:"password"`
@@ -340,14 +346,14 @@ type ImageContext struct {
 	GitContext   *context.GitContext   `json:"gitContext" protobuf:"bytes,3,opt,name=gitContext"`
 }
 
-// Represents a single line in a Dockerfile
+// Command Represents a single line in a Dockerfile
 type Command struct {
 	// Cmd lowercased command name (e.g `from`)
 	Cmd string `json:"cmd" protobuf:"bytes,1,opt,name=cmd"`
 	// SubCmd for ONBUILD only this holds the sub-command
 	SubCmd string `json:"subCmd" protobuf:"bytes,2,opt,name=subCmd"`
 	// Json bool for whether the value is written in json
-	Json bool `json:"json" protobuf:"bytes,3,opt,name=json"`
+	IsJSON bool `json:"isJSON" protobuf:"bytes,3,opt,name=isJSON"`
 	// Original is the original source line
 	Original string `json:"original" protobuf:"bytes,4,opt,name=original"`
 	// StartLine is the original source line number
