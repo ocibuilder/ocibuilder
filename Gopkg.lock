@@ -1159,6 +1159,7 @@
     "cmd/client-gen/generators/util",
     "cmd/client-gen/path",
     "cmd/client-gen/types",
+    "cmd/openapi-gen",
     "pkg/namer",
     "pkg/util",
   ]

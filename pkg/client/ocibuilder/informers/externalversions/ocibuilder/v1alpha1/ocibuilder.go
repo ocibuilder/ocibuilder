@@ -18,16 +18,16 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"time"
+	time "time"
 
 	ocibuilderv1alpha1 "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
-	"github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/informers/externalversions/internalinterfaces"
-	"github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/listers/ocibuilder/v1alpha1"
+	versioned "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
+	internalinterfaces "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/informers/externalversions/internalinterfaces"
+	v1alpha1 "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/listers/ocibuilder/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/watch"
-	"k8s.io/client-go/tools/cache"
+	runtime "k8s.io/apimachinery/pkg/runtime"
+	watch "k8s.io/apimachinery/pkg/watch"
+	cache "k8s.io/client-go/tools/cache"
 )
 
 // OCIBuilderInformer provides access to a shared informer and lister for
