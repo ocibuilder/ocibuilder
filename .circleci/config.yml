@@ -1,4 +1,6 @@
 version: 2
+orbs:
+  codecov: codecov/codecov@1.0.2
 jobs:
   # lint is the initial job which lints the codebase using standard golangci-lint linter
   lint:
@@ -26,8 +28,6 @@ jobs:
       - run: golangci-lint run
   # test runs the ocibuilder unit tests and stores test results in TEMP_RESULTS
   test:
-    environment:
-      - TEST_RESULTS: /tmp/test-results
     docker:
       - image: golang:1.13.1
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
@@ -37,10 +37,11 @@ jobs:
           keys:
             - go-dep-cache-{{ checksum "Gopkg.lock" }}
             - go-dep-cache-
-      - run: mkdir -p $TEST_RESULTS
       - run:
           name: Run unit tests
           command: make test
+      - codecov/upload:
+          file: ./coverage.text
   # build_linux runs the build of the linux ocictl artifact and persists the binary to the circleci workspace
   build_linux:
     docker:

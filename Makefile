@@ -50,7 +50,7 @@ ocibuilder-image: ocibuilder-linux
 	@if [ "$(DOCKER_PUSH)" = "true" ] ; then  docker push $(IMAGE_PREFIX)ocibuilder:$(IMAGE_TAG) ; fi
 
 test:
-	go test $(shell go list ./... | grep -v /vendor/ | grep -v /test/e2e/) -race -short -v
+	go test $(shell go list ./... | grep -v /vendor/ | grep -v /test/e2e/) -race -short -v -coverprofile=coverage.text
 
 clean:
 	-rm -rf ${CURRENT_DIR}/dist
