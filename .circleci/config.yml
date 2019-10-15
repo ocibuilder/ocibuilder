@@ -1,6 +1,4 @@
-version: 2.1
-orbs:
-  codecov: codecov/codecov@1.0.2
+version: 2
 jobs:
   # lint is the initial job which lints the codebase using standard golangci-lint linter
   lint:
@@ -40,8 +38,6 @@ jobs:
       - run:
           name: Run unit tests
           command: make test
-      - codecov/upload:
-          file: ./coverage.text
   # build_linux runs the build of the linux ocictl artifact and persists the binary to the circleci workspace
   build_linux:
     docker:
