@@ -7,6 +7,10 @@ jobs:
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - go-dep-cache-{ checksum "Gopkg.toml" }
+            - go-dep-cache-
       - run:
           name: Install dependencies
           command: |
@@ -15,7 +19,7 @@ jobs:
             dep version
             dep ensure
       - save_cache:
-          key: dep-cache
+          key: go-dep-cache-{ checksum "Gopkg.toml" }
           paths:
             - ./vendor
       - run: curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.19.0
@@ -31,7 +35,8 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - dep-cache
+            - go-dep-cache-{ checksum "Gopkg.toml" }
+            - go-dep-cache-
       - run: mkdir -p $TEST_RESULTS
       - run:
           name: Run unit tests
@@ -45,7 +50,8 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - dep-cache
+            - go-dep-cache-{ checksum "Gopkg.toml" }
+            - go-dep-cache-
       - run: go get -u github.com/gobuffalo/packr/packr
       - run:
           name: Build Linux Artifact
@@ -63,7 +69,8 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - dep-cache
+            - go-dep-cache-{ checksum "Gopkg.toml" }
+            - go-dep-cache-
       - run: go get -u github.com/gobuffalo/packr/packr
       - run:
           name: Build Mac Artifact
