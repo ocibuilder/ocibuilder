@@ -70,21 +70,25 @@ type OCIBuilder struct {
 type OCIBuilderList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata" protobuf:"bytes,1,name=metadata"`
-	Items           []OCIBuilder `json:"items" protobuf:"bytes,2,name=items"`
+	// +listType=map
+	Items []OCIBuilder `json:"items" protobuf:"bytes,2,name=items"`
 }
 
 // OCIBuilderSpec represents OCIBuilder specifications.
 type OCIBuilderSpec struct {
 	// Envs are the list of environment variables available to components.
 	// +optional
+	// +listType=map
 	Params []Param `json:"params,omitempty" protobuf:"bytes,1,opt,name=params"`
 	// Logins holds information to log into one or more registries
+	// +listType=map
 	Login []LoginSpec `json:"login,omitempty" protobuf:"bytes,2,opt,name=login"`
 	// Build represents the build specifications for images
 	// +optional
 	Build *BuildSpec `json:"build,omitempty" protobuf:"bytes,3,name=build"`
 	// Push contains specification to push images to registries
 	// +optional
+	// +listType=map
 	Push []PushSpec `json:"push,omitempty" protobuf:"bytes,4,name=push"`
 }
 
@@ -113,11 +117,13 @@ type Param struct {
 	ValueFromEnvVariable string `json:"valueFromEnv,omitempty" protobuf:"bytes,3,opt,name=valueFromEnv"`
 }
 
-// BuildSpec represent the build specifications for images
+// BuildSpec represents the build specifications for images
 type BuildSpec struct {
 	// Templates are set of build templates that describe steps needed to build a Dockerfile
+	// +listType=map
 	Templates []BuildTemplate `json:"templates" protobuf:"bytes,1,rep,name=templates"`
 	// Steps within a build
+	// +listType=map
 	Steps []BuildStep `json:"steps" protobuf:"bytes,2,rep,name=steps"`
 }
 
@@ -126,6 +132,7 @@ type BuildTemplate struct {
 	// Name of the template
 	Name string `json:"name" protobuf:"bytes,1,name=name"`
 	// List of cmds in a Dockerfile
+	// +listType=
 	Cmd []BuildTemplateStep `json:"cmd" protobuf:"bytes,2,rep,name=steps"`
 }
 
@@ -141,6 +148,7 @@ type BuildTemplateStep struct {
 type DockerStep struct {
 	// Inline Dockerfile commands
 	// +optional
+	// +listType=map
 	Inline []string `json:"inline,omitempty" protobuf:"bytes,1,opt,name=inline"`
 	// Path to a file that contains Dockerfile commands
 	// +optional
@@ -179,6 +187,7 @@ type BuildStep struct {
 	// +optional
 	Daemon Daemon `json:"daemon,omitempty" protobuf:"bytes,2,opt,name=daemon"`
 	// Stages of the build
+	// +listType=map
 	Stages []Stage `json:"stages" protobuf:"bytes,3,opt,name=purge"`
 	// Git url to fetch the project from.
 	// +optional
@@ -199,6 +208,7 @@ type BuildStep struct {
 	// Context used for image build
 	// default looks at the current working directory
 	// +optional
+	// +listType=map
 	Context ImageContext `json:"imageContext,omitempty" protobuf:"bytes,9,opt,name=imageContext"`
 }
 
@@ -211,6 +221,7 @@ type Stage struct {
 	// Template refers to one of the build templates.
 	Template string `json:"template" protobuf:"bytes,3,name=template"`
 	// Cmd refers to a template defined in a stage without a template.
+	// +listType=map
 	Cmd []BuildTemplateStep `json:"cmd" protobuf:"bytes,4,name=cmd"`
 }
 
@@ -359,7 +370,9 @@ type Command struct {
 	// StartLine is the original source line number
 	StartLine int `json:"startLine" protobuf:"bytes,5,opt,name=startLine"`
 	// Flags such as `--from=...` for `COPY`.
+	// +listType=map
 	Flags []string `json:"flags" protobuf:"bytes,6,opt,name=flags"`
 	// Value is the contents of the command (e.g `ubuntu:xenial`)
+	// +listType=map
 	Value []string `json:"value" protobuf:"bytes,7,opt,name=value"`
 }

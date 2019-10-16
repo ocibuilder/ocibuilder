@@ -171,10 +171,15 @@ func schema_pkg_apis_ocibuilder_v1alpha1_BuildSpec(ref common.ReferenceCallback)
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "BuildSpec represent the build specifications for images",
+				Description: "BuildSpec represents the build specifications for images",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"templates": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "map",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "Templates are set of build templates that describe steps needed to build a Dockerfile",
 							Type:        []string{"array"},
@@ -188,6 +193,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_BuildSpec(ref common.ReferenceCallback)
 						},
 					},
 					"steps": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "map",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "Steps within a build",
 							Type:        []string{"array"},
@@ -224,6 +234,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_BuildStep(ref common.ReferenceCallback)
 						},
 					},
 					"stages": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "map",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "Stages of the build",
 							Type:        []string{"array"},
@@ -272,6 +287,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_BuildStep(ref common.ReferenceCallback)
 						},
 					},
 					"imageContext": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "map",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "Context used for image build default looks at the current working directory",
 							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.ImageContext"),
@@ -301,6 +321,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_BuildTemplate(ref common.ReferenceCallb
 						},
 					},
 					"cmd": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "List of cmds in a Dockerfile",
 							Type:        []string{"array"},
@@ -392,6 +417,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_Command(ref common.ReferenceCallback) c
 						},
 					},
 					"flags": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "map",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "Flags such as `--from=...` for `COPY`.",
 							Type:        []string{"array"},
@@ -406,6 +436,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_Command(ref common.ReferenceCallback) c
 						},
 					},
 					"value": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "map",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "Value is the contents of the command (e.g `ubuntu:xenial`)",
 							Type:        []string{"array"},
@@ -434,6 +469,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_DockerStep(ref common.ReferenceCallback
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"inline": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "map",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "Inline Dockerfile commands",
 							Type:        []string{"array"},
@@ -982,6 +1022,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderList(ref common.ReferenceCall
 						},
 					},
 					"items": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "map",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Type: []string{"array"},
 							Items: &spec.SchemaOrArray{
@@ -1010,6 +1055,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderSpec(ref common.ReferenceCall
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"params": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "map",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "Envs are the list of environment variables available to components.",
 							Type:        []string{"array"},
@@ -1023,6 +1073,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderSpec(ref common.ReferenceCall
 						},
 					},
 					"login": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "map",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "Logins holds information to log into one or more registries",
 							Type:        []string{"array"},
@@ -1042,6 +1097,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderSpec(ref common.ReferenceCall
 						},
 					},
 					"push": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "map",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "Push contains specification to push images to registries",
 							Type:        []string{"array"},
@@ -1283,6 +1343,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_Stage(ref common.ReferenceCallback) com
 						},
 					},
 					"cmd": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "map",
+							},
+						},
 						SchemaProps: spec.SchemaProps{
 							Description: "Cmd refers to a template defined in a stage without a template.",
 							Type:        []string{"array"},
