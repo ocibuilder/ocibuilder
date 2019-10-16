@@ -286,12 +286,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_BuildStep(ref common.ReferenceCallback)
 							Format:      "",
 						},
 					},
-					"imageContext": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "map",
-							},
-						},
+					"context": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Context used for image build default looks at the current working directory",
 							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.ImageContext"),
@@ -623,20 +618,20 @@ func schema_pkg_apis_ocibuilder_v1alpha1_K8sCreds(ref common.ReferenceCallback) 
 				Description: "K8sCreds refers to the K8s secret that holds the registry creds.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"Username": {
+					"username": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Username refers to the K8s secret that holds username",
 							Ref:         ref("k8s.io/api/core/v1.SecretKeySelector"),
 						},
 					},
-					"Password": {
+					"password": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Password refers to the K8s secret that holds password",
 							Ref:         ref("k8s.io/api/core/v1.SecretKeySelector"),
 						},
 					},
 				},
-				Required: []string{"Username", "Password"},
+				Required: []string{"username", "password"},
 			},
 		},
 		Dependencies: []string{
@@ -1193,7 +1188,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_Param(ref common.ReferenceCallback) com
 							Format:      "",
 						},
 					},
-					"valueFromEnv": {
+					"valueFromEnvVariable": {
 						SchemaProps: spec.SchemaProps{
 							Description: "ValueFromEnvVar is a variable which is to be replaced by an env var",
 							Type:        []string{"string"},

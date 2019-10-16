@@ -114,7 +114,7 @@ type Param struct {
 	Dest string `json:"dest" protobuf:"bytes,2,opt,name=dest"`
 	// ValueFromEnvVar is a variable which is to be replaced by an env var
 	// +optional
-	ValueFromEnvVariable string `json:"valueFromEnv,omitempty" protobuf:"bytes,3,opt,name=valueFromEnv"`
+	ValueFromEnvVariable string `json:"valueFromEnvVariable,omitempty" protobuf:"bytes,3,opt,name=valueFromEnvVariable"`
 }
 
 // BuildSpec represents the build specifications for images
@@ -208,8 +208,7 @@ type BuildStep struct {
 	// Context used for image build
 	// default looks at the current working directory
 	// +optional
-	// +listType=map
-	Context ImageContext `json:"imageContext,omitempty" protobuf:"bytes,9,opt,name=imageContext"`
+	Context ImageContext `json:"context,omitempty" protobuf:"bytes,9,opt,name=context"`
 }
 
 // Stage represents a stage within the build
@@ -270,9 +269,9 @@ type RegistryCreds struct {
 // K8sCreds refers to the K8s secret that holds the registry creds.
 type K8sCreds struct {
 	// Username refers to the K8s secret that holds username
-	Username *corev1.SecretKeySelector
+	Username *corev1.SecretKeySelector `json:"username" protobuf:"bytes,1,name=username"`
 	// Password refers to the K8s secret that holds password
-	Password *corev1.SecretKeySelector
+	Password *corev1.SecretKeySelector `json:"password" protobuf:"bytes,2,name=password"`
 }
 
 // EnvCreds refers to credentials stored in env vars.
