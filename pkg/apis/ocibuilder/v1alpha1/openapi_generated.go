@@ -137,7 +137,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_Base(ref common.ReferenceCallback) comm
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Base",
+				Description: "Base represents base image details",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"image": {
@@ -353,7 +353,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_Command(ref common.ReferenceCallback) c
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Represents a single line in a Dockerfile",
+				Description: "Command Represents a single line in a Dockerfile",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"cmd": {
@@ -370,7 +370,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_Command(ref common.ReferenceCallback) c
 							Format:      "",
 						},
 					},
-					"json": {
+					"isJSON": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Json bool for whether the value is written in json",
 							Type:        []string{"boolean"},
@@ -420,7 +420,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_Command(ref common.ReferenceCallback) c
 						},
 					},
 				},
-				Required: []string{"cmd", "subCmd", "json", "original", "startLine", "flags", "value"},
+				Required: []string{"cmd", "subCmd", "isJSON", "original", "startLine", "flags", "value"},
 			},
 		},
 	}
@@ -643,7 +643,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_Metadata(ref common.ReferenceCallback) 
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Metadata",
+				Description: "Metadata represents data about a build step",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"name": {
@@ -1151,7 +1151,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_PlainCreds(ref common.ReferenceCallback
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Plain refers to the credentials set inline",
+				Description: "PlainCreds refers to the credentials set inline",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"username": {
@@ -1266,7 +1266,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_Stage(ref common.ReferenceCallback) com
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Stages",
+				Description: "Stage represents a stage within the build",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"base": {
