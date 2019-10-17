@@ -18,8 +18,8 @@ limitations under the License.
 package ocibuilder
 
 import (
-	"github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/informers/externalversions/internalinterfaces"
-	"github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/informers/externalversions/ocibuilder/v1alpha1"
+	internalinterfaces "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/informers/externalversions/internalinterfaces"
+	v1alpha1 "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/informers/externalversions/ocibuilder/v1alpha1"
 )
 
 // Interface provides access to each of this group's versions.

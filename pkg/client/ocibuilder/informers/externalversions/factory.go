@@ -18,17 +18,17 @@ limitations under the License.
 package externalversions
 
 import (
-	"reflect"
-	"sync"
-	"time"
+	reflect "reflect"
+	sync "sync"
+	time "time"
 
-	"github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
-	"github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/informers/externalversions/internalinterfaces"
-	"github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/informers/externalversions/ocibuilder"
+	versioned "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
+	internalinterfaces "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/informers/externalversions/internalinterfaces"
+	ocibuilder "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/informers/externalversions/ocibuilder"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/client-go/tools/cache"
+	runtime "k8s.io/apimachinery/pkg/runtime"
+	schema "k8s.io/apimachinery/pkg/runtime/schema"
+	cache "k8s.io/client-go/tools/cache"
 )
 
 // SharedInformerOption defines the functional option type for SharedInformerFactory.
