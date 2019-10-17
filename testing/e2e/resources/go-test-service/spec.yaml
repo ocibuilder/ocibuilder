@@ -1,0 +1,46 @@
+build:
+  templates:
+    - name: template-1
+      cmd:
+        - docker:
+            inline:
+              - ADD . /src
+              - RUN cd /src && go build -o goapp
+    - name: template-2
+      cmd:
+        - docker:
+            inline:
+              - WORKDIR /app
+              - COPY --from=build-env /src/goapp /app/
+              - ENTRYPOINT ./goapp
+  steps:
+    - metadata:
+        name: art/go-service
+        labels:
+          type: build-1
+          overlay: first-step
+      stages:
+        - metadata:
+            name: build-env
+            labels:
+              stage: stage-1
+              type: build-from-base
+          base:
+            image: golang
+            platform: alpine
+          template: template-1
+        - metadata:
+            name: alpine-stage
+            labels:
+              stage: stage-2
+              type: build-from-base
+          base:
+            image: alpine
+          template: template-2
+      tag: v0.1.0
+      distroless: false
+      cache: false
+      purge: false
+      imageContext:
+        localContext:
+          contextPath: ./resources/go-test-service
