@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"os"
 	"os/exec"
 
 	. "github.com/onsi/ginkgo"
@@ -18,6 +19,9 @@ var _ = Describe("ocictl docker", func() {
 
 	AfterEach(func() {
 		gexec.CleanupBuildArtifacts()
+		if _, err := os.Stat("./spec.yaml"); err == nil {
+			os.Remove("spec.yaml")
+		}
 	})
 
 	It("exits with status code 0", func() {
@@ -32,6 +36,20 @@ var _ = Describe("ocictl docker", func() {
 			return session
 		}, 5).Should(gexec.Exit(0))
 	}, 5)
+
+	It("completes an init and exits with status code 0", func() {
+		args := []string{"init"}
+		session = runOcictl(ocictlPath, args)
+		Eventually(func() *gexec.Session {
+			return session
+		}, 2).Should(gexec.Exit(0))
+	})
+
+	It("completes a version and exits with statue code 0", func() {
+		args := []string{"version"}
+		session = runOcictl(ocictlPath, args)
+		Eventually(session).Should(gexec.Exit(0))
+	}, 1)
 
 })
 

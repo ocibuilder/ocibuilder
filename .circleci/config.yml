@@ -25,7 +25,7 @@ jobs:
       - run: curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.19.0
       - run: golangci-lint run
   # test runs the ocibuilder unit tests and stores test results in TEMP_RESULTS
-  test:
+  unit_test:
     docker:
       - image: golang:1.13.1
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
@@ -38,6 +38,19 @@ jobs:
       - run:
           name: Run unit tests
           command: make test
+  e2e_docker:
+    docker:
+      - image: docker:stable
+    working_directory: /go/src/github.com/ocibuilder/ocibuilder
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - go-dep-cache-{{ checksum "Gopkg.lock" }}
+            - go-dep-cache-
+      - run:
+          name: Run e2e tests
+          command: echo "Running e2e"
   # build_linux runs the build of the linux ocictl artifact and persists the binary to the circleci workspace
   build_linux:
     docker:
@@ -127,12 +140,15 @@ workflows:
       - test:
           requires:
             - lint
+      - e2e_test_docker:
+          requires:
+            - test
       - build_linux:
           requires:
-            - test
+            - e2e_test_docker
       - build_mac:
           requires:
-            - test
+            - e2e_test_docker
       - push_bin:
           requires:
             - build_linux

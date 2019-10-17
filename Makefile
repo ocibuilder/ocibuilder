@@ -52,5 +52,8 @@ ocibuilder-image: ocibuilder-linux
 test:
 	go test $(shell go list ./... | grep -v /vendor/ | grep -v /test/e2e/) -race -short -v -coverprofile=coverage.text
 
+lint:
+	golangci-lint run
+
 clean:
 	-rm -rf ${CURRENT_DIR}/dist
