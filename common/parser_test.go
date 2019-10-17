@@ -51,8 +51,13 @@ func TestGenerateDockerfile(t *testing.T) {
 	}}}
 
 	buildSpecification := v1alpha1.BuildSpec{}
-	yaml.Unmarshal(file, &buildSpecification)
+	if err := yaml.Unmarshal(file, &buildSpecification); err != nil {
+		assert.Fail(t, "fail unmarshalling build spec")
+	}
+
 	path, err := GenerateDockerfile(buildSpecification.Steps[0], templates, "")
+	assert.Equal(t, nil, err)
+
 	defer os.Remove(path)
 
 	dockerfile, err := ioutil.ReadFile(path)
@@ -79,7 +84,9 @@ func TestGenerateDockerfileInline(t *testing.T) {
 	}}
 
 	buildSpecification := v1alpha1.BuildSpec{}
-	yaml.Unmarshal(file, &buildSpecification)
+	if err := yaml.Unmarshal(file, &buildSpecification); err != nil {
+		assert.Fail(t, "fail unmarshalling build spec")
+	}
 
 	path, err := GenerateDockerfile(buildSpecification.Steps[0], template, "")
 	assert.Equal(t, nil, err)

@@ -51,5 +51,4 @@ func (v *versionCmd) run() {
 	}
 
 	prov.Print(v.out)
-	return
 }
