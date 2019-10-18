@@ -53,7 +53,7 @@ test:
 	go test $(shell go list ./... | grep -v /vendor/ | grep -v /test/e2e/) -race -short -v -coverprofile=coverage.text
 
 lint:
-	golangci-lint run
+	golangci-lint run --timeout=30m
 
 e2e:
 	ginkgo testing/e2e

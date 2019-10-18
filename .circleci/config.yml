@@ -23,7 +23,7 @@ jobs:
           paths:
             - ./vendor
       - run: curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.19.0
-      - run: golangci-lint run
+      - run: make lint
   # test runs the ocibuilder unit tests and stores test results in TEMP_RESULTS
   unit_test:
     docker:
