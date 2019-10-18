@@ -137,7 +137,7 @@ workflows:
   build_test_deploy:
     jobs:
       - lint
-      - test:
+      - unit_test:
           requires:
             - lint
       - e2e_test_docker:
