@@ -17,7 +17,7 @@ var _ = Describe("ocictl docker", func() {
 		ocictlPath = buildOcictl()
 	})
 
-	AfterEach(func() {
+	AfterSuite(func() {
 		gexec.CleanupBuildArtifacts()
 		if _, err := os.Stat("./spec.yaml"); err == nil {
 			os.Remove("spec.yaml")
@@ -34,8 +34,16 @@ var _ = Describe("ocictl docker", func() {
 		session = runOcictl(ocictlPath, args)
 		Eventually(func() *gexec.Session {
 			return session
-		}, 5).Should(gexec.Exit(0))
-	}, 5)
+		}, 10).Should(gexec.Exit(0))
+	}, 10)
+
+	It("completes a push and exits with status code 0", func() {
+		args := []string{"push", "-p", "./resources/go-test-service"}
+		session = runOcictl(ocictlPath, args)
+		Eventually(func() *gexec.Session {
+			return session
+		}, 10).Should(gexec.Exit(0))
+	}, 10)
 
 	It("completes an init and exits with status code 0", func() {
 		args := []string{"init"}
@@ -45,11 +53,12 @@ var _ = Describe("ocictl docker", func() {
 		}, 2).Should(gexec.Exit(0))
 	})
 
-	It("completes a version and exits with statue code 0", func() {
+	It("completes a version and exits with status code 0", func() {
 		args := []string{"version"}
 		session = runOcictl(ocictlPath, args)
 		Eventually(session).Should(gexec.Exit(0))
 	}, 1)
+
 
 })
 
