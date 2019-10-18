@@ -53,7 +53,7 @@ test:
 	go test $(shell go list ./... | grep -v /vendor/ | grep -v /test/e2e/) -race -short -v -coverprofile=coverage.text
 
 lint:
-	GOGC=50 golangci-lint run -v
+	golangci-lint run -v
 
 e2e:
 	ginkgo testing/e2e
