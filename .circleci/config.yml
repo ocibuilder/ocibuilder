@@ -142,7 +142,7 @@ workflows:
             - lint
       - e2e_test_docker:
           requires:
-            - test
+            - unit_test
       - build_linux:
           requires:
             - e2e_test_docker
