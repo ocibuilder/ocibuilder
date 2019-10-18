@@ -32,9 +32,14 @@ required = [
   name = "k8s.io/kube-openapi"
   branch = "master"
 
+[[override]]
+  name = "gopkg.in/fsnotify.v1"
+  source = "https://github.com/fsnotify/fsnotify.git"
+  
 [[constraint]]
   name = "k8s.io/gengo"
   revision = "b90029ef6cd877cb3f422d75b3a07707e3aac6b7"
+
 
 [prune]
   go-tests = true

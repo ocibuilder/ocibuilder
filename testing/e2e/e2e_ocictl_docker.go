@@ -67,7 +67,6 @@ var _ = Describe("ocictl docker", func() {
 		Eventually(session).Should(gexec.Exit(0))
 	}, 1)
 
-
 })
 
 func buildOcictl() string {
