@@ -56,7 +56,7 @@ lint:
 	golangci-lint run
 
 e2e:
-	ginkgo testing/e2e --progress --v
+	ginkgo testing/e2e
 
 clean:
 	-rm -rf ${CURRENT_DIR}/dist

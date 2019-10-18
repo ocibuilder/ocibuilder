@@ -59,6 +59,6 @@ push:
 
 params:
   - dest: login.0.token
-    value: 768db35a-3a20-4664-b55b-36f11b14d9db
+    valueFromEnv: E2E_DOCKERHUB_TOKEN
   - dest: login.0.creds.plain.username
-    value: ocibuilderbot
+    valueFromEnv: E2E_DOCKERHUB_USER
