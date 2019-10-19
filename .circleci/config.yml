@@ -38,7 +38,7 @@ jobs:
       - run:
           name: Run unit tests
           command: make test
-  e2e_docker:
+  e2e_test_docker:
     docker:
       - image: docker:stable
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
