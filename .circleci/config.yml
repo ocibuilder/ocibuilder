@@ -61,9 +61,8 @@ jobs:
             export GOPATH=/opt/go/
             export PATH=$PATH:$GOPATH/bin
             apk del .build-deps
-            apt-get update && apt-get install make
             echo "running e2e test"
-            make e2e
+            go test testing/e2e
   # build_linux runs the build of the linux ocictl artifact and persists the binary to the circleci workspace
   build_linux:
     docker:
