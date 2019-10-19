@@ -50,7 +50,9 @@ jobs:
             - go-dep-cache-
       - run:
           name: Run e2e tests
-          command: echo "Running e2e"
+          command: |
+            go get -u github.com/onsi/ginkgo/ginkgo
+            make e2e
   # build_linux runs the build of the linux ocictl artifact and persists the binary to the circleci workspace
   build_linux:
     docker:
