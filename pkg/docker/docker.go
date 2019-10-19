@@ -182,7 +182,6 @@ func (d Docker) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 		log.WithField("name:", pushImageName).Infoln("pushing image")
 
 		authString, err := getPushAuthRegistryString(pushSpec.Registry, spec)
-		log.Warnln("authString", authString)
 		if err != nil {
 			log.WithError(err).Errorln("unable to find login spec")
 		}
