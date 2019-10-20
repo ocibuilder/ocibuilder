@@ -2,7 +2,6 @@ package e2e
 
 import (
 	"os"
-	"os/exec"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -69,17 +68,4 @@ var _ = Describe("ocictl docker", func() {
 
 })
 
-func buildOcictl() string {
-	ocictlPath, err := gexec.Build("github.com/ocibuilder/ocibuilder/ocictl")
-	Expect(err).NotTo(HaveOccurred())
 
-	return ocictlPath
-}
-
-func runOcictl(path string, args []string) *gexec.Session {
-	cmd := exec.Command(path, args...)
-	session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
-	Expect(err).NotTo(HaveOccurred())
-
-	return session
-}

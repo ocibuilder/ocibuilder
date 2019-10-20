@@ -48,12 +48,14 @@ jobs:
           keys:
             - go-dep-cache-{{ checksum "Gopkg.lock" }}
             - go-dep-cache-
-      - run: ls -l
+      - run:
+          name: Build Linux Artifact
+          command: "make ocictl-linux"
       - run:
           name: Run e2e tests
           command: |
             go get -u github.com/onsi/ginkgo/ginkgo
-            go get -u github.com/onsi/gomega/... 
+            go get -u github.com/onsi/gomega/...
             go test ./testing/e2e
   # build_linux runs the build of the linux ocictl artifact and persists the binary to the circleci workspace
   build_linux:
