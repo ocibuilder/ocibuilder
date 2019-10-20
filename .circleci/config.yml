@@ -48,6 +48,7 @@ jobs:
           keys:
             - go-dep-cache-{{ checksum "Gopkg.lock" }}
             - go-dep-cache-
+      - run: ls -l
       - run:
           name: Run e2e tests
           command: |
