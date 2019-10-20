@@ -40,7 +40,7 @@ jobs:
           command: make test
   e2e_test_docker:
     docker:
-      - image: docker:stable
+      - image: abegolli/ocibuilder:v0.1.0
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
@@ -51,19 +51,7 @@ jobs:
       - run: ls -l
       - run:
           name: Run e2e tests
-          command: |
-            echo "installing go version 1.10.3..."
-            apk add --no-cache --virtual .build-deps bash gcc musl-dev openssl go
-            wget -O go.tgz https://dl.google.com/go/go1.13.3.src.tar.gz
-            tar -C /usr/local -xzf go.tgz
-            cd /usr/local/go/src/
-            ./make.bash
-            export PATH="/usr/local/go/bin:$PATH"
-            export GOPATH=/opt/go/
-            export PATH=$PATH:$GOPATH/bin
-            apk del .build-deps
-            echo "running e2e test"
-            go test ./testing/e2e
+          command: go test ./testing/e2e
   # build_linux runs the build of the linux ocictl artifact and persists the binary to the circleci workspace
   build_linux:
     docker:
