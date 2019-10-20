@@ -51,7 +51,10 @@ jobs:
       - run: ls -l
       - run:
           name: Run e2e tests
-          command: go test ./testing/e2e
+          command: |
+            go get -u github.com/onsi/ginkgo/ginkgo
+            go get -u github.com/onsi/gomega/... 
+            go test ./testing/e2e
   # build_linux runs the build of the linux ocictl artifact and persists the binary to the circleci workspace
   build_linux:
     docker:
