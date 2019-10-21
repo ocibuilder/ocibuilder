@@ -18,7 +18,7 @@ you to pick between [Buildah](https://github.com/containers/buildah) or [Docker]
 
 ## Architecture
 
-![architecture](https://github.com/ocibuilder/docs/blob/master/ocibuilder.png)
+![architecture](https://github.com/ocibuilder/docs/blob/master/assets/ocibuilder.png)
 
 ### Documentation
 
