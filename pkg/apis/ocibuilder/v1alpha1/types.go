@@ -81,6 +81,10 @@ type OCIBuilderSpec struct {
 	// Push contains specification to push images to registries
 	// +optional
 	Push []PushSpec `json:"push,omitempty" protobuf:"bytes,4,name=push"`
+	// Type of the build framework.
+	// Defaults to docker
+	// +optional
+	Daemon Daemon `json:"daemon,omitempty" protobuf:"bytes,5,opt,name=daemon"`
 }
 
 // OCIBuilderStatus holds the status of a OCIBuilder resource
@@ -169,32 +173,28 @@ type AnsibleGalaxy struct {
 type BuildStep struct {
 	// Metadata about the build step.
 	*Metadata `json:"metadata,inline" protobuf:"bytes,1,name=metadata"`
-	// Type of the build framework.
-	// Defaults to docker
-	// +optional
-	Daemon Daemon `json:"daemon,omitempty" protobuf:"bytes,2,opt,name=daemon"`
 	// Stages of the build
-	Stages []Stage `json:"stages" protobuf:"bytes,3,opt,name=purge"`
+	Stages []Stage `json:"stages" protobuf:"bytes,2,opt,name=purge"`
 	// Git url to fetch the project from.
 	// +optional
-	Git string `json:"git,omitempty" protobuf:"bytes,4,opt,name=git"`
+	Git string `json:"git,omitempty" protobuf:"bytes,3,opt,name=git"`
 	// Tag the tag of the build
 	// +optional
-	Tag string `json:"tag,omitempty" protobuf:"bytes,5,opt,name=tag"`
+	Tag string `json:"tag,omitempty" protobuf:"bytes,4,opt,name=tag"`
 	// Distroless if set to true generates a distroless image
-	Distroless bool `json:"distroless,omitempty" protobuf:"bytes,6,opt,name=distroless"`
+	Distroless bool `json:"distroless,omitempty" protobuf:"bytes,5,opt,name=distroless"`
 	// Cache for build
 	// Set to false by default
 	// +optional
-	Cache bool `json:"cache,omitempty" protobuf:"bytes,7,opt,name=cache"`
+	Cache bool `json:"cache,omitempty" protobuf:"bytes,6,opt,name=cache"`
 	// Purge the build
 	// defaults to false
 	// +optional
-	Purge bool `json:"purge,omitempty" protobuf:"bytes,8,opt,name=purge"`
+	Purge bool `json:"purge,omitempty" protobuf:"bytes,7,opt,name=purge"`
 	// Context used for image build
 	// default looks at the current working directory
 	// +optional
-	Context ImageContext `json:"imageContext,omitempty" protobuf:"bytes,9,opt,name=imageContext"`
+	Context ImageContext `json:"imageContext,omitempty" protobuf:"bytes,8,opt,name=imageContext"`
 }
 
 // Stages
