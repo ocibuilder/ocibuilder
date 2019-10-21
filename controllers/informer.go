@@ -42,7 +42,7 @@ func (ctrl *Controller) instanceIDReq() (*labels.Requirement, error) {
 func (ctrl *Controller) newControllerInformer(labelFilterRequirements *labels.Requirement) cache.SharedIndexInformer {
 	informerFactory := informers.NewSharedInformerFactoryWithOptions(
 		ctrl.ociClient,
-		resourceResyncPeriod,
+		resyncPeriod,
 		informers.WithNamespace(ctrl.Config.Namespace),
 		informers.WithTweakListOptions(func(options *metav1.ListOptions) {
 			options.FieldSelector = fields.Everything().String()

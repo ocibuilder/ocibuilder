@@ -36,15 +36,14 @@ import (
 )
 
 const (
-	resyncPeriod         = 20 * time.Minute
-	resourceResyncPeriod = 30 * time.Minute
+	resyncPeriod         = 30 * time.Minute
 	rateLimiterBaseDelay = 5 * time.Second
 	rateLimiterMaxDelay  = 1000 * time.Second
 )
 
 // ControllerConfig contain the configuration settings for the controller
 type ControllerConfig struct {
-	// InstanceID is a label selector to limit the ontroller's watch of gateway jobs to a specific instance.
+	// InstanceID is a label selector to limit the controller's watch of ocibuilders to a specific instance.
 	InstanceID string
 	// Namespace is a label selector filter to limit controller's watch to specific namespace
 	Namespace string
@@ -54,7 +53,7 @@ type ControllerConfig struct {
 type Controller struct {
 	// Configmap is the name of the K8s configmap which contains controller configuration
 	Configmap string
-	// Namespace for gateway controller
+	// Namespace for controller
 	Namespace string
 	// Config is the controller's configuration
 	Config *ControllerConfig
@@ -97,12 +96,12 @@ func (ctrl *Controller) processNextItem() bool {
 
 	obj, exists, err := ctrl.informer.GetIndexer().GetByKey(key.(string))
 	if err != nil {
-		fmt.Printf("failed to get sensor '%s' from informer index: %+v", key, err)
+		fmt.Printf("failed to get ocibuilder '%s' from informer index: %+v", key, err)
 		return true
 	}
 
 	if !exists {
-		// this happens after sensor was deleted, but work queue still had entry in it
+		// this happens after ocibuilder was deleted, but work queue still had entry in it
 		return true
 	}
 
@@ -112,18 +111,11 @@ func (ctrl *Controller) processNextItem() bool {
 		return true
 	}
 
-	ctx := newControllerOperationContext(builder, ctrl)
+	ctx := newOperationContext(builder, ctrl)
 
 	err = ctx.operate()
 	if err != nil {
-		labels := map[string]string{
-			common.LabelSensorName: sensor.Name,
-			common.LabelOperation:  "controller_operation",
-		}
-		if err := common.GenerateK8sEvent(c.kubeClientset, fmt.Sprintf("failed to operate on sensor %s, err :%+v", sensor.Name, err), common.EscalationEventType,
-			"sensor operation failed", sensor.Name, sensor.Namespace, c.Config.InstanceID, sensor.Kind, labels); err != nil {
-			ctx.log.Error().Err(err).Msg("failed to create K8s event to escalate sensor operation failure")
-		}
+		ctrl.logger.WithError(err).WithField(common.LabelOCIBuilderName, builder.Name).Errorln("failed to operate on the ocibuilder obejct")
 	}
 
 	err = ctrl.handleErr(err, key)
@@ -144,8 +136,8 @@ func (ctrl *Controller) handleErr(err error, key interface{}) error {
 	}
 
 	// due to the base delay of 5ms of the DefaultControllerRateLimiter
-	// requeues will happen very quickly even after a sensor pod goes down
-	// we want to give the sensor pod a chance to come back up so we give a genorous number of retries
+	// requeues will happen very quickly even after a ocibuilder pod goes down
+	// we want to give the ocibuilder pod a chance to come back up so we give a generous number of retries
 	if ctrl.queue.NumRequeues(key) < 20 {
 		// Re-enqueue the key rate limited. This key will be processed later again.
 		ctrl.queue.AddRateLimited(key)
@@ -168,7 +160,13 @@ func (ctrl *Controller) Run(ctx context.Context, gwThreads, eventThreads int) {
 		return
 	}
 
-	ctrl.informer = ctrl.newGatewayInformer()
+	labelFilters, err := ctrl.instanceIDReq()
+	if err != nil {
+		ctrl.logger.WithError(err).Error("failed to get instance id filter")
+		return
+	}
+
+	ctrl.informer = ctrl.newControllerInformer(labelFilters)
 	go ctrl.informer.Run(ctx.Done())
 
 	if !cache.WaitForCacheSync(ctx.Done(), ctrl.informer.HasSynced) {

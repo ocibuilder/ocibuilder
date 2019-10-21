@@ -16,6 +16,10 @@ const (
 	LabelKeyPhase = ocibuilder.FullName + "/phase"
 	// LabelKeyComplete is the label to mark builders as complete
 	LabelKeyComplete = ocibuilder.FullName + "/complete"
+	// LabelOCIBuilderName is the label to indicate the name of an ocibuilder object
+	LabelOCIBuilderName = "ocibuilder-name"
+	// LabelNamespace is the label to indicate K8s namespace
+	LabelNamespace = "namespace"
 )
 
 // Miscellaneous constants for controller
