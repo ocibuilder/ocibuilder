@@ -23,8 +23,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ghodss/yaml"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/pkg/errors"
 	"github.com/tidwall/sjson"
 )
@@ -33,8 +33,10 @@ import (
 // combined in spec.yaml or separated in login.yaml, build.yaml and push.yaml.
 // The passed in OCIBuilderSpec reference is populated
 // If a filepath is not specified the current working directory is used
-func Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepaths ...string) error {
+func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepaths ...string) error {
 	dir, err := os.Getwd()
+	log := r.Logger
+
 	if err != nil {
 		log.WithError(err).Errorln("failed to get current working directory")
 		return err
@@ -45,7 +47,7 @@ func Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepaths ...string
 	}
 	file, err := ioutil.ReadFile(dir + "/spec.yaml")
 	if overlayPath != "" {
-		file, err = applyOverlay(file, overlayPath)
+		file, err = r.applyOverlay(file, overlayPath)
 		if err != nil {
 			log.WithError(err).Errorln("failed to apply overlay to spec")
 			return err
@@ -54,7 +56,7 @@ func Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepaths ...string
 
 	if err != nil {
 		log.Infoln("spec file not found, looking for individual specifications...")
-		if err := readIndividualSpecs(spec, dir); err != nil {
+		if err := r.readIndividualSpecs(spec, dir); err != nil {
 			log.WithError(err).Errorln("failed to read individual specs")
 			return err
 		}
@@ -71,7 +73,7 @@ func Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepaths ...string
 	}
 
 	if spec.Params != nil {
-		if err = applyParams(file, spec); err != nil {
+		if err = r.applyParams(file, spec); err != nil {
 			log.WithError(err).Errorln("failed to apply params to spec")
 			return err
 		}
@@ -82,7 +84,7 @@ func Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepaths ...string
 
 // readIndividualSpecs reads the individual specifications if a global
 // spec.yaml is not found
-func readIndividualSpecs(spec *v1alpha1.OCIBuilderSpec, path string) error {
+func (r Reader) readIndividualSpecs(spec *v1alpha1.OCIBuilderSpec, path string) error {
 	var loginSpec []v1alpha1.LoginSpec
 	var buildSpec *v1alpha1.BuildSpec
 	var pushSpec []v1alpha1.PushSpec
@@ -113,7 +115,7 @@ func readIndividualSpecs(spec *v1alpha1.OCIBuilderSpec, path string) error {
 }
 
 // applyOverlay applys a ytt overalay to the specification
-func applyOverlay(yamlTemplate []byte, overlayPath string) ([]byte, error) {
+func (r Reader) applyOverlay(yamlTemplate []byte, overlayPath string) ([]byte, error) {
 	file, err := os.Open(overlayPath)
 
 	if err != nil {
@@ -138,7 +140,7 @@ func applyOverlay(yamlTemplate []byte, overlayPath string) ([]byte, error) {
 	return overlayedSpec, nil
 }
 
-func applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error {
+func (r Reader) applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error {
 	specJson, err := yaml.YAMLToJSON(yamlObj)
 	if err != nil {
 		return err
@@ -173,7 +175,7 @@ func applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error {
 }
 
 // ReadContext reads the user supplied context for the image build
-func ReadContext(ctx v1alpha1.ImageContext) (io.ReadCloser, error) {
+func (r Reader) ReadContext(ctx v1alpha1.ImageContext) (io.ReadCloser, error) {
 
 	if ctx.GitContext != nil {
 		return nil, errors.New("git context is not supported in this version of the ocibuilder")

@@ -46,6 +46,10 @@ func (d Docker) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	cli := d.Client
 	buildOpts, err := common.ParseBuildSpec(spec.Build)
 
+	reader := common.Reader{
+		Logger: log,
+	}
+
 	if err != nil {
 		log.WithError(err).Errorln("error in parsing build spec...")
 		return nil, err
@@ -54,7 +58,7 @@ func (d Docker) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	var buildResponses []io.ReadCloser
 	for _, opt := range buildOpts {
 
-		ctx, err := common.ReadContext(opt.Context)
+		ctx, err := reader.ReadContext(opt.Context)
 		if err != nil {
 			log.WithError(err).Errorln("error reading image build context")
 			continue
