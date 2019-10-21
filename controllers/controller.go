@@ -15,3 +15,175 @@ limitations under the License.
 */
 
 package ocibuilder
+
+import (
+	"context"
+	"fmt"
+	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/pkg/errors"
+	"k8s.io/apimachinery/pkg/util/wait"
+	"log"
+	"time"
+
+	base "github.com/ocibuilder/ocibuilder"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	ociv1alpha1 "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
+	"github.com/sirupsen/logrus"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/cache"
+	"k8s.io/client-go/util/workqueue"
+)
+
+const (
+	resyncPeriod         = 20 * time.Minute
+	resourceResyncPeriod = 30 * time.Minute
+	rateLimiterBaseDelay = 5 * time.Second
+	rateLimiterMaxDelay  = 1000 * time.Second
+)
+
+// ControllerConfig contain the configuration settings for the controller
+type ControllerConfig struct {
+	// InstanceID is a label selector to limit the ontroller's watch of gateway jobs to a specific instance.
+	InstanceID string
+	// Namespace is a label selector filter to limit controller's watch to specific namespace
+	Namespace string
+}
+
+// Controller listens for new ocibuilder resources and hands off handling of each resource on the queue to the operator
+type Controller struct {
+	// Configmap is the name of the K8s configmap which contains controller configuration
+	Configmap string
+	// Namespace for gateway controller
+	Namespace string
+	// Config is the controller's configuration
+	Config *ControllerConfig
+	// logger is the logger for a controller
+	logger *logrus.Logger
+	// kubernetes config and apis
+	kubeConfig *rest.Config
+	// kubeClient communicates with Kubernetes API server
+	kubeClient kubernetes.Interface
+	// ociClient is the client to operates on ocibuilder resource
+	ociClient ociv1alpha1.Interface
+	// informer provides eventually consistent linkage of its clients to the authoritative state of a given collection of objects.
+	informer cache.SharedIndexInformer
+	// queue is an interface that rate limits items being added to the queue.
+	queue workqueue.RateLimitingInterface
+}
+
+// NewController creates a new controller
+func NewController(rest *rest.Config, config *ControllerConfig, logger *logrus.Logger, configmap, namespace string) *Controller {
+	rateLimiter := workqueue.NewItemExponentialFailureRateLimiter(rateLimiterBaseDelay, rateLimiterMaxDelay)
+	return &Controller{
+		Namespace:  namespace,
+		Configmap:  configmap,
+		Config:     config,
+		logger:     logger,
+		kubeConfig: rest,
+		kubeClient: kubernetes.NewForConfigOrDie(rest),
+		ociClient:  ociv1alpha1.NewForConfigOrDie(rest),
+		queue:      workqueue.NewRateLimitingQueue(rateLimiter),
+	}
+}
+
+func (ctrl *Controller) processNextItem() bool {
+	// Wait until there is a new item in the queue
+	key, quit := ctrl.queue.Get()
+	if quit {
+		return false
+	}
+	defer ctrl.queue.Done(key)
+
+	obj, exists, err := ctrl.informer.GetIndexer().GetByKey(key.(string))
+	if err != nil {
+		fmt.Printf("failed to get sensor '%s' from informer index: %+v", key, err)
+		return true
+	}
+
+	if !exists {
+		// this happens after sensor was deleted, but work queue still had entry in it
+		return true
+	}
+
+	builder, ok := obj.(*v1alpha1.OCIBuilder)
+	if !ok {
+		fmt.Printf("key '%s' in index is not a builder", key)
+		return true
+	}
+
+	ctx := newControllerOperationContext(builder, ctrl)
+
+	err = ctx.operate()
+	if err != nil {
+		labels := map[string]string{
+			common.LabelSensorName: sensor.Name,
+			common.LabelOperation:  "controller_operation",
+		}
+		if err := common.GenerateK8sEvent(c.kubeClientset, fmt.Sprintf("failed to operate on sensor %s, err :%+v", sensor.Name, err), common.EscalationEventType,
+			"sensor operation failed", sensor.Name, sensor.Namespace, c.Config.InstanceID, sensor.Kind, labels); err != nil {
+			ctx.log.Error().Err(err).Msg("failed to create K8s event to escalate sensor operation failure")
+		}
+	}
+
+	err = ctrl.handleErr(err, key)
+	if err != nil {
+		ctrl.logger.WithError(err).Errorln("controller is unable to handle the error")
+	}
+	return true
+}
+
+// handleErr checks if an error happened and make sure we will retry later
+// returns an error if unable to handle the error
+func (ctrl *Controller) handleErr(err error, key interface{}) error {
+	if err == nil {
+		// Forget about the #AddRateLimited history of key on every successful sync
+		// Ensure future updates for this key are not delayed because of outdated error history
+		ctrl.queue.Forget(key)
+		return nil
+	}
+
+	// due to the base delay of 5ms of the DefaultControllerRateLimiter
+	// requeues will happen very quickly even after a sensor pod goes down
+	// we want to give the sensor pod a chance to come back up so we give a genorous number of retries
+	if ctrl.queue.NumRequeues(key) < 20 {
+		// Re-enqueue the key rate limited. This key will be processed later again.
+		ctrl.queue.AddRateLimited(key)
+		return nil
+	}
+	return errors.New("exceeded max requeues")
+}
+
+// Run executes the controller
+func (ctrl *Controller) Run(ctx context.Context, gwThreads, eventThreads int) {
+	defer ctrl.queue.ShutDown()
+	ctrl.logger.WithFields(
+		map[string]interface{}{
+			common.LabelKeyControllerInstanceID: ctrl.Config.InstanceID,
+			common.LabelVersion:                 base.GetVersion().Version,
+		}).Info("starting controller")
+	_, err := ctrl.watchControllerConfigMap(ctx)
+	if err != nil {
+		ctrl.logger.WithError(err).Error("failed to register watch for controller config map")
+		return
+	}
+
+	ctrl.informer = ctrl.newGatewayInformer()
+	go ctrl.informer.Run(ctx.Done())
+
+	if !cache.WaitForCacheSync(ctx.Done(), ctrl.informer.HasSynced) {
+		log.Panicf("timed out waiting for the caches to sync")
+		return
+	}
+
+	for i := 0; i < gwThreads; i++ {
+		go wait.Until(ctrl.runWorker, time.Second, ctx.Done())
+	}
+
+	<-ctx.Done()
+}
+
+func (ctrl *Controller) runWorker() {
+	for ctrl.processNextItem() {
+	}
+}
