@@ -38,7 +38,7 @@ jobs:
       - run:
           name: Run unit tests
           command: make test
-  e2e_test_docker:
+  e2e_test:
     docker:
       - image: ocibuildere2e/ocibuilder-base-go:v0.1.0
 #      - image: docker
@@ -149,15 +149,15 @@ workflows:
       - unit_test:
           requires:
             - lint
-      - e2e_test_docker:
+      - e2e_test:
           requires:
             - unit_test
       - build_linux:
           requires:
-            - e2e_test_docker
+            - e2e_test
       - build_mac:
           requires:
-            - e2e_test_docker
+            - e2e_test
       - push_bin:
           requires:
             - build_linux
