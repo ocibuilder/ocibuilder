@@ -44,8 +44,4 @@ var _ = Describe("ocictl buildah", func() {
 		}, 25).Should(gexec.Exit(0))
 	}, 25)
 
-	It("will fail for testing purposes", func() {
-		panic("panic!!@E!@£!@£")
-	})
-
 })
