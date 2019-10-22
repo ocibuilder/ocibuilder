@@ -46,9 +46,6 @@ jobs:
     steps:
       - setup_remote_docker
       - checkout
-      - run:
-          name: Test docker build
-          command: docker build .
       - restore_cache:
           keys:
             - go-dep-cache-{{ checksum "Gopkg.lock" }}
