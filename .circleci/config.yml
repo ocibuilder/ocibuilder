@@ -40,7 +40,7 @@ jobs:
           command: make test
   e2e_test_docker:
     docker:
-      - image: abegolli/ocibuilder-base:v0.1.0
+      - image: ocibuildere2e/ocibuilder-base-go:v0.1.0
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
