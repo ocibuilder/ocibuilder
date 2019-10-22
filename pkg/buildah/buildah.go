@@ -19,12 +19,11 @@ package buildah
 import (
 	"fmt"
 	"io"
-	"os"
 	"os/exec"
 
+	"github.com/creack/pty"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/creack/pty"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -67,15 +66,15 @@ func (b Buildah) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 		}
 		buildResponses = append(buildResponses, out)
 
-		if err := cmd.Wait(); err != nil {
-			log.WithError(err).Errorln("error waiting for cmd execution")
-			return nil, err
-		}
+		//if err := cmd.Wait(); err != nil {
+		//	log.WithError(err).Errorln("error waiting for cmd execution")
+		//	return nil, err
+		//}
 
 		log.WithField("filepath", fullPath).Debugln("attempting to cleanup dockerfile")
-		if err := os.Remove(fullPath); err != nil {
-			log.WithError(err).Errorln("failed to remove dockerfile")
-		}
+		//if err := os.Remove(fullPath); err != nil {
+		//	log.WithError(err).Errorln("failed to remove dockerfile")
+		//}
 
 		if opt.Purge {
 			purgeCommand := createPurgeCommand(imageName)
@@ -135,10 +134,10 @@ func (b Buildah) Login(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 		}
 		loginResponses = append(loginResponses, out)
 
-		if err := cmd.Wait(); err != nil {
-			log.WithError(err).Errorln("error waiting for cmd execution")
-			return nil, err
-		}
+		//if err := cmd.Wait(); err != nil {
+		//	log.WithError(err).Errorln("error waiting for cmd execution")
+		//	return nil, err
+		//}
 
 		log.Infoln("buildah login has been executed")
 	}
@@ -196,10 +195,10 @@ func (b Buildah) Pull(spec v1alpha1.OCIBuilderSpec, imageName string) ([]io.Read
 		}
 		pullResponses = append(pullResponses, out)
 
-		if err := cmd.Wait(); err != nil {
-			log.WithError(err).Errorln("error waiting for cmd execution")
-			return nil, err
-		}
+		//if err := cmd.Wait(); err != nil {
+		//	log.WithError(err).Errorln("error waiting for cmd execution")
+		//	return nil, err
+		//}
 
 		log.Infoln("buildah pull has been executed")
 	}
@@ -256,10 +255,10 @@ func (b Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 		}
 		pushResponses = append(pushResponses, out)
 
-		if err := cmd.Wait(); err != nil {
-			log.WithError(err).Errorln("error waiting for cmd execution")
-			return nil, err
-		}
+		//if err := cmd.Wait(); err != nil {
+		//	log.WithError(err).Errorln("error waiting for cmd execution")
+		//	return nil, err
+		//}
 
 		log.Infoln("buildah push has been executed")
 
