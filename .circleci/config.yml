@@ -40,8 +40,8 @@ jobs:
           command: make test
   e2e_test_docker:
     docker:
-#      - image: ocibuildere2e/ocibuilder-base-go:v0.1.0
-      - image: docker
+      - image: ocibuildere2e/ocibuilder-base-go:v0.1.0
+#      - image: docker
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - setup_remote_docker
