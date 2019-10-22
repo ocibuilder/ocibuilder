@@ -25,23 +25,23 @@ var _ = Describe("ocictl buildah", func() {
 		session = utils.RunOcictl(ocictlPath, args)
 		Eventually(func() *gexec.Session {
 			return session
-		}, 15).Should(gexec.Exit(0))
-	}, 15)
+		}, 25).Should(gexec.Exit(0))
+	}, 25)
 
 	It("completes a push and exits with status code 0", func() {
 		args := []string{"push", "-b", "buildah", "-p", "./resources/go-test-service"}
 		session = utils.RunOcictl(ocictlPath, args)
 		Eventually(func() *gexec.Session {
 			return session
-		}, 10).Should(gexec.Exit(0))
-	}, 10)
+		}, 25).Should(gexec.Exit(0))
+	}, 25)
 
 	It("completes a pull and exits with status code 0", func() {
 		args := []string{"pull", "-b", "buildah", "-i", "ocibuildere2e/go-test-service:v0.1.0", "-p", "./resources/go-test-service"}
 		session = utils.RunOcictl(ocictlPath, args)
 		Eventually(func() *gexec.Session {
 			return session
-		}, 10).Should(gexec.Exit(0))
-	}, 10)
+		}, 25).Should(gexec.Exit(0))
+	}, 25)
 
 })
