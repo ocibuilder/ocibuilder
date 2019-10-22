@@ -34,8 +34,8 @@ var _ = Describe("ocictl docker", func() {
 		session = utils.RunOcictl(ocictlPath, args)
 		Eventually(func() *gexec.Session {
 			return session
-		}, 10).Should(gexec.Exit(0))
-	}, 10)
+		}, 15).Should(gexec.Exit(0))
+	}, 15)
 
 	It("completes a push and exits with status code 0", func() {
 		args := []string{"push", "-p", "./resources/go-test-service"}
