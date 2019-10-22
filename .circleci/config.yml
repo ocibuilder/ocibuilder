@@ -59,6 +59,11 @@ jobs:
             go get -u github.com/onsi/ginkgo/ginkgo
             go get -u github.com/onsi/gomega/...
             ginkgo -v ./testing/e2e
+      - run:
+          name: Buildah test
+          command: |
+            cd ./testing/e2e/resources/go-test-service
+            buildah bud .
   # build_linux runs the build of the linux ocictl artifact and persists the binary to the circleci workspace
   build_linux:
     docker:
