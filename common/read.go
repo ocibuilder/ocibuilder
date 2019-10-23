@@ -23,8 +23,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ghodss/yaml"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/pkg/errors"
 	"github.com/tidwall/sjson"
 )
@@ -139,18 +139,18 @@ func applyOverlay(yamlTemplate []byte, overlayPath string) ([]byte, error) {
 }
 
 func applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error {
-	specJson, err := yaml.YAMLToJSON(yamlObj)
+	specJSON, err := yaml.YAMLToJSON(yamlObj)
 	if err != nil {
 		return err
 	}
 
 	for _, param := range spec.Params {
 		if param.Value != "" {
-			tmp, err := sjson.SetBytes(specJson, param.Dest, param.Value)
+			tmp, err := sjson.SetBytes(specJSON, param.Dest, param.Value)
 			if err != nil {
 				return err
 			}
-			specJson = tmp
+			specJSON = tmp
 		}
 		if param.ValueFromEnvVariable != "" {
 			val := os.Getenv(param.ValueFromEnvVariable)
@@ -158,15 +158,15 @@ func applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error {
 				log.Warn("env variable ", param.ValueFromEnvVariable, " is empty")
 			}
 
-			tmp, err := sjson.SetBytes(specJson, param.Dest, val)
+			tmp, err := sjson.SetBytes(specJSON, param.Dest, val)
 			if err != nil {
 				return err
 			}
-			specJson = tmp
+			specJSON = tmp
 		}
 	}
 
-	if err := json.Unmarshal(specJson, spec); err != nil {
+	if err := json.Unmarshal(specJSON, spec); err != nil {
 		return err
 	}
 	return nil

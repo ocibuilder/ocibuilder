@@ -18,14 +18,14 @@ you to pick between [Buildah](https://github.com/containers/buildah) or [Docker]
 
 ## Architecture
 
-![architecture](./docs/assets/ocibuilder.png)
+![architecture](https://github.com/ocibuilder/docs/blob/master/assets/ocibuilder.png)
 
 ### Documentation
 
 To learn more about ocibuilder and how to get started, [please go to the complete documentation 
-here](./docs)
+here](https://github.com/ocibuilder/docs)
 
-Our specification file is documented [here](docs/spec/specification.md).
+Our specification file is documented [here](https://github.com/ocibuilder/docs/blob/master/spec/specification.md).
 
 ### Roadmap
 Take a look at our roadmap and features in developement [here](https://github.com/ocibuilder/ocibuilder/blob/master/ROADMAP.md)

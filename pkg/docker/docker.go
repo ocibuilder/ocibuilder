@@ -27,17 +27,18 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/ocibuilder/ocibuilder/common"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
+	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/sirupsen/logrus"
 )
 
 // Docker is a struct which consists of an instance of logger, docker client and context path
 type Docker struct {
-	Logger      *logrus.Logger
-	Client      client.APIClient
+	Logger *logrus.Logger
+	Client client.APIClient
+	Metadata []v1alpha1.ImageMeta
 }
 
 // Build is used to execute docker build and optionally purge the image after the build
@@ -77,11 +78,11 @@ func (d Docker) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 			log.WithError(err).Errorln("error building image...")
 			continue
 		}
-
-		if err = os.Remove(opt.Context.LocalContext.ContextPath + "/" + opt.Dockerfile); err != nil {
-			log.WithError(err).Errorln("error removing generated dockerfile")
-		}
 		buildResponses = append(buildResponses, buildResponse.Body)
+
+		d.Metadata = append(d.Metadata, v1alpha1.ImageMeta{
+			BuildFile: opt.Context.LocalContext.ContextPath + "/" + opt.Dockerfile,
+		})
 
 		if opt.Purge {
 			log.Debugln("purge enabled, attempting to purge image after build")
@@ -250,4 +251,17 @@ func encodeAuth(spec v1alpha1.LoginSpec) (string, error) {
 
 	authStr := base64.URLEncoding.EncodeToString(encodedJSON)
 	return authStr, nil
+}
+
+func (d Docker) Clean() {
+	log := d.Logger
+	for _, m := range d.Metadata {
+		if m.BuildFile != "" {
+			log.WithField("filepath", m.BuildFile).Debugln("attempting to cleanup dockerfile")
+			if err := os.Remove(m.BuildFile); err != nil {
+				d.Logger.WithError(err).Errorln("error removing generated Dockerfile")
+				continue
+			}
+		}
+	}
 }

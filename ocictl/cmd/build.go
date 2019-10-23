@@ -20,12 +20,12 @@ import (
 	"errors"
 	"io"
 
+	"github.com/docker/docker/client"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/ocictl/pkg/utils"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/buildah"
 	"github.com/ocibuilder/ocibuilder/pkg/docker"
-	"github.com/docker/docker/client"
 	"github.com/spf13/cobra"
 )
 
@@ -35,12 +35,13 @@ It can run a build in both docker and buildah varieties.
 `
 
 type buildCmd struct {
-	out     io.Writer
-	name    string
-	path    string
+	out io.Writer
+	name string
+	path string
 	builder string
 	overlay string
-	debug   bool
+	storageDriver string
+	debug bool
 }
 
 func newBuildCmd(out io.Writer) *cobra.Command {
@@ -59,6 +60,7 @@ func newBuildCmd(out io.Writer) *cobra.Command {
 	f.StringVarP(&bc.builder, "builder", "b", "docker", "Choose either docker and buildah as the targetted image builder. By default the builder is docker.")
 	f.BoolVarP(&bc.debug, "debug", "d", false, "Turn on debug logging")
 	f.StringVarP(&bc.overlay, "overlay", "o", "", "Path to your overlay.yaml file")
+	f.StringVarP(&bc.storageDriver, "storage-driver", "s", "", "Storage-driver for Buildah. vfs enables the use of buildah within an unprivileged container. By default the storage driver is overlay")
 
 	return cmd
 }
@@ -101,16 +103,19 @@ func (b *buildCmd) run(args []string) error {
 					return err
 				}
 			}
-			log.Infoln("docker build complete")
+			d.Clean()
 		}
 
 	case v1alpha1.BuildahFramework:
 		{
 			b := buildah.Buildah{
-				Logger:      common.GetLogger(b.debug),
+				Logger: common.GetLogger(b.debug),
+				StorageDriver: b.storageDriver,
 			}
+
 			res, err := b.Build(ociBuilderSpec)
 			if err != nil {
+				log.WithError(err).Errorln("error executing build on ocibuilder spec")
 				return err
 			}
 
@@ -120,7 +125,7 @@ func (b *buildCmd) run(args []string) error {
 					return err
 				}
 			}
-			log.Infoln("buildah build complete")
+			b.Clean()
 		}
 
 	default:
