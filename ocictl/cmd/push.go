@@ -66,7 +66,9 @@ func newPushCmd(out io.Writer) *cobra.Command {
 }
 
 func (p *pushCmd) run(args []string) error {
-	ociBuilderSpec := v1alpha1.OCIBuilderSpec{}
+	ociBuilderSpec := v1alpha1.OCIBuilderSpec{
+		Daemon: true,
+	}
 	if err := common.Read(&ociBuilderSpec, "", p.path); err != nil {
 		log.WithError(err).Errorln("failed to read spec")
 		return err
