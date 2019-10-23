@@ -22,16 +22,16 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/creack/pty"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/creack/pty"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
-// This is Buildah struct which consists of a logger and context path
+// Buildah is  the struct which consists of a logger and context path
 type Buildah struct {
-	Logger      *logrus.Logger
+	Logger *logrus.Logger
 }
 
 var executor = exec.Command

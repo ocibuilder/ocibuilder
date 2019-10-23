@@ -37,7 +37,7 @@ func Validate(spec *v1alpha1.OCIBuilderSpec) error {
 	return nil
 }
 
-// ValidateBuildTempalteStep validates build template step
+// ValidateBuildTemplateStep validates build template step
 func ValidateBuildTemplateStep(step v1alpha1.BuildTemplateStep) error {
 	if step.Ansible == nil && step.Docker == nil {
 		return errors.New("at least one step type should be defined")
