@@ -36,8 +36,9 @@ import (
 
 // Docker is a struct which consists of an instance of logger, docker client and context path
 type Docker struct {
-	Logger      *logrus.Logger
-	Client      client.APIClient
+	Logger *logrus.Logger
+	Client client.APIClient
+	Metadata v1alpha1.ImageMeta
 }
 
 // Build is used to execute docker build and optionally purge the image after the build
@@ -244,4 +245,8 @@ func encodeAuth(spec v1alpha1.LoginSpec) (string, error) {
 
 	authStr := base64.URLEncoding.EncodeToString(encodedJSON)
 	return authStr, nil
+}
+
+func (d Docker) Clean() {
+
 }

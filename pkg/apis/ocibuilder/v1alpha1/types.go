@@ -357,3 +357,9 @@ type Command struct {
 	// Value is the contents of the command (e.g `ubuntu:xenial`)
 	Value []string `json:"value" protobuf:"bytes,7,opt,name=value"`
 }
+
+// Represents build image metadata
+type ImageMeta struct {
+	// BuildFile is the path to the buildfile
+	BuildFile string
+}

@@ -31,14 +31,15 @@ import (
 
 // This is Buildah struct which consists of a logger and context path
 type Buildah struct {
-	Logger      *logrus.Logger
+	Logger *logrus.Logger
 	StorageDriver string
+	Metadata []v1alpha1.ImageMeta
 }
 
 var executor = exec.Command
 
 // Build performs a buildah build and returns an array of readclosers
-func (b Buildah) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
+func (b *Buildah) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	log := b.Logger
 	buildOpts, err := common.ParseBuildSpec(spec.Build)
 
@@ -68,15 +69,9 @@ func (b Buildah) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 		}
 		buildResponses = append(buildResponses, out)
 
-		if err := cmd.Wait(); err != nil {
-			log.WithError(err).Errorln("error waiting for cmd execution")
-			return nil, err
-		}
-
-		log.WithField("filepath", fullPath).Debugln("attempting to cleanup dockerfile")
-		if err := os.Remove(fullPath); err != nil {
-			log.WithError(err).Errorln("failed to remove dockerfile")
-		}
+		b.Metadata = append(b.Metadata, v1alpha1.ImageMeta{
+			BuildFile: fullPath,
+		})
 
 		if opt.Purge {
 			purgeCommand := createPurgeCommand(imageName)
@@ -142,11 +137,6 @@ func (b Buildah) Login(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 		}
 		loginResponses = append(loginResponses, out)
 
-		if err := cmd.Wait(); err != nil {
-			log.WithError(err).Errorln("error waiting for cmd execution")
-			return nil, err
-		}
-
 		log.Infoln("buildah login has been executed")
 	}
 
@@ -203,11 +193,6 @@ func (b Buildah) Pull(spec v1alpha1.OCIBuilderSpec, imageName string) ([]io.Read
 		}
 		pullResponses = append(pullResponses, out)
 
-		if err := cmd.Wait(); err != nil {
-			log.WithError(err).Errorln("error waiting for cmd execution")
-			return nil, err
-		}
-
 		log.Infoln("buildah pull has been executed")
 	}
 
@@ -263,11 +248,6 @@ func (b Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 		}
 		pushResponses = append(pushResponses, out)
 
-		if err := cmd.Wait(); err != nil {
-			log.WithError(err).Errorln("error waiting for cmd execution")
-			return nil, err
-		}
-
 		log.Infoln("buildah push has been executed")
 
 		if pushSpec.Purge {
@@ -298,4 +278,17 @@ func createPushCommand(spec v1alpha1.PushSpec, imageName string) ([]string, erro
 
 func createPurgeCommand(imageName string) []string {
 	return append([]string{"rmi"}, imageName)
+}
+
+func (b Buildah) Clean() {
+	log := b.Logger
+	for _, m := range b.Metadata {
+		if m.BuildFile != "" {
+			log.WithField("filepath", m.BuildFile).Debugln("attempting to cleanup dockerfile")
+			if err := os.Remove(m.BuildFile); err != nil {
+				b.Logger.WithError(err).Errorln("error removing generated Dockerfile")
+				continue
+			}
+		}
+	}
 }
