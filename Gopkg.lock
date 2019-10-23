@@ -1236,6 +1236,7 @@
     "github.com/docker/docker/pkg/jsonmessage",
     "github.com/docker/docker/pkg/term",
     "github.com/ghodss/yaml",
+    "github.com/go-openapi/spec",
     "github.com/gobuffalo/packr",
     "github.com/gogo/protobuf/protoc-gen-gofast",
     "github.com/gogo/protobuf/protoc-gen-gogofast",
@@ -1277,6 +1278,7 @@
     "k8s.io/code-generator/cmd/client-gen",
     "k8s.io/gengo/examples/deepcopy-gen",
     "k8s.io/kube-openapi/cmd/openapi-gen",
+    "k8s.io/kube-openapi/pkg/common",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
