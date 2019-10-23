@@ -19,6 +19,7 @@ package buildah
 import (
 	"fmt"
 	"io"
+	"os"
 	"os/exec"
 
 	"github.com/creack/pty"
