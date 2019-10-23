@@ -56,7 +56,7 @@ func newBuildCmd(out io.Writer) *cobra.Command {
 	f := cmd.Flags()
 	f.StringVarP(&bc.name, "name", "n", "", "Specify the name of your build or defined in spec.yaml")
 	f.StringVarP(&bc.path, "path", "p", "", "Path to your spec.yaml or build.yaml. By default will look in the current working directory")
-	f.StringVarP(&bc.builder, "builder", "b", "", "Choose either docker and buildah as the targetted image builder. By default the builder is docker.")
+	f.StringVarP(&bc.builder, "builder", "b", "docker", "Choose either docker and buildah as the targetted image builder. By default the builder is docker.")
 	f.BoolVarP(&bc.debug, "debug", "d", false, "Turn on debug logging")
 	f.StringVarP(&bc.overlay, "overlay", "o", "", "Path to your overlay.yaml file")
 
@@ -64,7 +64,9 @@ func newBuildCmd(out io.Writer) *cobra.Command {
 }
 
 func (b *buildCmd) run(args []string) error {
-	ociBuilderSpec := v1alpha1.OCIBuilderSpec{}
+	ociBuilderSpec := v1alpha1.OCIBuilderSpec{
+		Daemon: true,
+	}
 	if err := common.Read(&ociBuilderSpec, b.overlay, b.path); err != nil {
 		log.WithError(err).Errorln("failed to read spec")
 		return err
@@ -72,11 +74,8 @@ func (b *buildCmd) run(args []string) error {
 
 	// Prioritise builder passed in as argument, default builder is docker
 	builder := b.builder
-	if builder == "" {
-		builder = "docker"
-		if !ociBuilderSpec.Daemon {
-			builder = "buildah"
-		}
+	if !ociBuilderSpec.Daemon {
+		builder = "buildah"
 	}
 
 	switch v1alpha1.Framework(builder) {

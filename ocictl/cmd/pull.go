@@ -60,13 +60,15 @@ func newPullCmd(out io.Writer) *cobra.Command {
 	f := cmd.Flags()
 	f.StringVarP(&pc.name, "name", "i", "", "Specify the name of the image you want to pull")
 	f.StringVarP(&pc.path, "path", "p", "", "Path to your spec.yaml. By default will look in the current working directory")
-	f.StringVarP(&pc.builder, "builder", "b", "", "Choose either docker and buildah as the targetted image puller. By default the builder is docker.")
+	f.StringVarP(&pc.builder, "builder", "b", "docker", "Choose either docker and buildah as the targetted image puller. By default the builder is docker.")
 	f.BoolVarP(&pc.debug, "debug", "d", false, "Turn on debug logging")
 	return cmd
 }
 
 func (p *pullCmd) run(args []string) error {
-	ociBuilderSpec := v1alpha1.OCIBuilderSpec{}
+	ociBuilderSpec := v1alpha1.OCIBuilderSpec{
+		Daemon: true,
+	}
 	if err := common.Read(&ociBuilderSpec, "", p.path); err != nil {
 		log.WithError(err).Errorln("failed to read spec")
 		return err
@@ -74,11 +76,8 @@ func (p *pullCmd) run(args []string) error {
 
 	// Prioritise builder passed in as argument, default builder is docker
 	builder := p.builder
-	if builder == "" {
-		builder = "docker"
-		if !ociBuilderSpec.Daemon {
-			builder = "buildah"
-		}
+	if !ociBuilderSpec.Daemon {
+		builder = "buildah"
 	}
 
 	switch v1alpha1.Framework(builder) {

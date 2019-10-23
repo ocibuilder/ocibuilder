@@ -23,9 +23,6 @@ import (
 	"github.com/ocibuilder/ocibuilder/common/context"
 )
 
-// Daemon is the type of build framework
-type Daemon bool
-
 // NodePhase is the label for the condition of a node.
 type NodePhase string
 
@@ -93,7 +90,7 @@ type OCIBuilderSpec struct {
 	// Type of the build framework.
 	// Defaults to docker
 	// +optional
-	Daemon Daemon `json:"daemon,omitempty" protobuf:"bytes,5,opt,name=daemon"`
+	Daemon bool `json:"daemon,omitempty" protobuf:"bytes,5,opt,name=daemon"`
 }
 
 // OCIBuilderStatus holds the status of a OCIBuilder resource
