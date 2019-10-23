@@ -43,6 +43,7 @@ func newOperationContext(builder *v1alpha1.OCIBuilder, controller *Controller) *
 			common.LabelOCIBuilderName: builder.Name,
 			common.LabelNamespace:      builder.Namespace,
 		}).Logger,
+		updated: false,
 	}
 }
 
