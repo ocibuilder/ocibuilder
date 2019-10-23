@@ -53,7 +53,7 @@ func newLoginCmd(out io.Writer) *cobra.Command {
 	}
 	f := cmd.Flags()
 	f.StringVarP(&lc.path, "path", "p", "", "Path to your spec.yaml or login.yaml. By default will look in the current working directory")
-	f.StringVarP(&lc.builder, "builder", "b", "", "Choose either docker and buildah as the targetted image puller. By default the builder is docker.")
+	f.StringVarP(&lc.builder, "builder", "b", "docker", "Choose either docker and buildah as the targetted image puller. By default the builder is docker.")
 	f.BoolVarP(&lc.debug, "debug", "d", false, "Turn on debug logging")
 	return cmd
 }
@@ -67,11 +67,8 @@ func (l *loginCmd) run(args []string) error {
 
 	// Prioritise builder passed in as argument, default builder is docker
 	builder := l.builder
-	if builder == "" {
-		builder = "docker"
-		if !ociBuilderSpec.Daemon {
-			builder = "buildah"
-		}
+	if !ociBuilderSpec.Daemon {
+		builder = "buildah"
 	}
 
 	switch v1alpha1.Framework(builder) {
