@@ -18,17 +18,16 @@ package ocibuilder
 
 import (
 	"context"
-	"fmt"
-	"github.com/ocibuilder/ocibuilder/common"
-	"github.com/pkg/errors"
-	"k8s.io/apimachinery/pkg/util/wait"
 	"log"
 	"time"
 
-	base "github.com/ocibuilder/ocibuilder"
+	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	ociv1alpha1 "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
+	"github.com/ocibuilder/ocibuilder/provenance"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
@@ -96,7 +95,7 @@ func (ctrl *Controller) processNextItem() bool {
 
 	obj, exists, err := ctrl.informer.GetIndexer().GetByKey(key.(string))
 	if err != nil {
-		fmt.Printf("failed to get ocibuilder '%s' from informer index: %+v", key, err)
+		ctrl.logger.WithError(err).WithField("key", key).Errorln("failed to get ocibuilder from informer index")
 		return true
 	}
 
@@ -107,7 +106,7 @@ func (ctrl *Controller) processNextItem() bool {
 
 	builder, ok := obj.(*v1alpha1.OCIBuilder)
 	if !ok {
-		fmt.Printf("key '%s' in index is not a builder", key)
+		ctrl.logger.WithError(err).WithField("key", key).Errorln("key in index is not a builder")
 		return true
 	}
 
@@ -152,10 +151,9 @@ func (ctrl *Controller) Run(ctx context.Context, gwThreads, eventThreads int) {
 	ctrl.logger.WithFields(
 		map[string]interface{}{
 			common.LabelKeyControllerInstanceID: ctrl.Config.InstanceID,
-			common.LabelVersion:                 base.GetVersion().Version,
+			common.LabelVersion:                 provenance.GetProvenance().Version,
 		}).Info("starting controller")
-	_, err := ctrl.watchControllerConfigMap(ctx)
-	if err != nil {
+	if _, err := ctrl.watchControllerConfigMap(ctx); err != nil {
 		ctrl.logger.WithError(err).Error("failed to register watch for controller config map")
 		return
 	}

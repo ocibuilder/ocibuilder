@@ -1,8 +1,25 @@
+/*
+Copyright 2019 BlackRock, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package ocibuilder
 
 import (
 	"context"
 	"fmt"
+	"github.com/pkg/errors"
 
 	"github.com/ghodss/yaml"
 	"github.com/ocibuilder/ocibuilder/common"
@@ -26,17 +43,15 @@ func (ctrl *Controller) watchControllerConfigMap(ctx context.Context) (cache.Con
 			AddFunc: func(obj interface{}) {
 				if cm, ok := obj.(*corev1.ConfigMap); ok {
 					ctrl.logger.Info("detected configmap update. updating the controller config")
-					err := ctrl.updateConfig(cm)
-					if err != nil {
-						ctrl.logger.Error("update of config failed", "err", err)
+					if err := ctrl.updateConfig(cm); err != nil {
+						ctrl.logger.WithError(err).Errorln("update of config failed")
 					}
 				}
 			},
 			UpdateFunc: func(old, new interface{}) {
 				if newCm, ok := new.(*corev1.ConfigMap); ok {
 					ctrl.logger.Info("detected configmap update. updating the controller config.")
-					err := ctrl.updateConfig(newCm)
-					if err != nil {
+					if err := ctrl.updateConfig(newCm); err != nil {
 						ctrl.logger.WithError(err).Error("update of config failed")
 					}
 				}
@@ -49,14 +64,14 @@ func (ctrl *Controller) watchControllerConfigMap(ctx context.Context) (cache.Con
 
 // creates a new config map watcher
 func (ctrl *Controller) newControllerConfigMapWatch() *cache.ListWatch {
-	x := ctrl.kubeClient.CoreV1().RESTClient()
+	client := ctrl.kubeClient.CoreV1().RESTClient()
 	resource := "configmaps"
 	name := ctrl.Configmap
 	fieldSelector := fields.ParseSelectorOrDie(fmt.Sprintf("metadata.name=%s", name))
 
 	listFunc := func(options metav1.ListOptions) (runtime.Object, error) {
 		options.FieldSelector = fieldSelector.String()
-		req := x.Get().
+		req := client.Get().
 			Namespace(ctrl.Namespace).
 			Resource(resource).
 			VersionedParams(&options, metav1.ParameterCodec)
@@ -65,7 +80,7 @@ func (ctrl *Controller) newControllerConfigMapWatch() *cache.ListWatch {
 	watchFunc := func(options metav1.ListOptions) (watch.Interface, error) {
 		options.Watch = true
 		options.FieldSelector = fieldSelector.String()
-		req := x.Get().
+		req := client.Get().
 			Namespace(ctrl.Namespace).
 			Resource(resource).
 			VersionedParams(&options, metav1.ParameterCodec)
@@ -88,7 +103,7 @@ func (ctrl *Controller) ResyncConfig(namespace string) error {
 func (ctrl *Controller) updateConfig(cm *corev1.ConfigMap) error {
 	configStr, ok := cm.Data[common.ControllerConfigMapKey]
 	if !ok {
-		return fmt.Errorf("configMap '%s' does not have key '%s'", ctrl.Configmap, common.ControllerConfigMapKey)
+		return errors.Errorf("configMap '%s' does not have key '%s'", ctrl.Configmap, common.ControllerConfigMapKey)
 	}
 	var config *ControllerConfig
 	err := yaml.Unmarshal([]byte(configStr), &config)
