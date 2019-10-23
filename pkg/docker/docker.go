@@ -42,7 +42,7 @@ type Docker struct {
 }
 
 // Build is used to execute docker build and optionally purge the image after the build
-func (d Docker) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
+func (d *Docker) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	log := d.Logger
 	cli := d.Client
 	buildOpts, err := common.ParseBuildSpec(spec.Build)

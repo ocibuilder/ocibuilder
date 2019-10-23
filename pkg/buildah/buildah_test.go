@@ -38,6 +38,7 @@ func TestBuildah_Build(t *testing.T) {
 	}
 	_, err := b.Build(dummy.Spec)
 	assert.Equal(t, nil, err)
+	b.Clean()
 }
 
 // TestBuildah_Login is the test for a buildah login
