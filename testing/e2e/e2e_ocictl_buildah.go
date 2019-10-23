@@ -21,7 +21,7 @@ var _ = Describe("ocictl buildah", func() {
 	})
 
 	It("completes a build and exits with status code 0", func() {
-		args := []string{"build", "-b", "buildah", "-p", "./resources/go-test-service"}
+		args := []string{"build", "-b", "buildah", "-s", "vfs", "-p", "./resources/go-test-service"}
 		session = utils.RunOcictl(ocictlPath, args)
 		Eventually(func() *gexec.Session {
 			return session
