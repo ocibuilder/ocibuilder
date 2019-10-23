@@ -54,3 +54,13 @@ test:
 
 clean:
 	-rm -rf ${CURRENT_DIR}/dist
+
+dep:
+	dep ensure -v
+
+openapigen:
+	hack/update-openapigen.sh
+
+codegen:
+	hack/update-codegen.sh
+	hack/verify-codegen.sh

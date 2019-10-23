@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package v1alpha1
 
 import (
@@ -22,7 +23,7 @@ import (
 	"github.com/ocibuilder/ocibuilder/common/context"
 )
 
-// Type of build framework
+// Daemon is the type of build framework
 type Daemon bool
 
 // NodePhase is the label for the condition of a node.
@@ -40,12 +41,16 @@ const (
 type Framework string
 
 const (
-	DockerFramework  Framework = "docker"
+	// DockerFramework is the type of docker framework
+	DockerFramework Framework = "docker"
+	// BuildahFramework is the type of buildah framework
 	BuildahFramework Framework = "buildah"
 )
 
 const (
-	AnsiblePath       string = "ansible"
+	// AnsiblePath is the path for ansible module
+	AnsiblePath string = "ansible"
+	// AnsibleGalaxyPath is the path of ansible galaxy
 	AnsibleGalaxyPath string = "ansible-galaxy"
 )
 
@@ -65,21 +70,25 @@ type OCIBuilder struct {
 type OCIBuilderList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata" protobuf:"bytes,1,name=metadata"`
-	Items           []OCIBuilder `json:"items" protobuf:"bytes,2,name=items"`
+	// +listType=map
+	Items []OCIBuilder `json:"items" protobuf:"bytes,2,name=items"`
 }
 
 // OCIBuilderSpec represents OCIBuilder specifications.
 type OCIBuilderSpec struct {
 	// Envs are the list of environment variables available to components.
 	// +optional
+	// +listType=map
 	Params []Param `json:"params,omitempty" protobuf:"bytes,1,opt,name=params"`
 	// Logins holds information to log into one or more registries
+	// +listType=map
 	Login []LoginSpec `json:"login,omitempty" protobuf:"bytes,2,opt,name=login"`
 	// Build represents the build specifications for images
 	// +optional
 	Build *BuildSpec `json:"build,omitempty" protobuf:"bytes,3,name=build"`
 	// Push contains specification to push images to registries
 	// +optional
+	// +listType=map
 	Push []PushSpec `json:"push,omitempty" protobuf:"bytes,4,name=push"`
 }
 
@@ -105,14 +114,16 @@ type Param struct {
 	Dest string `json:"dest" protobuf:"bytes,2,opt,name=dest"`
 	// ValueFromEnvVar is a variable which is to be replaced by an env var
 	// +optional
-	ValueFromEnvVariable string `json:"valueFromEnv,omitempty" protobuf:"bytes,3,opt,name=valueFromEnv"`
+	ValueFromEnvVariable string `json:"valueFromEnvVariable,omitempty" protobuf:"bytes,3,opt,name=valueFromEnvVariable"`
 }
 
-// BuildSpec represent the build specifications for images
+// BuildSpec represents the build specifications for images
 type BuildSpec struct {
 	// Templates are set of build templates that describe steps needed to build a Dockerfile
+	// +listType=map
 	Templates []BuildTemplate `json:"templates" protobuf:"bytes,1,rep,name=templates"`
 	// Steps within a build
+	// +listType=map
 	Steps []BuildStep `json:"steps" protobuf:"bytes,2,rep,name=steps"`
 }
 
@@ -121,6 +132,7 @@ type BuildTemplate struct {
 	// Name of the template
 	Name string `json:"name" protobuf:"bytes,1,name=name"`
 	// List of cmds in a Dockerfile
+	// +listType=
 	Cmd []BuildTemplateStep `json:"cmd" protobuf:"bytes,2,rep,name=steps"`
 }
 
@@ -136,6 +148,7 @@ type BuildTemplateStep struct {
 type DockerStep struct {
 	// Inline Dockerfile commands
 	// +optional
+	// +listType=map
 	Inline []string `json:"inline,omitempty" protobuf:"bytes,1,opt,name=inline"`
 	// Path to a file that contains Dockerfile commands
 	// +optional
@@ -174,6 +187,7 @@ type BuildStep struct {
 	// +optional
 	Daemon Daemon `json:"daemon,omitempty" protobuf:"bytes,2,opt,name=daemon"`
 	// Stages of the build
+	// +listType=map
 	Stages []Stage `json:"stages" protobuf:"bytes,3,opt,name=purge"`
 	// Git url to fetch the project from.
 	// +optional
@@ -194,21 +208,23 @@ type BuildStep struct {
 	// Context used for image build
 	// default looks at the current working directory
 	// +optional
-	Context ImageContext `json:"imageContext,omitempty" protobuf:"bytes,9,opt,name=imageContext"`
+	Context ImageContext `json:"context,omitempty" protobuf:"bytes,9,opt,name=context"`
 }
 
-// Stages
+// Stage represents a stage within the build
 type Stage struct {
+	// Metadata refers to metadata of the build stage
 	*Metadata `json:"metadata,inline" protobuf:"bytes,1,name=metadata"`
 	// BaseImage refers to parent image for given build stage.
 	Base Base `json:"base" protobuf:"bytes,2,name=base"`
 	// Template refers to one of the build templates.
 	Template string `json:"template" protobuf:"bytes,3,name=template"`
 	// Cmd refers to a template defined in a stage without a template.
+	// +listType=map
 	Cmd []BuildTemplateStep `json:"cmd" protobuf:"bytes,4,name=cmd"`
 }
 
-// Base
+// Base represents base image details
 type Base struct {
 	Image string `json:"image" protobuf:"bytes,1,name=image"`
 	// Tag is the tag for the image
@@ -219,7 +235,7 @@ type Base struct {
 	Platform string `json:"platform,omitempty" protobuf:"bytes,3,name=platform"`
 }
 
-// Metadata
+// Metadata represents data about a build step
 type Metadata struct {
 	// Name of the build step
 	Name string `json:"name" protobuf:"bytes,1,name=name"`
@@ -253,9 +269,9 @@ type RegistryCreds struct {
 // K8sCreds refers to the K8s secret that holds the registry creds.
 type K8sCreds struct {
 	// Username refers to the K8s secret that holds username
-	Username *corev1.SecretKeySelector
+	Username *corev1.SecretKeySelector `json:"username" protobuf:"bytes,1,name=username"`
 	// Password refers to the K8s secret that holds password
-	Password *corev1.SecretKeySelector
+	Password *corev1.SecretKeySelector `json:"password" protobuf:"bytes,2,name=password"`
 }
 
 // EnvCreds refers to credentials stored in env vars.
@@ -266,7 +282,7 @@ type EnvCreds struct {
 	Password string `json:"password" protobuf:"bytes,2,name=password"`
 }
 
-// Plain refers to the credentials set inline
+// PlainCreds refers to the credentials set inline
 type PlainCreds struct {
 	Username string `json:"username" protobuf:"bytes,1,name=username"`
 	Password string `json:"password"`
@@ -340,21 +356,23 @@ type ImageContext struct {
 	GitContext   *context.GitContext   `json:"gitContext" protobuf:"bytes,3,opt,name=gitContext"`
 }
 
-// Represents a single line in a Dockerfile
+// Command Represents a single line in a Dockerfile
 type Command struct {
 	// Cmd lowercased command name (e.g `from`)
 	Cmd string `json:"cmd" protobuf:"bytes,1,opt,name=cmd"`
 	// SubCmd for ONBUILD only this holds the sub-command
 	SubCmd string `json:"subCmd" protobuf:"bytes,2,opt,name=subCmd"`
 	// Json bool for whether the value is written in json
-	Json bool `json:"json" protobuf:"bytes,3,opt,name=json"`
+	IsJSON bool `json:"isJSON" protobuf:"bytes,3,opt,name=isJSON"`
 	// Original is the original source line
 	Original string `json:"original" protobuf:"bytes,4,opt,name=original"`
 	// StartLine is the original source line number
 	StartLine int `json:"startLine" protobuf:"bytes,5,opt,name=startLine"`
 	// Flags such as `--from=...` for `COPY`.
+	// +listType=map
 	Flags []string `json:"flags" protobuf:"bytes,6,opt,name=flags"`
 	// Value is the contents of the command (e.g `ubuntu:xenial`)
+	// +listType=map
 	Value []string `json:"value" protobuf:"bytes,7,opt,name=value"`
 }
 

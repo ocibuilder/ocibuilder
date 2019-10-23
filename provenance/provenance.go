@@ -23,14 +23,19 @@ import (
 	"runtime"
 )
 
+// Version information set by link flags during build. We fall back to these sane
+// default values when we build outside the Makefile context (e.g. go build or go test).
 var (
-	version = "unknown"
+	// value from VERSION file
+	version = "v0.1.0"
 	// sha1 from git, output of $(git rev-parse HEAD)
 	gitCommit = "$Format:%H$"
 	// build date in ISO8601 format, output of $(date -u +'%Y-%m-%dT%H:%M:%SZ')
 	buildDate = "1970-01-01T00:00:00Z"
-	goos      = runtime.GOOS
-	goarch    = runtime.GOARCH
+	// output from `git describe --exact-match --tags HEAD` (if clean tree state)
+	gitTag = "v0.1.0"
+	// determined from `git status --porcelain`. either 'clean' or 'dirty'
+	gitTreeState = ""
 )
 
 // Provenance holds information about the build of an executable.
@@ -41,20 +46,55 @@ type Provenance struct {
 	GitCommit string `json:"gitCommit"`
 	// BuildDate is output from  `date -u +'%Y-%m-%dT%H:%M:%SZ'`
 	BuildDate string `json:"buildDate"`
-	// GoOs holds OS name.
-	GoOs string `json:"goOs"`
-	// GoArch holds architecture name.
-	GoArch string `json:"goArch"`
+	// OS holds the operating system name.
+	OS string `json:"goOs"`
+	// Platform holds architecture name.
+	Platform string `json:"goArch"`
+	// GitTag refers to tag on a git branch
+	GitTag string `json:"gitTag"`
+	// GitTreeState is the tree state of git branch/tag
+	GitTreeState string `json:"gitTreeState"`
+	// Compiler is the go compiler
+	Compiler string `json:"compiler"`
+	// GoVersion is the version of go language
+	GoVersion string
+}
+
+// String outputs the version as a string
+func (v Provenance) String() string {
+	return v.Version
 }
 
 // GetProvenance returns an instance of Provenance.
 func GetProvenance() Provenance {
+	var versionStr string
+	if gitCommit != "" && gitTag != "" && gitTreeState == "clean" {
+		// if we have a clean tree state and the current commit is tagged,
+		// this is an official release.
+		versionStr = gitTag
+	} else {
+		// otherwise formulate a version string based on as much metadata
+		// information we have available.
+		versionStr = "v" + version
+		if len(gitCommit) >= 7 {
+			versionStr += "+" + gitCommit[0:7]
+			if gitTreeState != "clean" {
+				versionStr += ".dirty"
+			}
+		} else {
+			versionStr += "+unknown"
+		}
+	}
 	return Provenance{
-		version,
-		gitCommit,
-		buildDate,
-		goos,
-		goarch,
+		Version:      versionStr,
+		BuildDate:    buildDate,
+		OS:           runtime.GOOS,
+		GitCommit:    gitCommit,
+		GitTag:       gitTag,
+		GitTreeState: gitTreeState,
+		GoVersion:    runtime.Version(),
+		Compiler:     runtime.Compiler,
+		Platform:     fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH),
 	}
 }
 
@@ -69,8 +109,8 @@ func (v Provenance) PrintVerbose(w io.Writer) {
 		v.Version,
 		v.BuildDate,
 		v.GitCommit,
-		v.GoOs,
-		v.GoArch); err != nil {
+		v.OS,
+		v.Platform); err != nil {
 		logrus.WithError(err).Errorln("error printing ocictl verbose version")
 	}
 }

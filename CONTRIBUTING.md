@@ -46,12 +46,32 @@ For the entire package, follow this command
 For single function, add `-run <function-name>` after above command like this
 `go test -v <path-to-your-pkg>/ -run <function-name>`
 
-## Changing Types
+### Getting all the dependencies
 
-If you're making a change to the `pkg/apis`  package, please ensure you re-run the K8 code-generator scripts found in the `/hack` folder. First, ensure you have the `generate-groups.sh` script at the path: `vendor/k8s.io/code-generator/`. Next run the following command:
+```
+$ make dep
+```
+
+### Re-generating Codegen
+
+```
+$ make dep
+```
+
+If you're making a change to the `pkg/apis` package, please ensure you re-run the K8 code-generator scripts found in the `/hack` folder. Ensure you have the `generate-groups.sh` script at the path: `vendor/k8s.io/code-generator/`. Next run the following command:
 
 ```
 $ make codegen
+```
+
+### Re-generating OpenAPI
+
+```
+$ make dep
+```
+
+```
+$ make openapigen
 ```
 
 ### Caveats

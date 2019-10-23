@@ -26,9 +26,9 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/gobuffalo/packr"
 	"github.com/moby/buildkit/frontend/dockerfile/parser"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 )
 
 // ParseBuildSpec parses the build specification which is read in through spec.yml
@@ -56,11 +56,11 @@ func ParseBuildSpec(spec *v1alpha1.BuildSpec) ([]v1alpha1.ImageBuildArgs, error)
 		}
 
 		imageBuild := v1alpha1.ImageBuildArgs{
-			Name:       	step.Name,
-			Tag:        	step.Tag,
-			Dockerfile: 	dockerfilePath,
-			Purge:      	step.Purge,
-			Context:		step.Context,
+			Name:       step.Name,
+			Tag:        step.Tag,
+			Dockerfile: dockerfilePath,
+			Purge:      step.Purge,
+			Context:    step.Context,
 		}
 		imageBuilds = append(imageBuilds, imageBuild)
 
@@ -241,7 +241,7 @@ func ParseDockerCommands(dockerStep *v1alpha1.DockerStep) ([]byte, error) {
 				child = child.Next.Children[0]
 			}
 
-			cmd.Json = child.Attributes["json"]
+			cmd.IsJSON = child.Attributes["json"]
 			for n := child.Next; n != nil; n = n.Next {
 				cmd.Value = append(cmd.Value, n.Value)
 			}
