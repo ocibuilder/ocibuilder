@@ -79,7 +79,14 @@ func TestBuildah_Pull(t *testing.T) {
 func TestCreateBuildCommand(t *testing.T) {
 	expectedBuildCommand := []string{"bud", "-f", "path/to/Dockerfile", "-t", "image-name:1.0.0", "."}
 
-	buildCommand := createBuildCommand(buildArgs)
+	buildCommand := createBuildCommand(buildArgs, "")
+	assert.Equal(t, expectedBuildCommand, buildCommand)
+}
+
+func TestCreateBuildCommandStorageDriver(t *testing.T) {
+	expectedBuildCommand := []string{"bud", "-f", "path/to/Dockerfile", "--storage-driver", "vfs", "-t", "image-name:1.0.0", "."}
+
+	buildCommand := createBuildCommand(buildArgs, "vfs")
 	assert.Equal(t, expectedBuildCommand, buildCommand)
 }
 
