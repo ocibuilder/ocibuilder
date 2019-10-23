@@ -66,13 +66,13 @@ func (ctrl *Controller) watchControllerConfigMap(ctx context.Context) (cache.Con
 func (ctrl *Controller) newControllerConfigMapWatch() *cache.ListWatch {
 	client := ctrl.kubeClient.CoreV1().RESTClient()
 	resource := "configmaps"
-	name := ctrl.Configmap
+	name := ctrl.configmap
 	fieldSelector := fields.ParseSelectorOrDie(fmt.Sprintf("metadata.name=%s", name))
 
 	listFunc := func(options metav1.ListOptions) (runtime.Object, error) {
 		options.FieldSelector = fieldSelector.String()
 		req := client.Get().
-			Namespace(ctrl.Namespace).
+			Namespace(ctrl.namespace).
 			Resource(resource).
 			VersionedParams(&options, metav1.ParameterCodec)
 		return req.Do().Get()
@@ -81,7 +81,7 @@ func (ctrl *Controller) newControllerConfigMapWatch() *cache.ListWatch {
 		options.Watch = true
 		options.FieldSelector = fieldSelector.String()
 		req := client.Get().
-			Namespace(ctrl.Namespace).
+			Namespace(ctrl.namespace).
 			Resource(resource).
 			VersionedParams(&options, metav1.ParameterCodec)
 		return req.Watch()
@@ -92,7 +92,7 @@ func (ctrl *Controller) newControllerConfigMapWatch() *cache.ListWatch {
 // ResyncConfig reloads the controller config from the configmap
 func (ctrl *Controller) ResyncConfig(namespace string) error {
 	cmClient := ctrl.kubeClient.CoreV1().ConfigMaps(namespace)
-	cm, err := cmClient.Get(ctrl.Configmap, metav1.GetOptions{})
+	cm, err := cmClient.Get(ctrl.configmap, metav1.GetOptions{})
 	if err != nil {
 		return err
 	}
@@ -103,13 +103,13 @@ func (ctrl *Controller) ResyncConfig(namespace string) error {
 func (ctrl *Controller) updateConfig(cm *corev1.ConfigMap) error {
 	configStr, ok := cm.Data[common.ControllerConfigMapKey]
 	if !ok {
-		return errors.Errorf("configMap '%s' does not have key '%s'", ctrl.Configmap, common.ControllerConfigMapKey)
+		return errors.Errorf("configMap '%s' does not have key '%s'", ctrl.configmap, common.ControllerConfigMapKey)
 	}
 	var config *ControllerConfig
 	err := yaml.Unmarshal([]byte(configStr), &config)
 	if err != nil {
 		return err
 	}
-	ctrl.Config = config
+	ctrl.config = config
 	return nil
 }

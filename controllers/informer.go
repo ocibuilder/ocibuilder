@@ -28,10 +28,10 @@ import (
 )
 
 func (ctrl *Controller) instanceIDReq() (*labels.Requirement, error) {
-	if ctrl.Config.InstanceID == "" {
+	if ctrl.config.InstanceID == "" {
 		return nil, errors.New("instance id is required")
 	}
-	instanceIDReq, err := labels.NewRequirement(common.LabelKeyControllerInstanceID, selection.Equals, []string{ctrl.Config.InstanceID})
+	instanceIDReq, err := labels.NewRequirement(common.LabelKeyControllerInstanceID, selection.Equals, []string{ctrl.config.InstanceID})
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (ctrl *Controller) newControllerInformer(labelFilterRequirements *labels.Re
 	informerFactory := informers.NewSharedInformerFactoryWithOptions(
 		ctrl.ociClient,
 		resyncPeriod,
-		informers.WithNamespace(ctrl.Config.Namespace),
+		informers.WithNamespace(ctrl.config.Namespace),
 		informers.WithTweakListOptions(func(options *metav1.ListOptions) {
 			options.FieldSelector = fields.Everything().String()
 			labelSelector := labels.NewSelector().Add(*labelFilterRequirements)

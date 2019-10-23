@@ -44,18 +44,18 @@ const (
 type ControllerConfig struct {
 	// InstanceID is a label selector to limit the controller's watch of ocibuilders to a specific instance.
 	InstanceID string
-	// Namespace is a label selector filter to limit controller's watch to specific namespace
+	// namespace is a label selector filter to limit controller's watch to specific namespace
 	Namespace string
 }
 
 // Controller listens for new ocibuilder resources and hands off handling of each resource on the queue to the operator
 type Controller struct {
-	// Configmap is the name of the K8s configmap which contains controller configuration
-	Configmap string
-	// Namespace for controller
-	Namespace string
-	// Config is the controller's configuration
-	Config *ControllerConfig
+	// configmap is the name of the K8s configmap which contains controller configuration
+	configmap string
+	// namespace for controller
+	namespace string
+	// config is the controller's configuration
+	config *ControllerConfig
 	// logger is the logger for a controller
 	logger *logrus.Logger
 	// kubernetes config and apis
@@ -74,9 +74,9 @@ type Controller struct {
 func NewController(rest *rest.Config, config *ControllerConfig, logger *logrus.Logger, configmap, namespace string) *Controller {
 	rateLimiter := workqueue.NewItemExponentialFailureRateLimiter(rateLimiterBaseDelay, rateLimiterMaxDelay)
 	return &Controller{
-		Namespace:  namespace,
-		Configmap:  configmap,
-		Config:     config,
+		namespace:  namespace,
+		configmap:  configmap,
+		config:     config,
 		logger:     logger,
 		kubeConfig: rest,
 		kubeClient: kubernetes.NewForConfigOrDie(rest),
@@ -150,7 +150,7 @@ func (ctrl *Controller) Run(ctx context.Context, gwThreads, eventThreads int) {
 	defer ctrl.queue.ShutDown()
 	ctrl.logger.WithFields(
 		map[string]interface{}{
-			common.LabelKeyControllerInstanceID: ctrl.Config.InstanceID,
+			common.LabelKeyControllerInstanceID: ctrl.config.InstanceID,
 			common.LabelVersion:                 provenance.GetProvenance().Version,
 		}).Info("starting controller")
 	if _, err := ctrl.watchControllerConfigMap(ctx); err != nil {
