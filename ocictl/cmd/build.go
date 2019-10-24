@@ -124,6 +124,9 @@ func (b *buildCmd) run(args []string) error {
 				if err := utils.Output(imageResponse); err != nil {
 					return err
 				}
+				if err := b.Wait(); err != nil {
+					return err
+				}
 			}
 			b.Clean()
 		}

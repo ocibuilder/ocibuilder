@@ -34,6 +34,7 @@ type Buildah struct {
 	Logger *logrus.Logger
 	StorageDriver string
 	Metadata []v1alpha1.ImageMeta
+	execCmd *exec.Cmd
 }
 
 var executor = exec.Command
@@ -63,6 +64,8 @@ func (b *Buildah) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 
 		cmd := executor("buildah", buildCommand...)
 		out, err := pty.Start(cmd)
+		b.execCmd = cmd
+
 		if err != nil {
 			log.WithError(err).Errorln("failed to execute buildah bud...")
 			return nil, err
@@ -291,4 +294,15 @@ func (b Buildah) Clean() {
 			}
 		}
 	}
+}
+
+func (b Buildah) Wait() error {
+	if err := b.execCmd.Wait(); err != nil {
+		if exitError, ok := err.(*exec.ExitError); ok {
+			fmt.Printf("Exit code is %d\n", exitError.ExitCode())
+			error := fmt.Sprintf("error in executing cmd, exited with code %d", exitError.ExitCode())
+			return errors.New(error)
+		}
+	}
+	return nil
 }
