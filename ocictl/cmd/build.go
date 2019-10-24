@@ -91,6 +91,7 @@ func (b *buildCmd) run(args []string) error {
 				return err
 			}
 
+			log.WithField("responses", len(res)).Debugln("received responses and running build")
 			for idx, imageResponse := range res {
 				log.WithField("step: ", idx).Infoln("running build step")
 
@@ -112,6 +113,7 @@ func (b *buildCmd) run(args []string) error {
 				Logger: common.GetLogger(b.debug),
 				StorageDriver: b.storageDriver,
 			}
+			log := b.Logger
 
 			res, err := b.Build(ociBuilderSpec)
 			if err != nil {
@@ -119,14 +121,16 @@ func (b *buildCmd) run(args []string) error {
 				return err
 			}
 
+			log.WithField("responses", len(res)).Debugln("received responses and running build")
 			for idx, imageResponse := range res {
 				log.WithField("step: ", idx).Infoln("running build step")
 				if err := utils.Output(imageResponse); err != nil {
 					return err
 				}
-				if err := b.Wait(); err != nil {
+				if err := b.Wait(idx); err != nil {
 					return err
 				}
+				log.WithField("response", idx).Debugln("response has finished executing")
 			}
 			b.Clean()
 		}
