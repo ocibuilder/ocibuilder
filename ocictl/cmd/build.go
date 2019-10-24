@@ -20,12 +20,12 @@ import (
 	"errors"
 	"io"
 
+	"github.com/docker/docker/client"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/ocictl/pkg/utils"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/buildah"
 	"github.com/ocibuilder/ocibuilder/pkg/docker"
-	"github.com/docker/docker/client"
 	"github.com/spf13/cobra"
 )
 
@@ -35,13 +35,13 @@ It can run a build in both docker and buildah varieties.
 `
 
 type buildCmd struct {
-	out io.Writer
-	name string
-	path string
-	builder string
-	overlay string
+	out           io.Writer
+	name          string
+	path          string
+	builder       string
+	overlay       string
 	storageDriver string
-	debug bool
+	debug         bool
 }
 
 func newBuildCmd(out io.Writer) *cobra.Command {
@@ -83,8 +83,8 @@ func (b *buildCmd) run(args []string) error {
 			}
 
 			d := docker.Docker{
-				Client:      cli,
-				Logger:      common.GetLogger(b.debug),
+				Client: cli,
+				Logger: common.GetLogger(b.debug),
 			}
 			res, err := d.Build(ociBuilderSpec)
 			if err != nil {
@@ -109,7 +109,7 @@ func (b *buildCmd) run(args []string) error {
 	case v1alpha1.BuildahFramework:
 		{
 			b := buildah.Buildah{
-				Logger: common.GetLogger(b.debug),
+				Logger:        common.GetLogger(b.debug),
 				StorageDriver: b.storageDriver,
 			}
 
