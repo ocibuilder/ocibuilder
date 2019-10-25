@@ -118,10 +118,10 @@ var buildArgs = v1alpha1.ImageBuildArgs{
 	Name:       "image-name",
 	Tag:        "1.0.0",
 	Dockerfile: "path/to/Dockerfile",
-	Context:	v1alpha1.ImageContext{
+	Context: v1alpha1.ImageContext{
 		LocalContext: &context.LocalContext{
-		ContextPath: ".",
-	}},
+			ContextPath: ".",
+		}},
 }
 
 // enabling the mocking of exec commands as in https://npf.io/2015/06/testing-exec-command/

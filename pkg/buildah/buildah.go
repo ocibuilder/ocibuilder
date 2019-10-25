@@ -29,7 +29,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// This is Buildah struct which consists of a logger and context path
+// Buildah is  the struct which consists of a logger and context path
 type Buildah struct {
 	Logger      *logrus.Logger
 	StorageDriver string
