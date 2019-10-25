@@ -203,10 +203,10 @@ type BuildStep struct {
 	// defaults to false
 	// +optional
 	Purge bool `json:"purge,omitempty" protobuf:"bytes,8,opt,name=purge"`
-	// BuildContext used for image build
+	// Context used for image build
 	// default looks at the current working directory
 	// +optional
-	BuildContext *BuildContext `json:"context,omitempty" protobuf:"bytes,9,opt,name=context"`
+	Context ImageContext `json:"context,omitempty" protobuf:"bytes,9,opt,name=context"`
 }
 
 // Stage represents a stage within the build
@@ -340,26 +340,20 @@ type ImageBuildArgs struct {
 	// defaults to false
 	// +optional
 	Purge bool `json:"purge,omitempty" protobuf:"bytes,5,opt,name=purge"`
-	// BuildContextPath is the path of the build context for Docker and Buildah
+	// Context is the context for Docker and Buildah
 	// defaults to LocalContext in current working directory
 	// +optional
-	BuildContextPath string `json:"buildContextPath,omitempty" protobuf:"bytes,6,opt,name=buildContextPath"`
+	Context ImageContext `json:"context,omitempty" protobuf:"bytes,6,opt,name=context"`
 }
 
-// BuildContext stores the chosen build context for your build, this can be Local, S3 or Git
-type BuildContext struct {
+// ImageContext stores the chosen build context for your build, this can be Local, S3 or Git
+type ImageContext struct {
 	// Local context contains local context information for a build
-	LocalContext *LocalContext `json:"localContext,omitempty" protobuf:"bytes,1,opt,name=localContext"`
+	LocalContext *LocalContext `json:"localContext" protobuf:"bytes,1,opt,name=localContext"`
 	// S3Context refers to the context stored on S3 bucket for a build
-	S3Context *S3Context `json:"s3Context,omitempty" protobuf:"bytes,2,opt,name=s3Context"`
+	S3Context *S3Context `json:"s3Context" protobuf:"bytes,2,opt,name=s3Context"`
 	// GitContext refers to the context stored on Git repository
-	GitContext *GitContext `json:"gitContext,omitempty" protobuf:"bytes,3,opt,name=gitContext"`
-	// GCSContext refers to the context stored on the GCS
-	GCSContext *GCSContext `json:"gcsContext,omitempty" protobuf:"bytes,4,opt,name=gcsContext"`
-	// AzureBlobContext refers to the context stored on the Azure Storage Blob
-	AzureBlobContext *AzureBlobContext `json:"azureBlobContext,omitempty" protobuf:"bytes,5,opt,name=azureBlobContext"`
-	// AliyunOSSContext refers to the context stored on the Aliyun OSS
-	AliyunOSSContext *AliyunOSSContext `json:"aliyunOSSContext,omitempty" protobuf:"bytes,6,opt,name=aliyunOSSContext"`
+	GitContext *GitContext `json:"gitContext" protobuf:"bytes,3,opt,name=gitContext"`
 }
 
 // LocalContext stores the path for your local build context, implements the ContextReader interface
@@ -368,22 +362,29 @@ type LocalContext struct {
 	ContextPath string `json:"contextPath" protobuf:"bytes,1,opt,name=contextPath"`
 }
 
-// KubeSecretCredentials refers to K8s secret that holds the credentials
-type KubeSecretCredentials struct {
-	// Secret is the K8s secret key selector
-	Secret *corev1.SecretKeySelector `json:"secret" protobuf:"bytes,1,name=secret"`
-	// Namespace where the secret is stored
-	Namespace string `json:"namespace" protobuf:"bytes,2,name=namespace"`
+// S3EnvCreds holds the references to environment variables that holds access and secret keys
+type S3EnvCreds struct {
+	// EnvVarAccessKey refers to env var that holds the access key
+	EnvVarAccessKey string `json:"envVarKey" protobuf:"bytes,1,name=envVarAccessKey"`
+	// EnvVarSecretKey refers to env var that holds the secret key
+	EnvVarSecretKey string `json:"envVarSecretKey" protobuf:"bytes,2,name=envVarSecretKey"`
 }
 
-// Credentials encapsulates different ways of storing the credentials
-type Credentials struct {
-	// Plain text credentials
-	Plain string `json:"plain,omitempty" protobuf:"bytes,1,opt,name=plain"`
-	// Env refers to credentials stored in environment variable
-	Env string `json:"env,omitempty" protobuf:"bytes,2,opt,name=env"`
-	// KubeSecret refers to K8s secret that holds the credentials
-	KubeSecret *KubeSecretCredentials `json:"kubeSecret,omitempty" protobuf:"bytes,3,opt,name=kubeSecret"`
+// S3PlainCreds holds reference to plain text access and secret keys
+type S3PlainCreds struct {
+	// AccessKey contains the access key
+	AccessKey string `json:"accessKey" protobuf:"bytes,1,name=accessKey"`
+	// SecretKey contains the secret key
+	SecretKey string `json:"secretKey" protobuf:"bytes,2,name=secretKey"`
+}
+
+// S3K8sCreds holds reference to K8s secret that holds access and secret keys
+type S3K8sCreds struct {
+	AccessKey *corev1.SecretKeySelector `json:"accessKey" protobuf:"bytes,1,name=accessKey"`
+	SecretKey *corev1.SecretKeySelector `json:"secretKey" protobuf:"bytes,2,name=secretKey"`
+	// Namespace where creds are stored.
+	// +optional
+	Namespace string `json:"namespace,omitempty" protobuf:"bytes,4,opt,name=namespace"`
 }
 
 // S3Bucket contains information to describe an S3 Bucket
@@ -394,12 +395,35 @@ type S3Bucket struct {
 
 // S3Context refers to context stored on S3 bucket to build an image
 type S3Context struct {
-	Endpoint  string       `json:"endpoint" protobuf:"bytes,1,name=endpoint"`
-	Bucket    *S3Bucket    `json:"bucket" protobuf:"bytes,2,name=bucket"`
-	Region    string       `json:"region,omitempty" protobuf:"bytes,3,opt,name=region"`
-	Insecure  bool         `json:"insecure,omitempty" protobuf:"variant,4,opt,name=insecure"`
-	AccessKey *Credentials `json:"accessKey" protobuf:"bytes,5,name=accessKey"`
-	SecretKey *Credentials `json:"secretKey" protobuf:"bytes,6,name=secretKey"`
+	Endpoint    string        `json:"endpoint" protobuf:"bytes,1,name=endpoint"`
+	Bucket      *S3Bucket     `json:"bucket" protobuf:"bytes,2,name=bucket"`
+	Region      string        `json:"region,omitempty" protobuf:"bytes,3,opt,name=region"`
+	Insecure    bool          `json:"insecure,omitempty" protobuf:"varint,4,opt,name=insecure"`
+	EnvVarCreds *S3EnvCreds   `json:"envVarCreds,omitempty" protobuf:"bytes,5,opt,name=envVarCreds"`
+	PlainCreds  *S3PlainCreds `json:"plainCreds,omitempty" protobuf:"bytes,6,opt,name=plainCreds"`
+	K8sCreds    *S3K8sCreds   `json:"k8sCreds,omitempty" protobuf:"bytes,7,opt,name=k8sCreds"`
+}
+
+// GitEnvCreds contain reference to env vars that store git username and password
+type GitEnvCreds struct {
+	EnvVarUsername string `json:"envVarUsername" protobuf:"bytes,1,opt,name=envVarUsername"`
+	EnvVarPassword string `json:"envVarPassword" protobuf:"bytes,2,opt,name=envVarPassword"`
+}
+
+// GitPlainCreds stores git username and password as plain text
+type GitPlainCreds struct {
+	Username string `json:"username" protobuf:"bytes,1,opt,name=username"`
+	Password string `json:"password" protobuf:"bytes,2,opt,name=password"`
+}
+
+// GitCreds contain reference to K8s secret that stores git username and password
+type GitK8sCreds struct {
+	// Username refers to K8s secret that holds the username
+	Username *corev1.SecretKeySelector `json:"username" protobuf:"bytes,1,name=username"`
+	// Password refers to K8s secret that holds the password
+	Password *corev1.SecretKeySelector `json:"password" protobuf:"bytes,2,name=password"`
+	// Namespace where K8s secret is available.
+	Namespace string `json:"namespace,omitempty" protobuf:"bytes,3,name=namespace"`
 }
 
 // GitRemoteConfig contains the configuration of a Git remote
@@ -416,66 +440,30 @@ type GitRemoteConfig struct {
 type GitContext struct {
 	// Git URL
 	URL string `json:"url" protobuf:"bytes,1,name=url"`
-	// Username for authentication
-	Username *Credentials `json:"username,omitempty" protobuf:"bytes,2,opt,name=username"`
-	// Password for authentication
-	Password *Credentials `json:"password,omitempty" protobuf:"bytes,3,opt,name=password"`
+	// Directory to clone the repository. We clone complete directory because GitArtifact is not limited to any specific Git service providers.
+	// Hence we don't use any specific git provider client.
+	CloneDirectory string `json:"cloneDirectory" protobuf:"bytes,2,name=cloneDirectory"`
+	// Creds contain reference to git username and password
+	// +optional
+	Creds *GitK8sCreds `json:"creds,omitempty" protobuf:"bytes,3,opt,name=creds"`
 	// SSHKeyPath is path to your ssh key path. Use this if you don't want to provide username and password.
 	// ssh key path must be mounted in sensor pod.
 	// +optional
-	SSHKeyPath string `json:"sshKeyPath,omitempty" protobuf:"bytes,4,opt,name=sshKeyPath"`
+	SSHKeyPath string `json:"sshKeyPath,omitempty" protobuf:"bytes,5,opt,name=sshKeyPath"`
 	// Branch to use to pull trigger resource
 	// +optional
-	Branch string `json:"branch,omitempty" protobuf:"bytes,5,opt,name=branch"`
+	Branch string `json:"branch,omitempty" protobuf:"bytes,7,opt,name=branch"`
 	// Tag to use to pull trigger resource
 	// +optional
-	Tag string `json:"tag,omitempty" protobuf:"bytes,6,opt,name=tag"`
+	Tag string `json:"tag,omitempty" protobuf:"bytes,8,opt,name=tag"`
 	// Ref to use to pull trigger resource. Will result in a shallow clone and
 	// fetch.
 	// +optional
-	Ref string `json:"ref,omitempty" protobuf:"bytes,7,opt,name=ref"`
+	Ref string `json:"ref,omitempty" protobuf:"bytes,9,opt,name=ref"`
 	// Remote to manage set of tracked repositories. Defaults to "origin".
 	// Refer https://git-scm.com/docs/git-remote
 	// +optional
-	Remote *GitRemoteConfig `json:"remote" protobuf:"bytes,8,opt,name=remote"`
-}
-
-// GCSContext refers to the context stored on GCP Storage
-type GCSContext struct {
-	// CredentialsFilePath refers to the credentials file path
-	CredentialsFilePath string `json:"credentialsFilePath,omitempty" protobuf:"bytes,1,opt,name=credentialsFilePath"`
-	// APIKey for authentication
-	APIKey *Credentials `json:"apiKey,omitempty" protobuf:"bytes,2,opt,name=apiKey"`
-	// AuthRequired checks if authentication is required to connect to GCS
-	AuthRequired bool `json:"authRequired" protobuf:"bytes,3,name=authRequired"`
-	// Endpoint is the storage to connect to
-	Endpoint string `json:"endpoint" protobuf:"bytes,4,name=endpoint"`
-	// Bucket refers to the bucket name on gcs
-	Bucket *S3Bucket `json:"bucket" protobuf:"bytes,5,name=bucket"`
-	// Region refers to GCS region
-	Region string `json:"region,omitempty" protobuf:"bytes,6,opt,name=region"`
-}
-
-// AzureBlobContext refers to configuration required to fetch context from Azure Storage Blob
-type AzureBlobContext struct {
-	// AzureStorageAccount refers to the account name
-	Account *Credentials `json:"account" protobuf:"bytes,1,name=account"`
-	// AccessKey refers to the access key
-	AccessKey *Credentials `json:"accessKey" protobuf:"bytes,2,name=accessKey"`
-	// URL refers to blob's URL
-	URL *Credentials `json:"url" protobuf:"bytes,3,name=url"`
-}
-
-// AliyunOSSContext refers to configuration required to fetch context from Aliyun OSS
-type AliyunOSSContext struct {
-	// AccessId refers to access id
-	AccessId *Credentials `json:"accessId" protobuf:"bytes,1,name=accessId"`
-	// AccessSecret refers to access secret
-	AccessSecret *Credentials `json:"accessSecret" protobuf:"bytes,2,name=accessSecret"`
-	// Endpoint is the storage to connect to
-	Endpoint string `json:"endpoint" protobuf:"bytes,4,name=endpoint"`
-	// Bucket refers to the bucket name on gcs
-	Bucket *S3Bucket `json:"bucket" protobuf:"bytes,5,name=bucket"`
+	Remote *GitRemoteConfig `json:"remote" protobuf:"bytes,10,opt,name=remote"`
 }
 
 // Command Represents a single line in a Dockerfile

@@ -14,11 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package build_context
+package context
 
-import (
-	"testing"
-)
+import "io"
 
-func TestGitContext_Read(t *testing.T) {
+type GitContext struct {
+	Url string
+}
+
+func (ctx GitContext) Read() (io.ReadCloser, error) {
+	return nil, nil
 }
