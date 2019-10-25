@@ -42,7 +42,7 @@ jobs:
     machine:
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
-      docker version
+      - run: docker version
 #      - checkout
 #      - restore_cache:
 #          keys:
