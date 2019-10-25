@@ -40,7 +40,7 @@ jobs:
           command: make test
   e2e_test:
     machine: true
-    working_directory: /go/src/github.com/ocibuilder/ocibuilder
+#    working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
       # start proprietary DB using private Docker image
