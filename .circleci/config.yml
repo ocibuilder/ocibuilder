@@ -39,31 +39,25 @@ jobs:
           name: Run unit tests
           command: make test
   e2e_test:
-    docker:
-      - image: ocibuildere2e/ocibuilder-base-go:v0.1.0
+    machine:
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
-      - setup_remote_docker
-      - checkout
-      - restore_cache:
-          keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}
-            - go-dep-cache-
-      - run: go get -u github.com/gobuffalo/packr/packr
-      - run:
-          name: Build Linux Artifact
-          command: make ocictl-linux
-      - run:
-          name: Run e2e tests
-          command: |
-            go get -u github.com/onsi/ginkgo/ginkgo
-            go get -u github.com/onsi/gomega/...
-            ginkgo -v ./testing/e2e
-      - run:
-          name: Buildah test
-          command: |
-            cd ./testing/e2e/resources/go-test-service
-            buildah bud .
+      docker version
+#      - checkout
+#      - restore_cache:
+#          keys:
+#            - go-dep-cache-{{ checksum "Gopkg.lock" }}
+#            - go-dep-cache-
+#      - run: go get -u github.com/gobuffalo/packr/packr
+#      - run:
+#          name: Build Linux Artifact
+#          command: make ocictl-linux
+#      - run:
+#          name: Run e2e tests
+#          command: |
+#            go get -u github.com/onsi/ginkgo/ginkgo
+#            go get -u github.com/onsi/gomega/...
+#            ginkgo -v ./testing/e2e
   # build_linux runs the build of the linux ocictl artifact and persists the binary to the circleci workspace
   build_linux:
     docker:
