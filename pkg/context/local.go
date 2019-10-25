@@ -25,12 +25,6 @@ import (
 	"os"
 )
 
-// LocalContext stores the path for your local build context, implements the ContextReader interface
-type LocalContext struct {
-	// ContextPath is the path to your build context
-	ContextPath string `json:"contextPath" protobuf:"bytes,1,opt,name=contextPath"`
-}
-
 func (ctx LocalContext) Read() (io.ReadCloser, error) {
 	fullPath := fmt.Sprintf("%s/docker-ctx.tar", ctx.ContextPath)
 
@@ -38,7 +32,7 @@ func (ctx LocalContext) Read() (io.ReadCloser, error) {
 		return nil, errors.New("cannot have empty contextPath: specify . for current directory")
 	}
 
-	defer func(){
+	defer func() {
 		if r := recover(); r != nil {
 			logrus.Warnln("panic in context read, recovered for cleanup")
 		}

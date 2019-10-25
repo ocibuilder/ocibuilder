@@ -22,9 +22,7 @@ import (
 )
 
 func TestS3Context_Read(t *testing.T) {
-	s3context := S3Context{
-
-	}
+	s3context := S3Context{}
 	_, err := s3context.Read()
 	assert.Equal(t, nil, err)
 }

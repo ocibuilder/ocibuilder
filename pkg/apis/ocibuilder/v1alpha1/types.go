@@ -19,8 +19,6 @@ package v1alpha1
 import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	"github.com/ocibuilder/ocibuilder/common/context"
 )
 
 // Daemon is the type of build framework
@@ -351,9 +349,121 @@ type ImageBuildArgs struct {
 // ImageContext stores the chosen build context for your build, this can be Local, S3 or Git
 type ImageContext struct {
 	// Local context contains local context information for a build
-	LocalContext *context.LocalContext `json:"localContext" protobuf:"bytes,1,opt,name=localContext"`
-	S3Context    *context.S3Context    `json:"s3Context" protobuf:"bytes,2,opt,name=s3Context"`
-	GitContext   *context.GitContext   `json:"gitContext" protobuf:"bytes,3,opt,name=gitContext"`
+	LocalContext *LocalContext `json:"localContext" protobuf:"bytes,1,opt,name=localContext"`
+	// S3Context refers to the context stored on S3 bucket for a build
+	S3Context *S3Context `json:"s3Context" protobuf:"bytes,2,opt,name=s3Context"`
+	// GitContext refers to the context stored on Git repository
+	GitContext *GitContext `json:"gitContext" protobuf:"bytes,3,opt,name=gitContext"`
+}
+
+// LocalContext stores the path for your local build context, implements the ContextReader interface
+type LocalContext struct {
+	// ContextPath is the path to your build context
+	ContextPath string `json:"contextPath" protobuf:"bytes,1,opt,name=contextPath"`
+}
+
+// S3EnvCreds holds the references to environment variables that holds access and secret keys
+type S3EnvCreds struct {
+	// EnvVarAccessKey refers to env var that holds the access key
+	EnvVarAccessKey string `json:"envVarKey" protobuf:"bytes,1,name=envVarAccessKey"`
+	// EnvVarSecretKey refers to env var that holds the secret key
+	EnvVarSecretKey string `json:"envVarSecretKey" protobuf:"bytes,2,name=envVarSecretKey"`
+}
+
+// S3PlainCreds holds reference to plain text access and secret keys
+type S3PlainCreds struct {
+	// AccessKey contains the access key
+	AccessKey string `json:"accessKey" protobuf:"bytes,1,name=accessKey"`
+	// SecretKey contains the secret key
+	SecretKey string `json:"secretKey" protobuf:"bytes,2,name=secretKey"`
+}
+
+// S3K8sCreds holds reference to K8s secret that holds access and secret keys
+type S3K8sCreds struct {
+	AccessKey *corev1.SecretKeySelector `json:"accessKey" protobuf:"bytes,1,name=accessKey"`
+	SecretKey *corev1.SecretKeySelector `json:"secretKey" protobuf:"bytes,2,name=secretKey"`
+	// Namespace where creds are stored.
+	// +optional
+	Namespace string `json:"namespace,omitempty" protobuf:"bytes,4,opt,name=namespace"`
+}
+
+// S3Bucket contains information to describe an S3 Bucket
+type S3Bucket struct {
+	Key  string `json:"key,omitempty" protobuf:"bytes,1,opt,name=key"`
+	Name string `json:"name" protobuf:"bytes,2,opt,name=name"`
+}
+
+// S3Context refers to context stored on S3 bucket to build an image
+type S3Context struct {
+	Endpoint    string        `json:"endpoint" protobuf:"bytes,1,name=endpoint"`
+	Bucket      *S3Bucket     `json:"bucket" protobuf:"bytes,2,name=bucket"`
+	Region      string        `json:"region,omitempty" protobuf:"bytes,3,opt,name=region"`
+	Insecure    bool          `json:"insecure,omitempty" protobuf:"varint,4,opt,name=insecure"`
+	EnvVarCreds *S3EnvCreds   `json:"envVarCreds,omitempty" protobuf:"bytes,5,opt,name=envVarCreds"`
+	PlainCreds  *S3PlainCreds `json:"plainCreds,omitempty" protobuf:"bytes,6,opt,name=plainCreds"`
+	K8sCreds    *S3K8sCreds   `json:"k8sCreds,omitempty" protobuf:"bytes,7,opt,name=k8sCreds"`
+}
+
+// GitEnvCreds contain reference to env vars that store git username and password
+type GitEnvCreds struct {
+	EnvVarUsername string `json:"envVarUsername" protobuf:"bytes,1,opt,name=envVarUsername"`
+	EnvVarPassword string `json:"envVarPassword" protobuf:"bytes,2,opt,name=envVarPassword"`
+}
+
+// GitPlainCreds stores git username and password as plain text
+type GitPlainCreds struct {
+	Username string `json:"username" protobuf:"bytes,1,opt,name=username"`
+	Password string `json:"password" protobuf:"bytes,2,opt,name=password"`
+}
+
+// GitCreds contain reference to K8s secret that stores git username and password
+type GitK8sCreds struct {
+	// Username refers to K8s secret that holds the username
+	Username *corev1.SecretKeySelector `json:"username" protobuf:"bytes,1,name=username"`
+	// Password refers to K8s secret that holds the password
+	Password *corev1.SecretKeySelector `json:"password" protobuf:"bytes,2,name=password"`
+	// Namespace where K8s secret is available.
+	Namespace string `json:"namespace,omitempty" protobuf:"bytes,3,name=namespace"`
+}
+
+// GitRemoteConfig contains the configuration of a Git remote
+type GitRemoteConfig struct {
+	// Name of the remote to fetch from.
+	Name string `json:"name" protobuf:"bytes,1,name=name"`
+	// +listType=urls
+	// URLs the URLs of a remote repository. It must be non-empty. Fetch will
+	// always use the first URL, while push will use all of them.
+	URLS []string `json:"urls" protobuf:"bytes,2,rep,name=urls"`
+}
+
+// GitContext contains information about an artifact stored in git
+type GitContext struct {
+	// Git URL
+	URL string `json:"url" protobuf:"bytes,1,name=url"`
+	// Directory to clone the repository. We clone complete directory because GitArtifact is not limited to any specific Git service providers.
+	// Hence we don't use any specific git provider client.
+	CloneDirectory string `json:"cloneDirectory" protobuf:"bytes,2,name=cloneDirectory"`
+	// Creds contain reference to git username and password
+	// +optional
+	Creds *GitK8sCreds `json:"creds,omitempty" protobuf:"bytes,3,opt,name=creds"`
+	// SSHKeyPath is path to your ssh key path. Use this if you don't want to provide username and password.
+	// ssh key path must be mounted in sensor pod.
+	// +optional
+	SSHKeyPath string `json:"sshKeyPath,omitempty" protobuf:"bytes,5,opt,name=sshKeyPath"`
+	// Branch to use to pull trigger resource
+	// +optional
+	Branch string `json:"branch,omitempty" protobuf:"bytes,7,opt,name=branch"`
+	// Tag to use to pull trigger resource
+	// +optional
+	Tag string `json:"tag,omitempty" protobuf:"bytes,8,opt,name=tag"`
+	// Ref to use to pull trigger resource. Will result in a shallow clone and
+	// fetch.
+	// +optional
+	Ref string `json:"ref,omitempty" protobuf:"bytes,9,opt,name=ref"`
+	// Remote to manage set of tracked repositories. Defaults to "origin".
+	// Refer https://git-scm.com/docs/git-remote
+	// +optional
+	Remote *GitRemoteConfig `json:"remote" protobuf:"bytes,10,opt,name=remote"`
 }
 
 // Command Represents a single line in a Dockerfile
