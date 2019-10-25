@@ -86,6 +86,8 @@ func (b *buildCmd) run(args []string) error {
 				Client:      cli,
 				Logger:      common.GetLogger(b.debug),
 			}
+			log := d.Logger
+
 			res, err := d.Build(ociBuilderSpec)
 			if err != nil {
 				return err
@@ -99,10 +101,10 @@ func (b *buildCmd) run(args []string) error {
 					return errors.New("no response received from daemon - check if docker is installed and running")
 				}
 
-				err := utils.OutputJson(imageResponse)
-				if err != nil {
+				if err := utils.OutputJson(imageResponse); err != nil {
 					return err
 				}
+				log.WithField("response", idx).Debugln("response has finished executing")
 			}
 			d.Clean()
 		}
