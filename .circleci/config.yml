@@ -39,11 +39,16 @@ jobs:
           name: Run unit tests
           command: make test
   e2e_test:
-    machine:
-      image: circleci/classic:201708-01
+    machine: true
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
-      - run: docker version
+      - checkout
+      # start proprietary DB using private Docker image
+      # with credentials stored in the UI
+      - run: |
+          docker build .
+
+#      - run: docker version
 #      - checkout
 #      - restore_cache:
 #          keys:
