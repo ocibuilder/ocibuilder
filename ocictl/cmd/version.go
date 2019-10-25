@@ -23,14 +23,14 @@ import (
 )
 
 type versionCmd struct {
-	out 	io.Writer
+	out     io.Writer
 	verbose bool
 }
 
 func newVersionCmd(out io.Writer) *cobra.Command {
 	vc := &versionCmd{out: out}
 	cmd := &cobra.Command{
-		Use: "version",
+		Use:   "version",
 		Short: "prints the version of ocibuilder",
 		Run: func(cmd *cobra.Command, args []string) {
 			vc.run()

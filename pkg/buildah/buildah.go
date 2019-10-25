@@ -31,7 +31,8 @@ import (
 
 // Buildah is  the struct which consists of a logger and context path
 type Buildah struct {
-	Logger *logrus.Logger
+	Logger      *logrus.Logger
+	StorageDriver string
 }
 
 var executor = exec.Command
@@ -56,7 +57,7 @@ func (b Buildah) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 			fullPath = "." + fullPath
 		}
 
-		buildCommand := createBuildCommand(opt)
+		buildCommand := createBuildCommand(opt, b.StorageDriver)
 		log.WithField("command", buildCommand).Debug("build command to be executed")
 
 		cmd := executor("buildah", buildCommand...)
@@ -94,9 +95,12 @@ func (b Buildah) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 }
 
 // createBuildCommand is used to generate build command and build args
-func createBuildCommand(args v1alpha1.ImageBuildArgs) []string {
-	buildArgs := []string{"bud"}
-	buildArgs = append(buildArgs, "-f", args.Dockerfile)
+func createBuildCommand(args v1alpha1.ImageBuildArgs, storageDriver string) []string {
+	buildArgs := append([]string{"bud"}, "-f", args.Dockerfile)
+
+	if storageDriver != "" {
+		buildArgs = append(buildArgs, "--storage-driver", storageDriver)
+	}
 
 	image := ""
 	if args.Name != "" {
@@ -105,8 +109,11 @@ func createBuildCommand(args v1alpha1.ImageBuildArgs) []string {
 	if args.Tag != "" {
 		image += ":" + args.Tag
 	}
-	buildArgs = append(buildArgs, "-t", image, args.Context.LocalContext.ContextPath)
-	return buildArgs
+
+	if image != "" {
+		return append(buildArgs, "-t", image, args.Context.LocalContext.ContextPath)
+	}
+	return append(buildArgs, args.Context.LocalContext.ContextPath)
 }
 
 // Login performs a buildah login on all registries defined in spec.yaml or login.yaml
