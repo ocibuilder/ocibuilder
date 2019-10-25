@@ -43,6 +43,7 @@ jobs:
 #    working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
+      - run: sudo wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
       - run: |
           sudo apt-get clean
           sudo mv /var/lib/apt/lists /tmp
