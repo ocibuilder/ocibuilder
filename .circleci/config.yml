@@ -39,7 +39,8 @@ jobs:
           name: Run unit tests
           command: make test
   e2e_test:
-    machine
+    machine:
+      image: circleci/classic:201708-01
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - run: docker version
