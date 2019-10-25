@@ -53,16 +53,16 @@ jobs:
           keys:
             - go-dep-cache-{{ checksum "Gopkg.lock" }}
             - go-dep-cache-
-        - run: go get -u github.com/gobuffalo/packr/packr
-        - run:
-            name: Build Linux Artifact
-            command: make ocictl-linux
-        - run:
-            name: Run e2e tests
-            command: |
-              go get -u github.com/onsi/ginkgo/ginkgo
-              go get -u github.com/onsi/gomega/...
-              ginkgo -v ./testing/e2e
+      - run: go get -u github.com/gobuffalo/packr/packr
+      - run:
+          name: Build Linux Artifact
+          command: make ocictl-linux
+      - run:
+          name: Run e2e tests
+          command: |
+            go get -u github.com/onsi/ginkgo/ginkgo
+            go get -u github.com/onsi/gomega/...
+            ginkgo -v ./testing/e2e
 #      - run: docker version
 #      - checkout
 #      - restore_cache:
