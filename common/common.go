@@ -18,8 +18,6 @@ const (
 	LabelKeyComplete = ocibuilder.FullName + "/complete"
 	// LabelOCIBuilderName is the label to indicate the name of an ocibuilder object
 	LabelOCIBuilderName = "ocibuilder-name"
-	// LabelNamespace is the label to indicate K8s namespace
-	LabelNamespace = "namespace"
 )
 
 // Miscellaneous constants for controller
@@ -27,6 +25,16 @@ const (
 	// ControllerConfigMapKey is the key in the configmap to retrieve ocibuilder controller configuration from.
 	// Content encoding is expected to be YAML.
 	ControllerConfigMapKey = "config"
+)
+
+// OCIBuilder resource labels
+const (
+	// LabelName refers to label of the ocibuilder resource name
+	LabelName = "name"
+	// LabelNamespace is the label to indicate K8s namespace
+	LabelNamespace = "namespace"
+	// LabelPhase is the label to indicate the phase of the ocibuilder resourc
+	LabelPhase = "phase"
 )
 
 // logger labels
