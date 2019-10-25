@@ -106,7 +106,9 @@ func (b *buildCmd) run(args []string) error {
 				}
 				log.WithField("response", idx).Debugln("response has finished executing")
 			}
+			log.Debugln("running build file cleanup")
 			d.Clean()
+			log.Infoln("docker build complete")
 		}
 
 	case v1alpha1.BuildahFramework:
@@ -134,7 +136,9 @@ func (b *buildCmd) run(args []string) error {
 				}
 				log.WithField("response", idx).Debugln("response has finished executing")
 			}
+			log.Debugln("running build file cleanup")
 			b.Clean()
+			log.Infoln("buildah build complete")
 		}
 
 	default:
