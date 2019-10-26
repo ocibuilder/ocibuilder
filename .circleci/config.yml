@@ -41,8 +41,9 @@ jobs:
   e2e_test:
     machine:
       image: ubuntu-1604:201903-01
-    working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
+      - run: ls -l
+      - run: ls -l /usr
       - run:
           name: Install Buildah
           command: |
