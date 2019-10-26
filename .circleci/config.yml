@@ -14,6 +14,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
+            cd $GOPATH/src/github.com/ocibuilder/ocibuilder
             apk update && apk add curl git build-base bash
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep version
@@ -21,7 +22,7 @@ jobs:
       - save_cache:
           key: go-dep-cache-{{ checksum "Gopkg.lock" }}
           paths:
-            - $GOPATH/src/github.com/ocibuilder/ocibuilder/vendor
+            - ./vendor
       - run: curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.21.0
       - run: make lint
   # test runs the ocibuilder unit tests and stores test results in TEMP_RESULTS
