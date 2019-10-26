@@ -4,7 +4,7 @@ jobs:
   lint:
     docker:
       - image: golang:1.13.1-alpine
-    working_directory: ~/go/src/github.com/ocibuilder/ocibuilder
+    working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
       - restore_cache:
@@ -21,14 +21,14 @@ jobs:
       - save_cache:
           key: go-dep-cache-{{ checksum "Gopkg.lock" }}
           paths:
-            - ./vendor
+            - $GOPATH/src/github.com/ocibuilder/ocibuilder/vendor
       - run: curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.21.0
       - run: make lint
   # test runs the ocibuilder unit tests and stores test results in TEMP_RESULTS
   unit_test:
     docker:
       - image: golang:1.13.1
-    working_directory: ~/go/src/github.com/ocibuilder/ocibuilder
+    working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
       - restore_cache:
@@ -110,7 +110,7 @@ jobs:
   build_linux:
     docker:
       - image: golang:1.13.1
-    working_directory: ~/go/src/github.com/ocibuilder/ocibuilder
+    working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
       - restore_cache:
@@ -129,7 +129,7 @@ jobs:
   build_mac:
     docker:
       - image: golang:1.13.1
-    working_directory: ~/go/src/github.com/ocibuilder/ocibuilder
+    working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
       - restore_cache:
