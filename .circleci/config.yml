@@ -1,7 +1,6 @@
 version: 2
 jobs:
-  # lint is the initial job which lints the codebase using standard golangci-lint linter
-  lint:
+  install_dep:
     docker:
       - image: golang:1.13.1-alpine
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
@@ -23,6 +22,17 @@ jobs:
           key: go-dep-cache-{{ checksum "Gopkg.lock" }}
           paths:
             - ./vendor
+  # lint is the initial job which lints the codebase using standard golangci-lint linter
+  lint:
+    docker:
+      - image: golang:1.13.1-alpine
+    working_directory: /go/src/github.com/ocibuilder/ocibuilder
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - go-dep-cache-{{ checksum "Gopkg.lock" }}
+            - go-dep-cache-
       - run: curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.21.0
       - run: make lint
   # test runs the ocibuilder unit tests and stores test results in TEMP_RESULTS
@@ -44,6 +54,7 @@ jobs:
       image: ubuntu-1604:201903-01
     working_directory: ~/go/src/github.com/ocibuilder/ocibuilder
     steps:
+      - echo ~/go/src/github.com/ocibuilder/ocibuilder
       - run:
           name: Install Buildah
           command: |
@@ -56,9 +67,7 @@ jobs:
             buildah version
             go version
             git version
-      - run: ls -l /home/circleci/go/src/github.com/ocibuilder/ocibuilder
       - checkout
-      - run: ln -s /go/src/github.com/ocibuilder/ocibuilder/vendor ~/go/src/github.com/ocibuilder/ocibuilder
       - restore_cache:
           keys:
             - go-dep-cache-{{ checksum "Gopkg.lock" }}
@@ -186,7 +195,9 @@ workflows:
   version: 2
   build_test_deploy:
     jobs:
-      - lint
+      - install_dep
+      - lint:
+          requires: install_dep
       - unit_test:
           requires:
             - lint
