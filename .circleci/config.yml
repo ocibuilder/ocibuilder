@@ -57,6 +57,7 @@ jobs:
             go version
             git version
       - checkout
+      - run: echo $GOPATH
       - restore_cache:
           keys:
             - go-dep-cache-{{ checksum "Gopkg.lock" }}
