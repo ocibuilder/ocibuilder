@@ -43,33 +43,33 @@ jobs:
       image: ubuntu-1604:201903-01
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
-    - run:
-        name: Install Buildah
-        command: |
-          sudo apt-get update -qq
-          sudo apt-get install -qq -y software-properties-common
-          sudo add-apt-repository -y ppa:projectatomic/ppa
-          sudo apt-get update -qq
-          sudo apt-get -qq -y install buildah
-          docker version
-          buildah version
-          go version
-          git version
-    - checkout
-    - restore_cache:
-        keys:
-          - go-dep-cache-{{ checksum "Gopkg.lock" }}
-          - go-dep-cache-
-    - run: go get -u github.com/gobuffalo/packr/packr
-    - run:
-        name: Build Linux Artifact
-        command: make ocictl-linux
-    - run:
-        name: Run e2e tests
-        command: |
-          go get -u github.com/onsi/ginkgo/ginkgo
-          go get -u github.com/onsi/gomega/...
-          ginkgo -v ./testing/e2e
+      - run:
+          name: Install Buildah
+          command: |
+            sudo apt-get update -qq
+            sudo apt-get install -qq -y software-properties-common
+            sudo add-apt-repository -y ppa:projectatomic/ppa
+            sudo apt-get update -qq
+            sudo apt-get -qq -y install buildah
+            docker version
+            buildah version
+            go version
+            git version
+      - checkout
+      - restore_cache:
+          keys:
+            - go-dep-cache-{{ checksum "Gopkg.lock" }}
+            - go-dep-cache-
+      - run: go get -u github.com/gobuffalo/packr/packr
+      - run:
+          name: Build Linux Artifact
+          command: make ocictl-linux
+      - run:
+          name: Run e2e tests
+          command: |
+            go get -u github.com/onsi/ginkgo/ginkgo
+            go get -u github.com/onsi/gomega/...
+            ginkgo -v ./testing/e2e
       # start proprietary DB using private Docker image
       # with credentials stored in the UI
 #      - run: |
