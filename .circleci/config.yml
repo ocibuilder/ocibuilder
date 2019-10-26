@@ -4,7 +4,7 @@ jobs:
   lint:
     docker:
       - image: golang:1.13.1-alpine
-    working_directory: ~/go/src/github.com/ocibuilder/ocibuilder
+    working_directory: $GOPATH/go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
       - restore_cache:
@@ -28,7 +28,7 @@ jobs:
   unit_test:
     docker:
       - image: golang:1.13.1
-    working_directory: ~/go/src/github.com/ocibuilder/ocibuilder
+    working_directory: $GOPATH/go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
       - restore_cache:
@@ -41,7 +41,7 @@ jobs:
   e2e_test:
     machine:
       image: ubuntu-1604:201903-01
-    working_directory: ~/go/src/github.com/ocibuilder/ocibuilder
+    working_directory: $GOPATH/go/src/github.com/ocibuilder/ocibuilder
     steps:
       - run:
           name: Install Buildah
@@ -110,7 +110,7 @@ jobs:
   build_linux:
     docker:
       - image: golang:1.13.1
-    working_directory: ~/go/src/github.com/ocibuilder/ocibuilder
+    working_directory: $GOPATH/go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
       - restore_cache:
@@ -129,7 +129,7 @@ jobs:
   build_mac:
     docker:
       - image: golang:1.13.1
-    working_directory: ~/go/src/github.com/ocibuilder/ocibuilder
+    working_directory: $GOPATH/go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
       - restore_cache:
@@ -215,3 +215,4 @@ workflows:
             tags:
               # only recognise tags with semantic versioning e.g. 0.1.0
               only: /^\d+\.\d+\.\d+$/
+              
