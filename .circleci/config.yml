@@ -41,7 +41,7 @@ jobs:
   e2e_test:
     machine:
       image: ubuntu-1604:201903-01
-    working_directory: go/src/github.com/ocibuilder/ocibuilder
+    working_directory: ~/go/src/github.com/ocibuilder/ocibuilder
     steps:
       - run:
           name: Install Buildah
@@ -55,8 +55,6 @@ jobs:
             buildah version
             go version
             git version
-      - run: pwd
-      - run: chmod u+w .
       - checkout
       - run: ls -l $GOPATH/src/github.com/ocibuilder/ocibuilder
       - restore_cache:
