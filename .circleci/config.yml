@@ -6,6 +6,7 @@ jobs:
       - image: golang:1.13.1-alpine
     working_directory: ../$GOPATH/src/github.com/ocibuilder/ocibuilder
     steps:
+      - run: cd $GOPATH/src/github.com/ocibuilder/ocibuilder
       - checkout
       - restore_cache:
           keys:
@@ -14,7 +15,6 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            cd $GOPATH/src/github.com/ocibuilder/ocibuilder
             apk update && apk add curl git build-base bash
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep version
