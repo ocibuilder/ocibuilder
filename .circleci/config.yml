@@ -18,10 +18,12 @@ jobs:
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep version
             dep ensure
+            mkdir -p /home/circleci/go/src/github.com/ocibuilder/ocibuilder
+            cp -rf ./vendor /home/circleci/go/src/github.com/ocibuilder/ocibuilder
       - save_cache:
           key: go-dep-cache-{{ checksum "Gopkg.lock" }}
           paths:
-            - ./vendor
+            - /home/circleci/go/src/github.com/ocibuilder/ocibuilder
   # lint is the initial job which lints the codebase using standard golangci-lint linter
   lint:
     docker:
