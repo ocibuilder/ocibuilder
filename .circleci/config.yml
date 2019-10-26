@@ -197,7 +197,8 @@ workflows:
     jobs:
       - install_dep
       - lint:
-          requires: install_dep
+          requires:
+            - install_dep
       - unit_test:
           requires:
             - lint
