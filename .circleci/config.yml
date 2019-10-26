@@ -7,6 +7,8 @@ jobs:
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
+      - run: ls -l
+      - run: pwd
       - restore_cache:
           keys:
             - go-dep-cache-{{ checksum "Gopkg.lock" }}
