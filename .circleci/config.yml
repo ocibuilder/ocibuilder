@@ -55,21 +55,21 @@ jobs:
           buildah version
           go version
           git version
-      - checkout
-      - restore_cache:
-          keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}
-            - go-dep-cache-
-      - run: go get -u github.com/gobuffalo/packr/packr
-      - run:
-          name: Build Linux Artifact
-          command: make ocictl-linux
-      - run:
-          name: Run e2e tests
-          command: |
-            go get -u github.com/onsi/ginkgo/ginkgo
-            go get -u github.com/onsi/gomega/...
-            ginkgo -v ./testing/e2e
+    - checkout
+    - restore_cache:
+        keys:
+          - go-dep-cache-{{ checksum "Gopkg.lock" }}
+          - go-dep-cache-
+    - run: go get -u github.com/gobuffalo/packr/packr
+    - run:
+        name: Build Linux Artifact
+        command: make ocictl-linux
+    - run:
+        name: Run e2e tests
+        command: |
+          go get -u github.com/onsi/ginkgo/ginkgo
+          go get -u github.com/onsi/gomega/...
+          ginkgo -v ./testing/e2e
       # start proprietary DB using private Docker image
       # with credentials stored in the UI
 #      - run: |
@@ -152,14 +152,6 @@ jobs:
     steps:
       - setup_remote_docker
       - checkout
-      - run:
-          name: Install Docker Client
-          command: |
-            set -x
-            DOCKER_VERSION="17.03.0-ce"
-            curl -L -o /tmp/docker-$DOCKER_VERSION.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$DOCKER_VERSION.tgz
-            tar -xz -C /tmp -f /tmp/docker-$DOCKER_VERSION.tgz
-            mv /tmp/docker/* /usr/bin
       - run:
           name: Run Docker Build
           command: |
