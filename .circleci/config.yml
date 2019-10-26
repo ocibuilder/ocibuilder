@@ -56,7 +56,6 @@ jobs:
             go version
             git version
       - checkout
-      - run: ls -l $GOPATH/src/github.com/ocibuilder/ocibuilder
       - restore_cache:
           keys:
             - go-dep-cache-{{ checksum "Gopkg.lock" }}
