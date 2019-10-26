@@ -44,7 +44,6 @@ jobs:
       image: ubuntu-1604:201903-01
     working_directory: ~/go/src/github.com/ocibuilder/ocibuilder
     steps:
-      - run: ln -s /go/src/github.com/ocibuilder/ocibuilder/vendor ~/go/src/github.com/ocibuilder/ocibuilder
       - run:
           name: Install Buildah
           command: |
@@ -59,6 +58,7 @@ jobs:
             git version
       - run: ls -l /home/circleci/go/src/github.com/ocibuilder/ocibuilder
       - checkout
+      - run: ln -s /go/src/github.com/ocibuilder/ocibuilder/vendor ~/go/src/github.com/ocibuilder/ocibuilder
       - restore_cache:
           keys:
             - go-dep-cache-{{ checksum "Gopkg.lock" }}
