@@ -55,8 +55,9 @@ jobs:
             buildah version
             go version
             git version
-      - checkout
       - run: pwd
+      - run: chmod u+w .
+      - checkout
       - run: ls -l $GOPATH/src/github.com/ocibuilder/ocibuilder
       - restore_cache:
           keys:
