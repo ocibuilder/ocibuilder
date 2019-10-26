@@ -57,6 +57,7 @@ jobs:
             buildah version
             go version
             git version
+      - run: ls -l /home/circleci/go/src/github.com/ocibuilder/ocibuilder
       - checkout
       - restore_cache:
           keys:
