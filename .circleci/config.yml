@@ -72,17 +72,16 @@ jobs:
             buildah version
             go version
             git version
-      - checkout
       - restore_cache:
           keys:
             - go-dep-cache-{{ checksum "Gopkg.lock" }}
             - go-dep-cache-
       - run: go get -u github.com/gobuffalo/packr/packr
+      - checkout
+      - run: cd /go/src/github.com/ocibuilder/ocibuilder
       - run:
           name: Build Linux Artifact
-          command: |
-            cd /go/src/github.com/ocibuilder/ocibuilder
-            make ocictl-linux
+          command: make ocictl-linux
       - run:
           name: Run e2e tests
           command: |
