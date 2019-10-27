@@ -23,7 +23,7 @@ jobs:
       - save_cache:
           key: go-dep-cache-{{ checksum "Gopkg.lock" }}
           paths:
-            - /home/circleci/go/src/github.com/ocibuilder/ocibuilder
+            - ./vendor
   # lint is the initial job which lints the codebase using standard golangci-lint linter
   lint:
     docker:
@@ -80,6 +80,8 @@ jobs:
       - run: ls -l /go/src/github.com/ocibuilder/ocibuilder
       - run: mkdir -p $GOPATH/src/github.com/ocibuilder/ocibuilder
       - run: cd $GOPATH/src/github.com/ocibuilder/ocibuilder
+      - run: ls $GOPATH/src/github.com/ocibuilder/ocibuilder
+      - run: ls /go/src/github.com/ocibuilder/ocibuilder
       - checkout
       - run: cp -rf /go/src/github.com/ocibuilder/ocibuilder $GOPATH/src/github.com/ocibuilder/ocibuilder
       - run:
