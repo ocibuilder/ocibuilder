@@ -8,7 +8,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}
+            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v1
             - go-dep-cache-
       - run:
           name: Install dependencies
@@ -18,7 +18,7 @@ jobs:
             dep version
             dep ensure -v
       - save_cache:
-          key: go-dep-cache-{{ checksum "Gopkg.lock" }}
+          key: go-dep-cache-{{ checksum "Gopkg.lock" }}-v1
           paths:
             - ./vendor
   # lint is the initial job which lints the codebase using standard golangci-lint linter
@@ -30,7 +30,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}
+            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v1
             - go-dep-cache-
       - run: apk update && apk add curl git build-base bash
       - run: curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.21.0
@@ -44,7 +44,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}
+            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v1
             - go-dep-cache-
       - run:
           name: Run unit tests
@@ -72,7 +72,7 @@ jobs:
             git version
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}
+            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v1
             - go-dep-cache-
       - run: go get -u github.com/gobuffalo/packr/packr
       - run: ls -l /go/src/github.com/ocibuilder/ocibuilder
@@ -103,7 +103,7 @@ jobs:
 #      - checkout
 #      - restore_cache:
 #          keys:
-#            - go-dep-cache-{{ checksum "Gopkg.lock" }}
+#            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v1
 #            - go-dep-cache-
 #      - run: go get -u github.com/gobuffalo/packr/packr
 #      - run:
@@ -119,7 +119,7 @@ jobs:
 #      - checkout
 #      - restore_cache:
 #          keys:
-#            - go-dep-cache-{{ checksum "Gopkg.lock" }}
+#            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v1
 #            - go-dep-cache-
 #      - run: go get -u github.com/gobuffalo/packr/packr
 #      - run:
@@ -140,7 +140,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}
+            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v1
             - go-dep-cache-
       - run: go get -u github.com/gobuffalo/packr/packr
       - run:
@@ -159,7 +159,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}
+            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v1
             - go-dep-cache-
       - run: go get -u github.com/gobuffalo/packr/packr
       - run:
