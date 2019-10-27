@@ -13,13 +13,10 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            cd $GOPATH/src/github.com/ocibuilder/ocibuilder
             apk update && apk add curl git build-base bash
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep version
-            dep ensure
-            mkdir -p /home/circleci/go/src/github.com/ocibuilder/ocibuilder
-            cp -rf ./vendor /home/circleci/go/src/github.com/ocibuilder/ocibuilder
+            dep ensure -v
       - save_cache:
           key: go-dep-cache-{{ checksum "Gopkg.lock" }}
           paths:
@@ -80,10 +77,10 @@ jobs:
       - run: ls -l /go/src/github.com/ocibuilder/ocibuilder
       - run: mkdir -p $GOPATH/src/github.com/ocibuilder/ocibuilder
       - run: cd $GOPATH/src/github.com/ocibuilder/ocibuilder
-      - run: ls $GOPATH/src/github.com/ocibuilder/ocibuilder
-      - run: ls /go/src/github.com/ocibuilder/ocibuilder
       - checkout
       - run: cp -rf /go/src/github.com/ocibuilder/ocibuilder $GOPATH/src/github.com/ocibuilder/ocibuilder
+      - run: ls $GOPATH/src/github.com/ocibuilder/ocibuilder
+      - run: ls /go/src/github.com/ocibuilder/ocibuilder
       - run:
           name: Build Linux Artifact
           command: make ocictl-linux
