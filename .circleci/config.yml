@@ -81,9 +81,8 @@ jobs:
 #      - run: cd $GOPATH/src/github.com/ocibuilder
       - run: ls -l
       - run: pwd
-      - run: cp -rf /go/src/github.com/ocibuilder/ocibuilder/vendor $GOPATH/src/github.com/ocibuilder/ocibuilder
-      - run: ls $GOPATH/src/github.com/ocibuilder/ocibuilder
-      - run: ls -l $GOPATH/src/github.com/ocibuilder/ocibuilder/vendor
+      - run: cp -rf /go/src/github.com/ocibuilder/ocibuilder/vendor /home/circleci/.go_workspace/src/github.com/ocibuilder/ocibuilder
+      - run: ls /home/circleci/.go_workspace/src/github.com/ocibuilder/ocibuilder
       - run: ls -l /home/circleci/.go_workspace/src/github.com/ocibuilder/ocibuilder/common
       - run:
           name: Build Linux Artifact
