@@ -78,6 +78,7 @@ jobs:
       - run: mkdir -p $GOPATH/src/github.com/ocibuilder/ocibuilder
       - run: cd $GOPATH/src/github.com/ocibuilder
       - checkout
+      - run: ls -l
       - run: pwd
       - run: cp -rf /go/src/github.com/ocibuilder/ocibuilder $GOPATH/src/github.com/ocibuilder/ocibuilder
       - run: ls $GOPATH/src/github.com/ocibuilder/ocibuilder
