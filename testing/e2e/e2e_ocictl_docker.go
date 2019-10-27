@@ -34,24 +34,24 @@ var _ = Describe("ocictl docker", func() {
 		session = utils.RunOcictl(ocictlPath, args)
 		Eventually(func() *gexec.Session {
 			return session
-		}, 15).Should(gexec.Exit(0))
-	}, 15)
+		}, 30).Should(gexec.Exit(0))
+	}, 30)
 
 	It("completes a push and exits with status code 0", func() {
 		args := []string{"push", "-p", "./resources/go-test-service"}
 		session = utils.RunOcictl(ocictlPath, args)
 		Eventually(func() *gexec.Session {
 			return session
-		}, 10).Should(gexec.Exit(0))
-	}, 10)
+		}, 20).Should(gexec.Exit(0))
+	}, 20)
 
 	It("completes a pull and exits with status code 0", func() {
 		args := []string{"pull", "-i", "ocibuildere2e/go-test-service:v0.1.0", "-p", "./resources/go-test-service"}
 		session = utils.RunOcictl(ocictlPath, args)
 		Eventually(func() *gexec.Session {
 			return session
-		}, 10).Should(gexec.Exit(0))
-	}, 10)
+		}, 15).Should(gexec.Exit(0))
+	}, 15)
 
 	It("completes an init and exits with status code 0", func() {
 		args := []string{"init"}

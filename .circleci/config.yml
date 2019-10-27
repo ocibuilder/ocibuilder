@@ -68,6 +68,8 @@ jobs:
             sudo apt-get -qq -y install buildah
             docker version
             buildah version
+            curl -sL https://raw.githubusercontent.com/containers/buildah/master/docs/samples/registries.conf | \
+                  sudo tee /etc/containers/registries.conf
             sudo rm -rf /usr/local/go
             sudo add-apt-repository -y ppa:longsleep/golang-backports
             sudo apt-get update -qq
@@ -80,61 +82,18 @@ jobs:
             - go-dep-cache-{{ checksum "Gopkg.lock" }}-v1
             - go-dep-cache-
       - run: go get -u github.com/gobuffalo/packr/packr
-      - run: ls -l /go/src/github.com/ocibuilder/ocibuilder
-#      - run: mkdir -p $GOPATH/src/github.com/ocibuilder/ocibuilder
-#      - run: cd $GOPATH/src/github.com/ocibuilder
-      - run: ls -l
-      - run: pwd
-      - run: cp -rf /go/src/github.com/ocibuilder/ocibuilder/vendor /home/circleci/.go_workspace/src/github.com/ocibuilder/ocibuilder
-      - run: ls /home/circleci/.go_workspace/src/github.com/ocibuilder/ocibuilder
-      - run: ls -l /home/circleci/.go_workspace/src/github.com/ocibuilder/ocibuilder/common
+      - run:
+          name: Copy Dependencies
+          command: cp -rf /go/src/github.com/ocibuilder/ocibuilder/vendor /home/circleci/.go_workspace/src/github.com/ocibuilder/ocibuilder
       - run:
           name: Build Linux Artifact
-          command: |
-            pwd
-            make ocictl-linux
+          command: make ocictl-linux
       - run:
           name: Run e2e tests
           command: |
             go get -u github.com/onsi/ginkgo/ginkgo
             go get -u github.com/onsi/gomega/...
             ginkgo -v ./testing/e2e
-      # start proprietary DB using private Docker image
-      # with credentials stored in the UI
-#      - run: |
-#          docker pull ocibuildere2e/ocibuilder-base-go:v0.1.0
-#        docker run --security-opt seccomp:unconfined -it ocibuildere2e/ocibuilder-base-go:v0.1.0
-#      - checkout
-#      - restore_cache:
-#          keys:
-#            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v1
-#            - go-dep-cache-
-#      - run: go get -u github.com/gobuffalo/packr/packr
-#      - run:
-#          name: Build Linux Artifact
-#          command: make ocictl-linux
-#      - run:
-#          name: Run e2e tests
-#          command: |
-#            go get -u github.com/onsi/ginkgo/ginkgo
-#            go get -u github.com/onsi/gomega/...
-#            ginkgo -v ./testing/e2e
-#      - run: docker version
-#      - checkout
-#      - restore_cache:
-#          keys:
-#            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v1
-#            - go-dep-cache-
-#      - run: go get -u github.com/gobuffalo/packr/packr
-#      - run:
-#          name: Build Linux Artifact
-#          command: make ocictl-linux
-#      - run:
-#          name: Run e2e tests
-#          command: |
-#            go get -u github.com/onsi/ginkgo/ginkgo
-#            go get -u github.com/onsi/gomega/...
-#            ginkgo -v ./testing/e2e
   # build_linux runs the build of the linux ocictl artifact and persists the binary to the circleci workspace
   build_linux:
     docker:
