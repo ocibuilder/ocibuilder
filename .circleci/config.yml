@@ -60,7 +60,7 @@ jobs:
       - run: |
           sudo mkdir -p /go/src/github.com/ocibuilder/ocibuilder
           cd /go/src/github.com/ocibuilder/ocibuilder
-          chown -R $USER:$USER /go/src/github.com/ocibuilder/ocibuilder
+          sudo chown -R $USER:$USER /go/src/github.com/ocibuilder/ocibuilder
       - run:
           name: Install Buildah
           command: |
