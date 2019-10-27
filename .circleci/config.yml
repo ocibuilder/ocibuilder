@@ -70,6 +70,7 @@ jobs:
             buildah version
             go version
             git version
+      - checkout
       - restore_cache:
           keys:
             - go-dep-cache-{{ checksum "Gopkg.lock" }}-v1
@@ -78,7 +79,6 @@ jobs:
       - run: ls -l /go/src/github.com/ocibuilder/ocibuilder
 #      - run: mkdir -p $GOPATH/src/github.com/ocibuilder/ocibuilder
 #      - run: cd $GOPATH/src/github.com/ocibuilder
-      - checkout
       - run: ls -l
       - run: pwd
       - run: cp -rf /go/src/github.com/ocibuilder/ocibuilder $GOPATH/src/github.com/ocibuilder/ocibuilder
