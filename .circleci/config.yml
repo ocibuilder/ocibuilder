@@ -81,7 +81,7 @@ jobs:
 #      - run: cd $GOPATH/src/github.com/ocibuilder
       - run: ls -l
       - run: pwd
-      - run: cp -rf /go/src/github.com/ocibuilder/ocibuilder $GOPATH/src/github.com/ocibuilder/ocibuilder
+      - run: cp -rf /go/src/github.com/ocibuilder/ocibuilder/vendor $GOPATH/src/github.com/ocibuilder/ocibuilder
       - run: ls $GOPATH/src/github.com/ocibuilder/ocibuilder
       - run: ls /go/src/github.com/ocibuilder/ocibuilder
       - run:
