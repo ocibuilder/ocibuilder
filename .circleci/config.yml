@@ -8,7 +8,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-#            - go-dep-cache-{{ checksum "Gopkg.lock" }}
+            - go-dep-cache-{{ checksum "Gopkg.lock" }}
             - go-dep-cache-
       - run:
           name: Install dependencies
