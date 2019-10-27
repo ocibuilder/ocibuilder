@@ -59,7 +59,6 @@ jobs:
     steps:
       - run: |
           sudo mkdir -p /go/src/github.com/ocibuilder/ocibuilder
-          cd /go/src/github.com/ocibuilder/ocibuilder
           sudo chown -R $USER:$USER /go/src/github.com/ocibuilder/ocibuilder
       - run:
           name: Install Buildah
@@ -81,7 +80,9 @@ jobs:
       - run: go get -u github.com/gobuffalo/packr/packr
       - run:
           name: Build Linux Artifact
-          command: make ocictl-linux
+          command: |
+            cd /go/src/github.com/ocibuilder/ocibuilder
+            make ocictl-linux
       - run:
           name: Run e2e tests
           command: |
