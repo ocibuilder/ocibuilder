@@ -77,8 +77,11 @@ jobs:
             - go-dep-cache-{{ checksum "Gopkg.lock" }}
             - go-dep-cache-
       - run: go get -u github.com/gobuffalo/packr/packr
+      - run: ls -l /go/src/github.com/ocibuilder/ocibuilder
+      - run: mkdir -p $GOPATH/src/github.com/ocibuilder/ocibuilder
+      - run: cd $GOPATH/src/github.com/ocibuilder/ocibuilder
       - checkout
-      - run: cd /go/src/github.com/ocibuilder/ocibuilder
+      - run: cp -rf /go/src/github.com/ocibuilder/ocibuilder $GOPATH/src/github.com/ocibuilder/ocibuilder
       - run:
           name: Build Linux Artifact
           command: make ocictl-linux
@@ -128,7 +131,7 @@ jobs:
   build_linux:
     docker:
       - image: golang:1.13.1
-#    working_directory: /go/src/github.com/ocibuilder/ocibuilder
+    working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
       - restore_cache:
@@ -147,7 +150,7 @@ jobs:
   build_mac:
     docker:
       - image: golang:1.13.1
-#    working_directory: /go/src/github.com/ocibuilder/ocibuilder
+    working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
       - restore_cache:
