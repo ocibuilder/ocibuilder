@@ -52,7 +52,7 @@ jobs:
   e2e_test:
     machine:
       image: ubuntu-1604:201903-01
-#    working_directory: ~/go/src/github.com/ocibuilder/ocibuilder
+    working_directory: ~/go/src/github.com/ocibuilder/ocibuilder
     steps:
       - run: |
           sudo mkdir -p /go/src/github.com/ocibuilder/ocibuilder
@@ -75,8 +75,8 @@ jobs:
             - go-dep-cache-
       - run: go get -u github.com/gobuffalo/packr/packr
       - run: ls -l /go/src/github.com/ocibuilder/ocibuilder
-      - run: mkdir -p $GOPATH/src/github.com/ocibuilder/ocibuilder
-      - run: cd $GOPATH/src/github.com/ocibuilder
+#      - run: mkdir -p $GOPATH/src/github.com/ocibuilder/ocibuilder
+#      - run: cd $GOPATH/src/github.com/ocibuilder
       - checkout
       - run: ls -l
       - run: pwd
