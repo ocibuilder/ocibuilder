@@ -76,7 +76,7 @@ jobs:
       - run: go get -u github.com/gobuffalo/packr/packr
       - run: ls -l /go/src/github.com/ocibuilder/ocibuilder
       - run: mkdir -p $GOPATH/src/github.com/ocibuilder/ocibuilder
-      - run: cd $GOPATH/src/github.com/ocibuilder/ocibuilder
+      - run: cd $GOPATH/src/github.com/ocibuilder
       - checkout
       - run: cp -rf /go/src/github.com/ocibuilder/ocibuilder $GOPATH/src/github.com/ocibuilder/ocibuilder
       - run: ls $GOPATH/src/github.com/ocibuilder/ocibuilder
