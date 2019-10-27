@@ -78,12 +78,15 @@ jobs:
       - run: mkdir -p $GOPATH/src/github.com/ocibuilder/ocibuilder
       - run: cd $GOPATH/src/github.com/ocibuilder
       - checkout
+      - run: pwd
       - run: cp -rf /go/src/github.com/ocibuilder/ocibuilder $GOPATH/src/github.com/ocibuilder/ocibuilder
       - run: ls $GOPATH/src/github.com/ocibuilder/ocibuilder
       - run: ls /go/src/github.com/ocibuilder/ocibuilder
       - run:
           name: Build Linux Artifact
-          command: make ocictl-linux
+          command: |
+            pwd
+            make ocictl-linux
       - run:
           name: Run e2e tests
           command: |
