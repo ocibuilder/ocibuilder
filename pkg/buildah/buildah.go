@@ -31,10 +31,10 @@ import (
 
 // Buildah is  the struct which consists of a logger and context path
 type Buildah struct {
-	Logger *logrus.Logger
+	Logger        *logrus.Logger
 	StorageDriver string
-	Metadata []v1alpha1.ImageMeta
-	execCmds []*exec.Cmd
+	Metadata      []v1alpha1.ImageMeta
+	execCmds      []*exec.Cmd
 }
 
 var executor = exec.Command
@@ -201,7 +201,7 @@ func (b Buildah) createPullCommand(registry string, imageName string, spec v1alp
 	fullImageName := fmt.Sprintf("%s/%s", registry, imageName)
 	b.Logger.WithField("command", append(args, fullImageName)).Debugln("push command with AUTH REVOKED")
 
-	authString, err := getPushAuthRegistryString(registry, spec);
+	authString, err := getPushAuthRegistryString(registry, spec)
 	if err != nil {
 		return nil, err
 	}
@@ -268,7 +268,7 @@ func (b Buildah) createPushCommand(registry string, imageName string, spec v1alp
 	fullImageName := fmt.Sprintf("%s/%s", registry, imageName)
 	b.Logger.WithField("command", append(args, fullImageName)).Debugln("push command with AUTH REVOKED")
 
-	authString, err := getPushAuthRegistryString(registry, spec);
+	authString, err := getPushAuthRegistryString(registry, spec)
 	if err != nil {
 		return nil, err
 	}
