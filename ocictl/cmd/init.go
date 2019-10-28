@@ -20,15 +20,15 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/gobuffalo/packr"
+	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/spf13/cobra"
 )
 
 type initCmd struct {
-	out		io.Writer
-	dry		bool
-	debug	bool
+	out   io.Writer
+	dry   bool
+	debug bool
 }
 
 func newInitCmd(out io.Writer) *cobra.Command {

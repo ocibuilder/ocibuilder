@@ -35,13 +35,13 @@ It can run a build in both docker and buildah varieties.
 `
 
 type buildCmd struct {
-	out io.Writer
-	name string
-	path string
-	builder string
-	overlay string
+	out           io.Writer
+	name          string
+	path          string
+	builder       string
+	overlay       string
 	storageDriver string
-	debug bool
+	debug         bool
 }
 
 func newBuildCmd(out io.Writer) *cobra.Command {
@@ -60,7 +60,7 @@ func newBuildCmd(out io.Writer) *cobra.Command {
 	f.StringVarP(&bc.builder, "builder", "b", "docker", "Choose either docker and buildah as the targetted image builder. By default the builder is docker.")
 	f.BoolVarP(&bc.debug, "debug", "d", false, "Turn on debug logging")
 	f.StringVarP(&bc.overlay, "overlay", "o", "", "Path to your overlay.yaml file")
-	f.StringVarP(&bc.storageDriver, "storage-driver", "s", "", "Storage-driver for Buildah. vfs enables the use of buildah within an unprivileged container. By default the storage driver is overlay")
+	f.StringVarP(&bc.storageDriver, "storage-driver", "-s", "overlay", "Storage-driver for Buildah. vfs enables the use of buildah within an unprivileged container. By default the storage driver is overlay")
 
 	return cmd
 }
@@ -83,8 +83,8 @@ func (b *buildCmd) run(args []string) error {
 			}
 
 			d := docker.Docker{
-				Client:      cli,
-				Logger:      common.GetLogger(b.debug),
+				Client: cli,
+				Logger: common.GetLogger(b.debug),
 			}
 			res, err := d.Build(ociBuilderSpec)
 			if err != nil {
@@ -109,7 +109,7 @@ func (b *buildCmd) run(args []string) error {
 	case v1alpha1.BuildahFramework:
 		{
 			b := buildah.Buildah{
-				Logger: common.GetLogger(b.debug),
+				Logger:        common.GetLogger(b.debug),
 				StorageDriver: b.storageDriver,
 			}
 
