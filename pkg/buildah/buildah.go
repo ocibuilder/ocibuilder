@@ -192,6 +192,7 @@ func (b Buildah) Pull(spec v1alpha1.OCIBuilderSpec, imageName string) ([]io.Read
 
 		cmd := executor("buildah", pullCommand...)
 		out, err := pty.Start(cmd)
+		b.execCmds = append(b.execCmds, cmd)
 		if err != nil {
 			log.WithError(err).Errorln("failed to execute buildah pull...")
 			return nil, err
@@ -247,6 +248,7 @@ func (b Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 
 		cmd := executor("buildah", pushCommand...)
 		out, err := pty.Start(cmd)
+		b.execCmds = append(b.execCmds, cmd)
 		if err != nil {
 			log.WithError(err).Errorln("failed to execute buildah push...")
 			return nil, err
