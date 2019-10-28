@@ -100,16 +100,16 @@ func TestCreateLoginCommand(t *testing.T) {
 
 func TestCreatePullCommand(t *testing.T) {
 	expectedPullCommand := []string{"pull", "test-registry/test-image:1.0.0"}
-
-	pullCommand, err := createPullCommand("test-image:1.0.0", "test-registry")
+	b := Buildah{}
+	pullCommand, err := b.createPullCommand("test-image:1.0.0", "test-registry")
 	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedPullCommand, pullCommand)
 }
 
 func TestCreatePushCommand(t *testing.T) {
 	expectedPushCommand := []string{"push", "example-registry/example-image:1.0.0"}
-
-	pushCommand, err := createPushCommand(dummy.PushSpec[0], "example-registry/example-image:1.0.0")
+	b := Buildah{}
+	pushCommand, err := b.createPushCommand(dummy.PushSpec[0], "example-registry/example-image:1.0.0")
 	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedPushCommand, pushCommand)
 }
