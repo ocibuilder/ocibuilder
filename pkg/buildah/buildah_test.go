@@ -99,17 +99,21 @@ func TestCreateLoginCommand(t *testing.T) {
 }
 
 func TestCreatePullCommand(t *testing.T) {
-	expectedPullCommand := []string{"pull", "test-registry/test-image:1.0.0"}
-	b := Buildah{}
-	pullCommand, err := b.createPullCommand("test-image:1.0.0", "test-registry")
+	expectedPullCommand := []string{"pull", "--creds", "username:ThiSiSalOgInToK3N", "example-registry/test-image:1.0.0"}
+	b := Buildah{
+		Logger: common.GetLogger(true),
+	}
+	pullCommand, err := b.createPullCommand("example-registry", "test-image:1.0.0", dummy.Spec)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedPullCommand, pullCommand)
 }
 
 func TestCreatePushCommand(t *testing.T) {
-	expectedPushCommand := []string{"push", "example-registry/example-image:1.0.0"}
-	b := Buildah{}
-	pushCommand, err := b.createPushCommand(dummy.PushSpec[0], "example-registry/example-image:1.0.0")
+	expectedPushCommand := []string{"push", "--creds", "username:ThiSiSalOgInToK3N", "example-registry/example-image:1.0.0"}
+	b := Buildah{
+		Logger: common.GetLogger(true),
+	}
+	pushCommand, err := b.createPushCommand("example-registry", "example-image:1.0.0", dummy.Spec)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedPushCommand, pushCommand)
 }

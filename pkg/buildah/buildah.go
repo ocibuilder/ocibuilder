@@ -127,7 +127,6 @@ func (b Buildah) Login(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	var loginResponses []io.ReadCloser
 	for _, loginSpec := range spec.Login {
 		loginCommand, err := createLoginCommand(loginSpec)
-		log.WithField("command", loginCommand).Debug("login command to be executed")
 
 		if err != nil {
 			log.WithError(err).Errorln("error creating login command")
@@ -182,8 +181,7 @@ func (b Buildah) Pull(spec v1alpha1.OCIBuilderSpec, imageName string) ([]io.Read
 
 	var pullResponses []io.ReadCloser
 	for _, loginSpec := range spec.Login {
-		pullCommand, err := b.createPullCommand(imageName, loginSpec.Registry, spec)
-		log.WithField("command", pullCommand).Debug("pull command to be executed")
+		pullCommand, err := b.createPullCommand(loginSpec.Registry, imageName, spec)
 
 		if err != nil {
 			log.WithError(err).Errorln("error attempting to create pull command")
@@ -209,15 +207,17 @@ func (b Buildah) Pull(spec v1alpha1.OCIBuilderSpec, imageName string) ([]io.Read
 	return pullResponses, nil
 }
 
-func (b Buildah) createPullCommand(imageName string, registry string, spec v1alpha1.OCIBuilderSpec) ([]string, error) {
+func (b Buildah) createPullCommand(registry string, imageName string, spec v1alpha1.OCIBuilderSpec) ([]string, error) {
 	args := []string{"pull", "--creds"}
 
 	fullImageName := fmt.Sprintf("%s/%s", registry, imageName)
 	b.Logger.WithField("command", append(args, fullImageName)).Debugln("push command with AUTH REVOKED")
 
-	if authString, err := getPushAuthRegistryString(registry, spec); err != nil {
-		args = append(args, authString)
+	authString, err := getPushAuthRegistryString(registry, spec);
+	if err != nil {
+		return nil, err
 	}
+	args = append(args, authString)
 
 	return append(args, fullImageName), nil
 }
@@ -285,9 +285,11 @@ func (b Buildah) createPushCommand(registry string, imageName string, spec v1alp
 	fullImageName := fmt.Sprintf("%s/%s", registry, imageName)
 	b.Logger.WithField("command", append(args, fullImageName)).Debugln("push command with AUTH REVOKED")
 
-	if authString, err := getPushAuthRegistryString(registry, spec); err != nil {
-		args = append(args, authString)
+	authString, err := getPushAuthRegistryString(registry, spec);
+	if err != nil {
+		return nil, err
 	}
+	args = append(args, authString)
 
 	return append(args, fullImageName), nil
 }
