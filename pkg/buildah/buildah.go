@@ -115,7 +115,7 @@ func createBuildCommand(args v1alpha1.ImageBuildArgs, storageDriver string) []st
 }
 
 // Login performs a buildah login on all registries defined in spec.yaml or login.yaml
-func (b Buildah) Login(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
+func (b *Buildah) Login(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	log := b.Logger
 
 	if err := common.ValidateLogin(spec); err != nil {
@@ -171,7 +171,7 @@ func createLoginCommand(args v1alpha1.LoginSpec) ([]string, error) {
 // Pull performs a buildah pull of a passed in image name. Pull will login to all
 // registries specified in the 'login' spec and attempt to pull the image
 // uses buildah login to login to directories specified
-func (b Buildah) Pull(spec v1alpha1.OCIBuilderSpec, imageName string) ([]io.ReadCloser, error) {
+func (b *Buildah) Pull(spec v1alpha1.OCIBuilderSpec, imageName string) ([]io.ReadCloser, error) {
 	log := b.Logger
 
 	var pullResponses []io.ReadCloser
@@ -215,7 +215,7 @@ func (b Buildah) createPullCommand(registry string, imageName string, spec v1alp
 
 // Push performs a buildah push of a spec image to a chosen registry
 // uses buildah login to login to directories specified
-func (b Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
+func (b *Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	log := b.Logger
 
 	if err := common.ValidatePush(spec); err != nil {
