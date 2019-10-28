@@ -15,7 +15,7 @@ build:
               - ENTRYPOINT ./goapp
   steps:
     - metadata:
-        name: registry.hub.docker.com/ocibuildere2e/go-test-service
+        name: docker.io/ocibuildere2e/go-test-service
         labels:
           type: build-1
           overlay: first-step
@@ -46,14 +46,14 @@ build:
           contextPath: ./resources/go-test-service
 
 login:
-  - registry: registry.hub.docker.com
+  - registry: docker.io
     token: REPLACED_BY_PARAM
     creds:
       plain:
         username: REPLACED_BY_PARAM
 
 push:
-  - registry: registry.hub.docker.com
+  - registry: docker.io
     image: ocibuildere2e/go-test-service
     tag: v0.1.0
 
