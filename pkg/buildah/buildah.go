@@ -133,6 +133,8 @@ func (b Buildah) Login(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 		}
 
 		cmd := executor("buildah", loginCommand...)
+		b.execCmds = append(b.execCmds, cmd)
+
 		out, err := pty.Start(cmd)
 		if err != nil {
 			log.WithError(err).Errorln("failed to execute buildah login...")
