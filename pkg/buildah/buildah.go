@@ -31,10 +31,10 @@ import (
 
 // Buildah is  the struct which consists of a logger and context path
 type Buildah struct {
-	Logger *logrus.Logger
+	Logger        *logrus.Logger
 	StorageDriver string
-	Metadata []v1alpha1.ImageMeta
-	execCmds []*exec.Cmd
+	Metadata      []v1alpha1.ImageMeta
+	execCmds      []*exec.Cmd
 }
 
 var executor = exec.Command

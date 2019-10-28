@@ -60,7 +60,7 @@ func newBuildCmd(out io.Writer) *cobra.Command {
 	f.StringVarP(&bc.builder, "builder", "b", "docker", "Choose either docker and buildah as the targetted image builder. By default the builder is docker.")
 	f.BoolVarP(&bc.debug, "debug", "d", false, "Turn on debug logging")
 	f.StringVarP(&bc.overlay, "overlay", "o", "", "Path to your overlay.yaml file")
-	f.StringVarP(&bc.storageDriver, "storage-driver", "-s", "overlay", "Storage-driver for Buildah. vfs enables the use of buildah within an unprivileged container. By default the storage driver is overlay")
+	f.StringVarP(&bc.storageDriver, "storage-driver", "s", "overlay", "Storage-driver for Buildah. vfs enables the use of buildah within an unprivileged container. By default the storage driver is overlay")
 
 	return cmd
 }
