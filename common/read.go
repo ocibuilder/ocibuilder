@@ -18,7 +18,6 @@ package common
 
 import (
 	"encoding/json"
-	"github.com/sirupsen/logrus"
 	"io"
 	"io/ioutil"
 	"os"
@@ -27,6 +26,7 @@ import (
 	"github.com/ghodss/yaml"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/tidwall/sjson"
 )
 
