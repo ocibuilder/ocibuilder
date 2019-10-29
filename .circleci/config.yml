@@ -54,7 +54,6 @@ jobs:
       image: ubuntu-1604:201903-01
     working_directory: /home/circleci/.go_workspace/src/github.com/ocibuilder/ocibuilder
     steps:
-      - run: echo $GOPATH
       - run: |
           sudo mkdir -p /go/src/github.com/ocibuilder/ocibuilder
           sudo chown -R $USER:$USER /go/src/github.com/ocibuilder/ocibuilder
@@ -93,7 +92,7 @@ jobs:
           command: |
             go get -u github.com/onsi/ginkgo/ginkgo
             go get -u github.com/onsi/gomega/...
-            ginkgo -v ./testing/e2e
+            ginkgo ./testing/e2e
   # build_linux runs the build of the linux ocictl artifact and persists the binary to the circleci workspace
   build_linux:
     docker:
