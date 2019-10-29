@@ -27,7 +27,10 @@ import (
 
 func TestReadLogin(t *testing.T) {
 	spec := v1alpha1.OCIBuilderSpec{}
-	err := Read(&spec, "", "../testing")
+	reader := Reader{
+		Logger: GetLogger(true),
+	}
+	err := reader.Read(&spec, "", "../testing")
 
 	assert.Equal(t, nil, err)
 	assert.Equal(t, spec.Login, loginSpec, "the login spec to match the expected")
@@ -35,6 +38,9 @@ func TestReadLogin(t *testing.T) {
 
 func TestApplyParams(t *testing.T) {
 	spec := v1alpha1.OCIBuilderSpec{}
+	reader := Reader{
+		Logger: GetLogger(true),
+	}
 	file, err := ioutil.ReadFile("../testing/spec_read_test.yaml")
 
 	spec.Login = loginSpec
@@ -46,7 +52,7 @@ func TestApplyParams(t *testing.T) {
 	}
 
 	assert.Equal(t, nil, err)
-	err = applyParams(file, &spec)
+	err = reader.applyParams(file, &spec)
 	assert.Equal(t, nil, err)
 
 	assert.Equal(t, expectedLogin, spec.Login[0].Creds.Env)
@@ -54,6 +60,9 @@ func TestApplyParams(t *testing.T) {
 
 func TestApplyParamsEnvVariable(t *testing.T) {
 	spec := v1alpha1.OCIBuilderSpec{}
+	reader := Reader{
+		Logger: GetLogger(true),
+	}
 	file, err := ioutil.ReadFile("../testing/spec_read_test.yaml")
 	assert.Equal(t, nil, err)
 
@@ -69,7 +78,7 @@ func TestApplyParamsEnvVariable(t *testing.T) {
 	}
 
 	assert.Equal(t, nil, err)
-	err = applyParams(file, &spec)
+	err = reader.applyParams(file, &spec)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedLoginEnv, spec.Login[0].Creds.Env)
 

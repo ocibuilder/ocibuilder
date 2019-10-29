@@ -140,7 +140,7 @@ func (r Reader) applyOverlay(yamlTemplate []byte, overlayPath string) ([]byte, e
 	return overlayedSpec, nil
 }
 
-func applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error {
+func (r Reader) applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error {
 	specJSON, err := yaml.YAMLToJSON(yamlObj)
 	if err != nil {
 		return err

@@ -115,7 +115,7 @@ func (b *buildCmd) run(args []string) error {
 	case v1alpha1.BuildahFramework:
 		{
 			b := buildah.Buildah{
-				Logger:        common.GetLogger(b.debug),
+				Logger:        logger,
 				StorageDriver: b.storageDriver,
 			}
 
