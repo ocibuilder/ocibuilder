@@ -140,19 +140,19 @@ func (r Reader) applyOverlay(yamlTemplate []byte, overlayPath string) ([]byte, e
 	return overlayedSpec, nil
 }
 
-func (r Reader) applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error {
-	specJson, err := yaml.YAMLToJSON(yamlObj)
+func applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error {
+	specJSON, err := yaml.YAMLToJSON(yamlObj)
 	if err != nil {
 		return err
 	}
 
 	for _, param := range spec.Params {
 		if param.Value != "" {
-			tmp, err := sjson.SetBytes(specJson, param.Dest, param.Value)
+			tmp, err := sjson.SetBytes(specJSON, param.Dest, param.Value)
 			if err != nil {
 				return err
 			}
-			specJson = tmp
+			specJSON = tmp
 		}
 		if param.ValueFromEnvVariable != "" {
 			val := os.Getenv(param.ValueFromEnvVariable)
@@ -160,15 +160,15 @@ func (r Reader) applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error
 				log.Warn("env variable ", param.ValueFromEnvVariable, " is empty")
 			}
 
-			tmp, err := sjson.SetBytes(specJson, param.Dest, val)
+			tmp, err := sjson.SetBytes(specJSON, param.Dest, val)
 			if err != nil {
 				return err
 			}
-			specJson = tmp
+			specJSON = tmp
 		}
 	}
 
-	if err := json.Unmarshal(specJson, spec); err != nil {
+	if err := json.Unmarshal(specJSON, spec); err != nil {
 		return err
 	}
 	return nil

@@ -27,17 +27,17 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/ocibuilder/ocibuilder/common"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
+	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/sirupsen/logrus"
 )
 
 // Docker is a struct which consists of an instance of logger, docker client and context path
 type Docker struct {
-	Logger      *logrus.Logger
-	Client      client.APIClient
+	Logger *logrus.Logger
+	Client client.APIClient
 }
 
 // Build is used to execute docker build and optionally purge the image after the build
