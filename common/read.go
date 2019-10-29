@@ -18,6 +18,7 @@ package common
 
 import (
 	"encoding/json"
+	"github.com/sirupsen/logrus"
 	"io"
 	"io/ioutil"
 	"os"
@@ -34,9 +35,9 @@ import (
 // The passed in OCIBuilderSpec reference is populated
 // If a filepath is not specified the current working directory is used
 func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepaths ...string) error {
-	dir, err := os.Getwd()
 	log := r.Logger
 
+	dir, err := os.Getwd()
 	if err != nil {
 		log.WithError(err).Errorln("failed to get current working directory")
 		return err
@@ -45,15 +46,8 @@ func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepath
 	if filepath != "" {
 		dir = filepath
 	}
+	log.WithField("filepath", dir + "/spec.yaml").Debugln("looking for spec.yaml")
 	file, err := ioutil.ReadFile(dir + "/spec.yaml")
-	if overlayPath != "" {
-		file, err = r.applyOverlay(file, overlayPath)
-		if err != nil {
-			log.WithError(err).Errorln("failed to apply overlay to spec")
-			return err
-		}
-	}
-
 	if err != nil {
 		log.Infoln("spec file not found, looking for individual specifications...")
 		if err := r.readIndividualSpecs(spec, dir); err != nil {
@@ -70,6 +64,15 @@ func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepath
 	if err := Validate(spec); err != nil {
 		log.WithError(err).Errorln("failed to validate spec")
 		return err
+	}
+
+	if overlayPath != "" {
+		log.WithField("overlayPath", overlayPath).Debugln("overlay path not empty - looking for overlay file")
+		file, err = applyOverlay(file, overlayPath)
+		if err != nil {
+			log.WithError(err).Errorln("failed to apply overlay to spec")
+			return err
+		}
 	}
 
 	if spec.Params != nil {
@@ -89,6 +92,7 @@ func (r Reader) readIndividualSpecs(spec *v1alpha1.OCIBuilderSpec, path string) 
 	var buildSpec *v1alpha1.BuildSpec
 	var pushSpec []v1alpha1.PushSpec
 
+	r.Logger.Debugln("attempting to read individual specs as spec.yaml as not found")
 	if file, err := ioutil.ReadFile(path + "/login.yaml"); err == nil {
 		if err := yaml.Unmarshal(file, &loginSpec); err != nil {
 			log.WithError(err).Errorln("failed to unmarshal login.yaml")
@@ -108,16 +112,14 @@ func (r Reader) readIndividualSpecs(spec *v1alpha1.OCIBuilderSpec, path string) 
 			log.WithError(err).Errorln("failed to unmarshal push.yaml")
 			return err
 		}
-
 		spec.Push = pushSpec
 	}
 	return nil
 }
 
 // applyOverlay applys a ytt overalay to the specification
-func (r Reader) applyOverlay(yamlTemplate []byte, overlayPath string) ([]byte, error) {
+func applyOverlay(yamlTemplate []byte, overlayPath string) ([]byte, error) {
 	file, err := os.Open(overlayPath)
-
 	if err != nil {
 		log.WithError(err).Errorln("unable to read overlay file...")
 		return nil, err
@@ -141,13 +143,25 @@ func (r Reader) applyOverlay(yamlTemplate []byte, overlayPath string) ([]byte, e
 }
 
 func (r Reader) applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error {
+	log := r.Logger
 	specJSON, err := yaml.YAMLToJSON(yamlObj)
 	if err != nil {
 		return err
 	}
 
+	log.WithField("number", len(spec.Params)).Debugln("found custom params in spec.yaml")
 	for _, param := range spec.Params {
 		if param.Value != "" {
+			log.WithFields(logrus.Fields{
+				"value": param.Value,
+				"dest" : param.Dest,
+			}).Debugln("setting param value at destination")
+
+			if err := ValidateParams(specJSON, param.Dest); err != nil {
+				log.WithError(err).WithField("dest", param.Dest).Errorln("Error validating params, check that your param dest is valid")
+				return err
+			}
+
 			tmp, err := sjson.SetBytes(specJSON, param.Dest, param.Value)
 			if err != nil {
 				return err
@@ -155,11 +169,20 @@ func (r Reader) applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error
 			specJSON = tmp
 		}
 		if param.ValueFromEnvVariable != "" {
+			log.WithFields(logrus.Fields{
+				"value": param.Value,
+				"dest" : param.Dest,
+			}).Debugln("setting param value at destination")
+
 			val := os.Getenv(param.ValueFromEnvVariable)
 			if val == "" {
 				log.Warn("env variable ", param.ValueFromEnvVariable, " is empty")
 			}
 
+			if err := ValidateParams(specJSON, param.Dest); err != nil {
+				log.WithError(err).WithField("dest", param.Dest).Errorln("Error validating params, check that your param dest is valid")
+				return err
+			}
 			tmp, err := sjson.SetBytes(specJSON, param.Dest, val)
 			if err != nil {
 				return err

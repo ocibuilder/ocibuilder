@@ -42,6 +42,7 @@ func TestApplyParams(t *testing.T) {
 		Logger: GetLogger(true),
 	}
 	file, err := ioutil.ReadFile("../testing/spec_read_test.yaml")
+	assert.Equal(t, nil, err)
 
 	spec.Login = loginSpec
 	spec.Params = params
@@ -51,11 +52,24 @@ func TestApplyParams(t *testing.T) {
 		Password: "my-real-password",
 	}
 
-	assert.Equal(t, nil, err)
 	err = reader.applyParams(file, &spec)
 	assert.Equal(t, nil, err)
-
 	assert.Equal(t, expectedLogin, spec.Login[0].Creds.Env)
+}
+
+func TestApplyInvalidParams(t *testing.T) {
+	spec := v1alpha1.OCIBuilderSpec{}
+	reader := Reader{
+		Logger: GetLogger(true),
+	}
+	file, err := ioutil.ReadFile("../testing/spec_read_test.yaml")
+	assert.Equal(t, nil, err)
+
+	spec.Login = loginSpec
+	spec.Params = invalidParams
+
+	err = reader.applyParams(file, &spec)
+	assert.EqualError(t, err, "path to dest is invalid in a set param")
 }
 
 func TestApplyParamsEnvVariable(t *testing.T) {
@@ -81,6 +95,27 @@ func TestApplyParamsEnvVariable(t *testing.T) {
 	err = reader.applyParams(file, &spec)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedLoginEnv, spec.Login[0].Creds.Env)
+
+	os.Remove("$TEST_USERNAME")
+	os.Remove("$TEST_PASSWORD")
+}
+
+func TestApplyInvalidParamsEnvVariable(t *testing.T) {
+	spec := v1alpha1.OCIBuilderSpec{}
+	reader := Reader{
+		Logger: GetLogger(true),
+	}
+	file, err := ioutil.ReadFile("../testing/spec_read_test.yaml")
+	assert.Equal(t, nil, err)
+
+	spec.Login = loginSpec
+	spec.Params = invalidParams
+
+	os.Setenv("$TEST_USERNAME", "test_env_user")
+	os.Setenv("$TEST_PASSWORD", "test_env_pass")
+
+	err = reader.applyParams(file, &spec)
+	assert.EqualError(t, err, "path to dest is invalid in a set param")
 
 	os.Remove("$TEST_USERNAME")
 	os.Remove("$TEST_PASSWORD")
@@ -117,6 +152,14 @@ var params = []v1alpha1.Param{{
 	Value: "testuser",
 }, {
 	Dest:  "login.0.creds.env.password",
+	Value: "my-real-password",
+}}
+
+var invalidParams = []v1alpha1.Param{{
+	Dest:  "login.0.this.path.is.wrong",
+	Value: "testuser",
+}, {
+	Dest:  "login.0.so.is.this",
 	Value: "my-real-password",
 }}
 
