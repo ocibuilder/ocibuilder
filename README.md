@@ -2,19 +2,18 @@
 
 ## What is the ocibuilder?
 
-The **ocibuilder** offers a command line tool called the **ocictl** to build, push and pull [OCI](https://www.opencontainers.org/) compliant images through declarative specifications, allowing
-you to pick between [Buildah](https://github.com/containers/buildah) or [Docker](https://docs.docker.com/) as the container build tool. 
+The **ocibuilder** offers a command line tool called the **ocictl** to build, push and pull [OCI](https://www.opencontainers.org/) compliant images through declarative specifications, allowing you to pick between [Buildah](https://github.com/containers/buildah) or [Docker](https://docs.docker.com/) as the container build tool.
 
 ## Features
 
-  * Specify docker or buildah as a build tool.
-  * Define multiple builds in single build configuration.
-  * Ability to templatize build stages.
-  * Multi-stage build support
-  * Parameterize build configuration at runtime with environment variable support.
-  * Supports [distroless](https://github.com/GoogleContainerTools/distroless) to produce lean images.
-  * Supports [ansible roles](https://docs.ansible.com/) as build stage.
-  * All basic features like registry login, pulling and pushing images from/to multiple registries.
+* Specify docker or buildah as a build tool.
+* Define multiple builds in single build configuration.
+* Ability to templatize build stages.
+* Multi-stage build support
+* Parameterize build configuration at runtime with environment variable support.
+* Supports [distroless](https://github.com/GoogleContainerTools/distroless) to produce lean images.
+* Supports [ansible roles](https://docs.ansible.com/) as build stage.
+* All basic features like registry login, pulling and pushing images from/to multiple registries.
 
 ## Architecture
 
@@ -22,17 +21,18 @@ you to pick between [Buildah](https://github.com/containers/buildah) or [Docker]
 
 ### Documentation
 
-To learn more about ocibuilder and how to get started, [please go to the complete documentation 
+To learn more about ocibuilder and how to get started, [please go to the complete documentation
 here](https://github.com/ocibuilder/docs)
 
 Our specification file is documented [here](https://github.com/ocibuilder/docs/blob/master/spec/specification.md).
 
 ### Roadmap
+
 Take a look at our roadmap and features in developement [here](https://github.com/ocibuilder/ocibuilder/blob/master/ROADMAP.md)
 
 ### Contribute
 
-Please read the [`CONTRIBUTING.md`](./CONTRIBUTING.md) for contributing guidelines. 
+Please read the [`CONTRIBUTING.md`](./CONTRIBUTING.md) for contributing guidelines.
 
 ### License
 

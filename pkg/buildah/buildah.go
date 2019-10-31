@@ -116,7 +116,7 @@ func createBuildCommand(args v1alpha1.ImageBuildArgs, storageDriver string) []st
 	return append(buildArgs, args.Context.LocalContext.ContextPath)
 }
 
-// Login performs a buildah login on all registries defined in spec.yaml or login.yaml
+// Login performs a buildah login on all registries defined in ocibuilder.yaml or login.yaml
 func (b Buildah) Login(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	log := b.Logger
 
