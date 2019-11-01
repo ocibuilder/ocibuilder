@@ -289,7 +289,7 @@ func (b Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 func createPushCommand(spec v1alpha1.PushSpec, imageName string) ([]string, error) {
 	pushArgs := []string{"push"}
 
-	if err := common.ValidatePushSpec(spec); err != nil {
+	if err := common.ValidatePushSpec(&spec); err != nil {
 		return nil, err
 	}
 
