@@ -66,6 +66,7 @@ func (d Docker) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 			Dockerfile: opt.Dockerfile,
 			Tags:       []string{imageName},
 			Context:    ctx,
+			Labels:		opt.Labels,
 		}
 		buildResponse, err := cli.ImageBuild(context.Background(), ctx, dockerOpt)
 		if err != nil {
