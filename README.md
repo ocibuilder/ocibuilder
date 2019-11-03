@@ -19,26 +19,36 @@ The **ocibuilder** offers a command line tool called the **ocictl** to build, pu
 
 ![architecture](https://github.com/ocibuilder/docs/blob/master/assets/ocibuilder.png)
 
-### Documentation
+## Install
 
-To learn more about ocibuilder and how to get started, [please go to the complete documentation
-here](https://github.com/ocibuilder/docs)
+Binary downloads of the `ocictl` are available on the [Releases page](https://github.com/ocibuilder/ocibuilder/releases).
+
+Simply unpack the `ocictl` tar and add it to your path
+
+The latest images with Buildah and Docker pre-installed alongside the ocictl is available on our
+[Dockerhub repository](https://cloud.docker.com/u/ocibuilder/repository/docker/ocibuilder/ocictl).
+
+Read the full [installation guide](https://github.com/ocibuilder/docs/blob/master/INSTALL.md) available in our docs.
+
+## Documentation
+
+To learn more about the ocibuilder and how to get started take a look at our [quick start](https://github.com/ocibuilder/docs/blob/master/QUICKSTART.md) guide or
+view our complete [documentation](https://github.com/ocibuilder/docs).
 
 Our specification file is documented [here](https://github.com/ocibuilder/docs/blob/master/spec/specification.md).
 
-### Roadmap
-
+## Roadmap
 Take a look at our roadmap and features in developement [here](https://github.com/ocibuilder/ocibuilder/blob/master/ROADMAP.md)
 
-### Contribute
+## Contribute
 
 Please read the [`CONTRIBUTING.md`](./CONTRIBUTING.md) for contributing guidelines.
 
-### License
+## License
 
 Apache License Version 2.0, see [`LICENSE`](https://github.com/ocibuilder/ocibuilder/blob/master/LICENSE)
 
-### References
+## References
 
 Docker: https://github.com/docker
 
