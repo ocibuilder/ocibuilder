@@ -38,7 +38,7 @@ import (
 type Docker struct {
 	Logger   *logrus.Logger
 	Client   client.APIClient
-	Metadata []v1alpha1.ImageMeta
+	Metadata []v1alpha1.ImageMetadata
 }
 
 // Build is used to execute docker build and optionally purge the image after the build
@@ -85,7 +85,7 @@ func (d *Docker) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 		}
 		buildResponses = append(buildResponses, buildResponse.Body)
 
-		d.Metadata = append(d.Metadata, v1alpha1.ImageMeta{
+		d.Metadata = append(d.Metadata, v1alpha1.ImageMetadata{
 			BuildFile: opt.Context.LocalContext.ContextPath + "/" + opt.Dockerfile,
 		})
 
