@@ -1,26 +1,5 @@
 version: 2
 jobs:
-  install_dep:
-    docker:
-      - image: golang:1.13.1-alpine
-    working_directory: /go/src/github.com/ocibuilder/ocibuilder
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v1
-            - go-dep-cache-
-      - run:
-          name: Install dependencies
-          command: |
-            apk update && apk add curl git build-base bash
-            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-            dep version
-            dep ensure -v
-      - save_cache:
-          key: go-dep-cache-{{ checksum "Gopkg.lock" }}-v1
-          paths:
-            - ./vendor
   # lint is the initial job which lints the codebase using standard golangci-lint linter
   lint:
     docker:
@@ -30,13 +9,23 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v1
+            - go-dep-cache-{{ checksum "Gopkg.lock" }}
             - go-dep-cache-
-      - run: apk update && apk add curl git build-base bash
+      - run:
+          name: Install dependencies
+          command: |
+            apk update && apk add curl git build-base bash
+            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+            dep version
+            dep ensure
+      - save_cache:
+          key: go-dep-cache-{{ checksum "Gopkg.lock" }}
+          paths:
+            - ./vendor
       - run: curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.21.0
-      - run: make lint
+      - run: golangci-lint run
   # test runs the ocibuilder unit tests and stores test results in TEMP_RESULTS
-  unit_test:
+  test:
     docker:
       - image: golang:1.13.1
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
@@ -44,55 +33,11 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v1
+            - go-dep-cache-{{ checksum "Gopkg.lock" }}
             - go-dep-cache-
       - run:
           name: Run unit tests
           command: make test
-  e2e_test:
-    machine:
-      image: ubuntu-1604:201903-01
-    working_directory: /home/circleci/.go_workspace/src/github.com/ocibuilder/ocibuilder
-    steps:
-      - run: |
-          sudo mkdir -p /go/src/github.com/ocibuilder/ocibuilder
-          sudo chown -R $USER:$USER /go/src/github.com/ocibuilder/ocibuilder
-      - run:
-          name: Install Buildah
-          command: |
-            sudo apt-get update -qq
-            sudo apt-get install -qq -y software-properties-common
-            sudo add-apt-repository -y ppa:projectatomic/ppa
-            sudo apt-get update -qq
-            sudo apt-get -qq -y install buildah
-            docker version
-            buildah version
-            curl -sL https://raw.githubusercontent.com/containers/buildah/master/docs/samples/registries.conf | \
-                  sudo tee /etc/containers/registries.conf
-            sudo rm -rf /usr/local/go
-            sudo add-apt-repository -y ppa:longsleep/golang-backports
-            sudo apt-get update -qq
-            sudo apt-get install -y golang-go
-            go version
-            git version
-      - checkout
-      - restore_cache:
-          keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v1
-            - go-dep-cache-
-      - run: go get -u github.com/gobuffalo/packr/packr
-      - run:
-          name: Copy Dependencies
-          command: cp -rf /go/src/github.com/ocibuilder/ocibuilder/vendor /home/circleci/.go_workspace/src/github.com/ocibuilder/ocibuilder
-      - run:
-          name: Build Linux Artifact
-          command: make ocictl-linux
-      - run:
-          name: Run e2e tests
-          command: |
-            go get -u github.com/onsi/ginkgo/ginkgo
-            go get -u github.com/onsi/gomega/...
-            ginkgo ./testing/e2e
   # build_linux runs the build of the linux ocictl artifact and persists the binary to the circleci workspace
   build_linux:
     docker:
@@ -102,12 +47,12 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v1
+            - go-dep-cache-{{ checksum "Gopkg.lock" }}
             - go-dep-cache-
       - run: go get -u github.com/gobuffalo/packr/packr
       - run:
           name: Build Linux Artifact
-          command: make ocictl-linux
+          command: "make ocictl-linux"
       - persist_to_workspace:
           root: .
           paths:
@@ -121,7 +66,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v1
+            - go-dep-cache-{{ checksum "Gopkg.lock" }}
             - go-dep-cache-
       - run: go get -u github.com/gobuffalo/packr/packr
       - run:
@@ -139,6 +84,14 @@ jobs:
     steps:
       - setup_remote_docker
       - checkout
+      - run:
+          name: Install Docker Client
+          command: |
+            set -x
+            DOCKER_VERSION="17.03.0-ce"
+            curl -L -o /tmp/docker-$DOCKER_VERSION.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$DOCKER_VERSION.tgz
+            tar -xz -C /tmp -f /tmp/docker-$DOCKER_VERSION.tgz
+            mv /tmp/docker/* /usr/bin
       - run:
           name: Run Docker Build
           command: |
@@ -170,22 +123,16 @@ workflows:
   version: 2
   build_test_deploy:
     jobs:
-      - install_dep
-      - lint:
-          requires:
-            - install_dep
-      - unit_test:
+      - lint
+      - test:
           requires:
             - lint
-      - e2e_test:
-          requires:
-            - unit_test
       - build_linux:
           requires:
-            - e2e_test
+            - test
       - build_mac:
           requires:
-            - e2e_test
+            - test
       - push_bin:
           requires:
             - build_linux
