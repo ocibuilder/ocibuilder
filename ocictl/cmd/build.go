@@ -66,8 +66,14 @@ func newBuildCmd(out io.Writer) *cobra.Command {
 }
 
 func (b *buildCmd) run(args []string) error {
+	logger := common.GetLogger(b.debug)
+
+	reader := common.Reader{
+		Logger: logger,
+	}
+
 	ociBuilderSpec := v1alpha1.OCIBuilderSpec{}
-	if err := common.Read(&ociBuilderSpec, b.overlay, b.path); err != nil {
+	if err := reader.Read(&ociBuilderSpec, b.overlay, b.path); err != nil {
 		log.WithError(err).Errorln("failed to read spec")
 		return err
 	}
@@ -84,7 +90,7 @@ func (b *buildCmd) run(args []string) error {
 
 			d := docker.Docker{
 				Client: cli,
-				Logger: common.GetLogger(b.debug),
+				Logger: logger,
 			}
 			log := d.Logger
 
@@ -114,7 +120,7 @@ func (b *buildCmd) run(args []string) error {
 	case v1alpha1.BuildahFramework:
 		{
 			b := buildah.Buildah{
-				Logger:        common.GetLogger(b.debug),
+				Logger:        logger,
 				StorageDriver: b.storageDriver,
 			}
 			log := b.Logger
