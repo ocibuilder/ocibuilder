@@ -57,8 +57,8 @@ func (d *Docker) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 		ctx, err := common.ReadContext(opt.Context)
 		log.WithFields(logrus.Fields{
 			"localContext": opt.Context.LocalContext,
-			"gitContext": opt.Context.GitContext,
-			"s3Context": opt.Context.S3Context,
+			"gitContext":   opt.Context.GitContext,
+			"s3Context":    opt.Context.S3Context,
 		}).Debugln("running docker build with context")
 		if err != nil {
 			log.WithError(err).Errorln("error reading image build context")
