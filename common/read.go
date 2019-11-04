@@ -46,7 +46,7 @@ func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepath
 	if filepath != "" {
 		dir = filepath
 	}
-	log.WithField("filepath", dir + "/ocibuilder.yaml").Debugln("looking for spec.yaml")
+	log.WithField("filepath", dir + "/ocibuilder.yaml").Debugln("looking for ocibuilder.yaml")
 	file, err := ioutil.ReadFile(dir + "/ocibuilder.yaml")
 	if overlayPath != "" {
 		file, err = applyOverlay(file, overlayPath)
@@ -100,7 +100,7 @@ func (r Reader) readIndividualSpecs(spec *v1alpha1.OCIBuilderSpec, path string) 
 	var buildSpec *v1alpha1.BuildSpec
 	var pushSpec []v1alpha1.PushSpec
 
-	r.Logger.Debugln("attempting to read individual specs as spec.yaml as not found")
+	r.Logger.Debugln("attempting to read individual specs as ocibuilder.yaml as not found")
 	if file, err := ioutil.ReadFile(path + "/login.yaml"); err == nil {
 		if err := yaml.Unmarshal(file, &loginSpec); err != nil {
 			log.WithError(err).Errorln("failed to unmarshal login.yaml")
@@ -157,7 +157,7 @@ func (r Reader) applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error
 		return err
 	}
 
-	log.WithField("number", len(spec.Params)).Debugln("found custom params in spec.yaml")
+	log.WithField("number", len(spec.Params)).Debugln("found custom params in ocibuilder.yaml")
 	for _, param := range spec.Params {
 		if param.Value != "" {
 			log.WithFields(logrus.Fields{
