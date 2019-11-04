@@ -2,19 +2,18 @@
 
 ## What is the ocibuilder?
 
-The **ocibuilder** offers a command line tool called the **ocictl** to build, push and pull [OCI](https://www.opencontainers.org/) compliant images through declarative specifications, allowing
-you to pick between [Buildah](https://github.com/containers/buildah) or [Docker](https://docs.docker.com/) as the container build tool. 
+The **ocibuilder** offers a command line tool called the **ocictl** to build, push and pull [OCI](https://www.opencontainers.org/) compliant images through declarative specifications, allowing you to pick between [Buildah](https://github.com/containers/buildah) or [Docker](https://docs.docker.com/) as the container build tool.
 
 ## Features
 
-  * Specify docker or buildah as a build tool.
-  * Define multiple builds in single build configuration.
-  * Ability to templatize build stages.
-  * Multi-stage build support
-  * Parameterize build configuration at runtime with environment variable support.
-  * Supports [distroless](https://github.com/GoogleContainerTools/distroless) to produce lean images.
-  * Supports [ansible roles](https://docs.ansible.com/) as build stage.
-  * All basic features like registry login, pulling and pushing images from/to multiple registries.
+* Specify docker or buildah as a build tool.
+* Define multiple builds in single build configuration.
+* Ability to templatize build stages.
+* Multi-stage build support
+* Parameterize build configuration at runtime with environment variable support.
+* Supports [distroless](https://github.com/GoogleContainerTools/distroless) to produce lean images.
+* Supports [ansible roles](https://docs.ansible.com/) as build stage.
+* All basic features like registry login, pulling and pushing images from/to multiple registries.
 
 ## Architecture
 
@@ -26,7 +25,7 @@ Binary downloads of the `ocictl` are available on the [Releases page](https://gi
 
 Simply unpack the `ocictl` tar and add it to your path
 
-The latest images with Buildah and Docker pre-installed alongside the ocictl is available on our 
+The latest images with Buildah and Docker pre-installed alongside the ocictl is available on our
 [Dockerhub repository](https://cloud.docker.com/u/ocibuilder/repository/docker/ocibuilder/ocictl).
 
 Read the full [installation guide](https://github.com/ocibuilder/docs/blob/master/INSTALL.md) available in our docs.
@@ -43,7 +42,7 @@ Take a look at our roadmap and features in developement [here](https://github.co
 
 ## Contribute
 
-Please read the [`CONTRIBUTING.md`](./CONTRIBUTING.md) for contributing guidelines. 
+Please read the [`CONTRIBUTING.md`](./CONTRIBUTING.md) for contributing guidelines.
 
 ## License
 
