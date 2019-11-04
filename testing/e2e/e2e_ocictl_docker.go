@@ -19,8 +19,8 @@ var _ = Describe("ocictl docker", func() {
 
 	AfterSuite(func() {
 		gexec.CleanupBuildArtifacts()
-		if _, err := os.Stat("./spec.yaml"); err == nil {
-			os.Remove("spec.yaml")
+		if _, err := os.Stat("./ocibuilder.yaml"); err == nil {
+			os.Remove("ocibuilder.yaml")
 		}
 	})
 

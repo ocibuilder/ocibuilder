@@ -31,10 +31,10 @@ import (
 
 // Buildah is  the struct which consists of a logger and context path
 type Buildah struct {
-	Logger        *logrus.Logger
-	StorageDriver string
-	Metadata      []v1alpha1.ImageMeta
 	execCmds      []*exec.Cmd
+	Logger        *logrus.Logger
+	Metadata      []v1alpha1.ImageMeta
+	StorageDriver string
 }
 
 var executor = exec.Command
@@ -114,7 +114,7 @@ func createBuildCommand(args v1alpha1.ImageBuildArgs, storageDriver string) []st
 	return append(buildArgs, args.Context.LocalContext.ContextPath)
 }
 
-// Login performs a buildah login on all registries defined in spec.yaml or login.yaml
+// Login performs a buildah login on all registries defined in ocibuilder.yaml or login.yaml
 func (b *Buildah) Login(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	log := b.Logger
 
