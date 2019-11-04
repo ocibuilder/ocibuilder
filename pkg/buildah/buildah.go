@@ -122,7 +122,6 @@ func (b Buildah) Login(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	var loginResponses []io.ReadCloser
 	for _, loginSpec := range spec.Login {
 		loginCommand, err := createLoginCommand(loginSpec)
-		log.WithField("command", loginCommand).Debug("login command to be executed")
 
 		if err != nil {
 			log.WithError(err).Errorln("error creating login command")
@@ -170,15 +169,9 @@ func createLoginCommand(args v1alpha1.LoginSpec) ([]string, error) {
 func (b Buildah) Pull(spec v1alpha1.OCIBuilderSpec, imageName string) ([]io.ReadCloser, error) {
 	log := b.Logger
 
-	if _, err := b.Login(spec); err != nil {
-		log.WithError(err).Errorln("error attempting to login")
-		return nil, err
-	}
-
 	var pullResponses []io.ReadCloser
 	for _, loginSpec := range spec.Login {
-		pullCommand, err := createPullCommand(imageName, loginSpec.Registry)
-		log.WithField("command", pullCommand).Debug("pull command to be executed")
+		pullCommand, err := b.createPullCommand(loginSpec.Registry, imageName, spec)
 
 		if err != nil {
 			log.WithError(err).Errorln("error attempting to create pull command")
@@ -199,18 +192,19 @@ func (b Buildah) Pull(spec v1alpha1.OCIBuilderSpec, imageName string) ([]io.Read
 	return pullResponses, nil
 }
 
-func createPullCommand(imageName string, registry string) ([]string, error) {
-	pullArgs := []string{"pull"}
+func (b Buildah) createPullCommand(registry string, imageName string, spec v1alpha1.OCIBuilderSpec) ([]string, error) {
+	args := []string{"pull", "--creds"}
 
-	if imageName == "" {
-		return nil, errors.New("no image name specified to pull")
+	fullImageName := fmt.Sprintf("%s/%s", registry, imageName)
+	b.Logger.WithField("command", append(args, fullImageName)).Debugln("push command with AUTH REVOKED")
+
+	authString, err := getPushAuthRegistryString(registry, spec);
+	if err != nil {
+		return nil, err
 	}
+	args = append(args, authString)
 
-	if registry != "" {
-		registry = registry + "/"
-	}
-
-	return append(pullArgs, registry+imageName), nil
+	return append(args, fullImageName), nil
 }
 
 // Push performs a buildah push of a spec image to a chosen registry
@@ -218,22 +212,21 @@ func createPullCommand(imageName string, registry string) ([]string, error) {
 func (b Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	log := b.Logger
 
-	if _, err := b.Login(spec); err != nil {
-		log.WithError(err).Errorln("error attempting to login")
-		return nil, err
-	}
-
 	if err := common.ValidatePush(spec); err != nil {
 		return nil, err
 	}
 
 	var pushResponses []io.ReadCloser
 	for _, pushSpec := range spec.Push {
-		pushImageName := fmt.Sprintf("%s/%s:%s", pushSpec.Registry, pushSpec.Image, pushSpec.Tag)
-		log.WithField("name:", pushImageName).Infoln("pushing image")
 
-		pushCommand, err := createPushCommand(pushSpec, pushImageName)
-		log.WithField("command", pushCommand).Debug("push command to be executed")
+		if err := common.ValidatePushSpec(pushSpec); err != nil {
+			return nil, err
+		}
+
+		imageName := fmt.Sprintf("%s:%s", pushSpec.Image, pushSpec.Tag)
+		log.WithFields(logrus.Fields{"name": imageName, "registry": pushSpec.Registry}).Infoln("pushing image")
+
+		pushCommand, err := b.createPushCommand(pushSpec.Registry, imageName, spec)
 
 		if err != nil {
 			log.WithError(err).Errorln("error attempting to create push command")
@@ -251,8 +244,9 @@ func (b Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 		log.Infoln("buildah push has been executed")
 
 		if pushSpec.Purge {
-			purgeCommand := createPurgeCommand(pushImageName)
-			log.WithFields(logrus.Fields{"command": purgeCommand, "image": pushImageName}).Debug("purge command to be executed")
+			fullImageName := fmt.Sprintf("%s:%s", pushSpec.Registry, imageName)
+			purgeCommand := createPurgeCommand(fullImageName)
+			log.WithFields(logrus.Fields{"command": purgeCommand, "image": fullImageName}).Debug("purge command to be executed")
 
 			cmd = executor("buildah", purgeCommand...)
 			out, err = pty.Start(cmd)
@@ -266,14 +260,39 @@ func (b Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	return pushResponses, nil
 }
 
-func createPushCommand(spec v1alpha1.PushSpec, imageName string) ([]string, error) {
-	pushArgs := []string{"push"}
+func (b Buildah) createPushCommand(registry string, imageName string, spec v1alpha1.OCIBuilderSpec) ([]string, error) {
+	args := []string{"push", "--creds"}
+	fullImageName := fmt.Sprintf("%s/%s", registry, imageName)
+	b.Logger.WithField("command", append(args, fullImageName)).Debugln("push command with AUTH REVOKED")
 
-	if err := common.ValidatePushSpec(spec); err != nil {
+	authString, err := getPushAuthRegistryString(registry, spec);
+	if err != nil {
 		return nil, err
 	}
+	args = append(args, authString)
 
-	return append(pushArgs, imageName), nil
+	return append(args, fullImageName), nil
+}
+
+func getPushAuthRegistryString(registry string, spec v1alpha1.OCIBuilderSpec) (string, error) {
+	if err := common.ValidateLogin(spec); err != nil {
+		return "", err
+	}
+	for _, spec := range spec.Login {
+		if spec.Registry == registry {
+			user, err := common.ValidateLoginUsername(spec)
+			if err != nil {
+				return "", err
+			}
+
+			pass, err := common.ValidateLoginPassword(spec)
+			if err != nil {
+				return "", err
+			}
+			return fmt.Sprintf("%s:%s", user, pass), nil
+		}
+	}
+	return "", errors.New("no auth credentials matching registry: " + registry + " found")
 }
 
 func createPurgeCommand(imageName string) []string {
