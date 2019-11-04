@@ -1,5 +1,5 @@
-FROM busybox AS binary
+FROM golang:latest AS ocictl
 COPY dist/ocictl /bin/ocictl
 
-FROM ocibuildere2e/ocibuilder-base-go:v0.1.0
-COPY --from=binary /bin/ocictl /bin
+FROM ocibuilder/ocibase:v0.1.0
+COPY --from=ocictl /bin/ocictl /bin
