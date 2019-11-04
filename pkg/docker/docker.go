@@ -36,8 +36,8 @@ import (
 
 // Docker is a struct which consists of an instance of logger, docker client and context path
 type Docker struct {
-	Logger *logrus.Logger
-	Client client.APIClient
+	Logger   *logrus.Logger
+	Client   client.APIClient
 	Metadata []v1alpha1.ImageMetadata
 }
 

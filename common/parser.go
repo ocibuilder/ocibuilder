@@ -32,7 +32,7 @@ import (
 )
 
 // ParseBuildSpec parses the build specification which is read in through spec.yml
-// or build.yaml and generates an array of build argumenets
+// or build.yaml and generates an array of build arguments
 func ParseBuildSpec(spec *v1alpha1.BuildSpec) ([]v1alpha1.ImageBuildArgs, error) {
 	var imageBuilds []v1alpha1.ImageBuildArgs
 	for _, step := range spec.Steps {
