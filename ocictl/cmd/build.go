@@ -72,13 +72,22 @@ func (b *buildCmd) run(args []string) error {
 		Logger: logger,
 	}
 
-	ociBuilderSpec := v1alpha1.OCIBuilderSpec{}
+	ociBuilderSpec := v1alpha1.OCIBuilderSpec{
+		Daemon: true,
+	}
+
 	if err := reader.Read(&ociBuilderSpec, b.overlay, b.path); err != nil {
 		log.WithError(err).Errorln("failed to read spec")
 		return err
 	}
 
-	switch v1alpha1.Framework(b.builder) {
+	// Prioritise builder passed in as argument, default builder is docker
+	builder := b.builder
+	if !ociBuilderSpec.Daemon {
+		builder = "buildah"
+	}
+
+	switch v1alpha1.Framework(builder) {
 
 	case v1alpha1.DockerFramework:
 		{

@@ -59,18 +59,26 @@ func newLoginCmd(out io.Writer) *cobra.Command {
 }
 
 func (l *loginCmd) run(args []string) error {
-	ociBuilderSpec := v1alpha1.OCIBuilderSpec{}
 	logger := common.GetLogger(l.debug)
-
 	reader := common.Reader{
 		Logger: logger,
+	}
+
+	ociBuilderSpec := v1alpha1.OCIBuilderSpec{
+		Daemon: true,
 	}
 	if err := reader.Read(&ociBuilderSpec, "", l.path); err != nil {
 		log.WithError(err).Errorln("failed to read spec")
 		return err
 	}
 
-	switch v1alpha1.Framework(l.builder) {
+	// Prioritise builder passed in as argument, default builder is docker
+	builder := l.builder
+	if !ociBuilderSpec.Daemon {
+		builder = "buildah"
+	}
+
+	switch v1alpha1.Framework(builder) {
 
 	case v1alpha1.DockerFramework:
 		{
