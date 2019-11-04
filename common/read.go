@@ -31,7 +31,7 @@ import (
 )
 
 // Read is responsible for reading in the specification files, either
-// combined in spec.yaml or separated in login.yaml, build.yaml and push.yaml.
+// combined in ocibuilder.yaml or separated in login.yaml, build.yaml and push.yaml.
 // The passed in OCIBuilderSpec reference is populated
 // If a filepath is not specified the current working directory is used
 func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepaths ...string) error {
@@ -46,8 +46,8 @@ func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepath
 	if filepath != "" {
 		dir = filepath
 	}
-	log.WithField("filepath", dir + "/spec.yaml").Debugln("looking for spec.yaml")
-	file, err := ioutil.ReadFile(dir + "/spec.yaml")
+	log.WithField("filepath", dir + "/ocibuilder.yaml").Debugln("looking for spec.yaml")
+	file, err := ioutil.ReadFile(dir + "/ocibuilder.yaml")
 	if err != nil {
 		log.Infoln("spec file not found, looking for individual specifications...")
 		if err := r.readIndividualSpecs(spec, dir); err != nil {
@@ -86,7 +86,7 @@ func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepath
 }
 
 // readIndividualSpecs reads the individual specifications if a global
-// spec.yaml is not found
+// ocibuilder.yaml is not found
 func (r Reader) readIndividualSpecs(spec *v1alpha1.OCIBuilderSpec, path string) error {
 	var loginSpec []v1alpha1.LoginSpec
 	var buildSpec *v1alpha1.BuildSpec

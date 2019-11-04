@@ -30,7 +30,7 @@ import (
 )
 
 const buildDesc = `
-This command runs an image build with the specification defined in your projects spec.yaml file.
+This command runs an image build with the specification defined in your projects ocibuilder.yaml file.
 It can run a build in both docker and buildah varieties.
 `
 
@@ -55,8 +55,8 @@ func newBuildCmd(out io.Writer) *cobra.Command {
 		},
 	}
 	f := cmd.Flags()
-	f.StringVarP(&bc.name, "name", "n", "", "Specify the name of your build or defined in spec.yaml")
-	f.StringVarP(&bc.path, "path", "p", "", "Path to your spec.yaml or build.yaml. By default will look in the current working directory")
+	f.StringVarP(&bc.name, "name", "n", "", "Specify the name of your build or defined in ocibuilder.yaml")
+	f.StringVarP(&bc.path, "path", "p", "", "Path to your ocibuilder.yaml or build.yaml. By default will look in the current working directory")
 	f.StringVarP(&bc.builder, "builder", "b", "docker", "Choose either docker and buildah as the targetted image builder. By default the builder is docker.")
 	f.BoolVarP(&bc.debug, "debug", "d", false, "Turn on debug logging")
 	f.StringVarP(&bc.overlay, "overlay", "o", "", "Path to your overlay.yaml file")
@@ -109,7 +109,7 @@ func (b *buildCmd) run(args []string) error {
 					return err
 				}
 			}
-			log.Infoln("docker build complete")
+			d.Clean()
 		}
 
 	case v1alpha1.BuildahFramework:
@@ -131,7 +131,7 @@ func (b *buildCmd) run(args []string) error {
 					return err
 				}
 			}
-			log.Infoln("buildah build complete")
+			b.Clean()
 		}
 
 	default:

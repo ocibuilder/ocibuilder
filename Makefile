@@ -37,10 +37,10 @@ ocictl:
 	packr build -v -ldflags '${LDFLAGS}' -o ${DIST_DIR}/ocictl ${CURRENT_DIR}/ocictl/main.go
 
 ocictl-linux:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 packr build -v -ldflags '${LDFLAGS}' -o ${DIST_DIR}/ocictl-linux-${VERSION} ${CURRENT_DIR}/ocictl/main.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 make ocictl
 
 ocictl-mac:
-	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 packr build -v -ldflags '${LDFLAGS}' -o ${DIST_DIR}/ocictl-mac-${VERSION} ${CURRENT_DIR}/ocictl/main.go
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 make ocictl
 
 ocibuilder-linux:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 make ocibuilder

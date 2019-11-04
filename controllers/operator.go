@@ -19,7 +19,9 @@ package ocibuilder
 import (
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	batchv1 "k8s.io/api/batch/v1"
 )
 
 // the context of an operation on a ocibuilder object.
@@ -35,6 +37,7 @@ type operationContext struct {
 	controller *Controller
 }
 
+// newOperationContext returns a new context of controller operation
 func newOperationContext(builder *v1alpha1.OCIBuilder, controller *Controller) *operationContext {
 	return &operationContext{
 		builder:    builder,
@@ -47,6 +50,33 @@ func newOperationContext(builder *v1alpha1.OCIBuilder, controller *Controller) *
 	}
 }
 
+// operate operate on an ocibuilder object and manages its lifecycle
 func (opCtx *operationContext) operate() error {
+	log := opCtx.logger.WithFields(map[string]interface{}{
+		common.LabelName:      opCtx.builder.Name,
+		common.LabelNamespace: opCtx.builder.Namespace,
+	})
+
+	log.Infoln("operating on the resource...")
+
+	if err := common.Validate(&opCtx.builder.Spec); err != nil {
+		return errors.Wrap(err, "failed to validate the resource spec")
+	}
+
+	switch opCtx.builder.Status.Phase {
+	case v1alpha1.NodePhaseNew:
+		opCtx.constructBuilderJob()
+	case v1alpha1.NodePhaseRunning:
+	case v1alpha1.NodePhaseCompleted:
+	case v1alpha1.NodePhaseError:
+	default:
+		opCtx.logger.WithField(common.LabelPhase, opCtx.builder.Status.Phase).Warnln("unknown phase of the resource")
+	}
+
 	return nil
+}
+
+// constructBuilderJob constructs a K8s job for ocibuilder build step.
+func (opCtx *operationContext) constructBuilderJob() *batchv1.Job {
+	return &batchv1.Job{}
 }
