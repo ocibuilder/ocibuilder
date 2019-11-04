@@ -103,7 +103,7 @@ func (b *buildCmd) run(args []string) error {
 					return err
 				}
 			}
-			log.Infoln("docker build complete")
+			d.Clean()
 		}
 
 	case v1alpha1.BuildahFramework:
@@ -125,7 +125,7 @@ func (b *buildCmd) run(args []string) error {
 					return err
 				}
 			}
-			log.Infoln("buildah build complete")
+			b.Clean()
 		}
 
 	default:

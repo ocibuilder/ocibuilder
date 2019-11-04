@@ -38,6 +38,7 @@ var docker = Docker{
 func TestDocker_Build(t *testing.T) {
 	_, err := docker.Build(dummy.Spec)
 	assert.Equal(t, nil, err)
+	docker.Clean()
 }
 
 // TestDocker_Login is the test for a docker login

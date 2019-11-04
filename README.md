@@ -32,10 +32,10 @@ Read the full [installation guide](https://github.com/ocibuilder/docs/blob/maste
 
 ## Documentation
 
-To learn more about the ocibuilder and how to get started take a look at our [quick start](https://github.com/ocibuilder/docs/blob/master/QUICKSTART.md) guide or
-view our complete [documentation](https://github.com/ocibuilder/docs).
+To learn more about the ocibuilder and how to get started take a look at our [quick start](https://github.com/ocibuilder/docs/blob/master/QUICKSTART.md) guide or 
+view our complete [documentation](https://ocibuilder.github.io/docs/).
 
-Our specification file is documented [here](https://github.com/ocibuilder/docs/blob/master/spec/specification.md).
+Our specification file is documented [here](https://ocibuilder.github.io/docs/specification/specification/).
 
 ## Roadmap
 Take a look at our roadmap and features in developement [here](https://github.com/ocibuilder/ocibuilder/blob/master/ROADMAP.md)

@@ -8,6 +8,7 @@ type Builder interface {
 	Login(spec OCIBuilderSpec) ([]io.ReadCloser, error)
 	Pull(spec OCIBuilderSpec, name string) ([]io.ReadCloser, error)
 	Push(spec OCIBuilderSpec) ([]io.ReadCloser, error)
+	Clean()
 }
 
 // Overlay is the overlay interface for handling of overylaying onto specification files
