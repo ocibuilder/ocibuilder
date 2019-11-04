@@ -1,0 +1,45 @@
+build:
+  steps:
+    - metadata:
+        name: abegolli/ocictl
+      stages:
+        - metadata:
+            name: binary
+          base:
+            image: busybox
+          cmd:
+            - docker:
+                inline:
+                  - COPY dist/ocictl /bin/ocictl
+        - metadata:
+            name: build
+          base:
+            image: ocibuilder/ocibase
+            tag: v0.1.0
+          cmd:
+            - docker:
+                inline:
+                  - COPY --from=binary /bin/ocictl /bin
+      tag: TAG_REPLACED
+
+login:
+  - registry: docker.io
+    creds:
+      plain:
+        username: USER_REPLACED
+        password: PASS_REPLACED
+
+push:
+  - registry: docker.io
+    image: abegolli/ocictl
+    tag: TAG_REPLACED
+
+params:
+  - dest: build.steps.0.tag
+    valueFromEnvVariable: OCI_TAG
+  - dest: push.0.tag
+    valueFromEnvVariable: OCI_TAG
+  - dest: login.0.creds.plain.username
+    valueFromEnvVariable: OCI_REGISTRY_USER
+  - dest: login.0.creds.plain.password
+    valueFromEnvVariable: OCI_REGISTRY_TOKEN
