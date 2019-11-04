@@ -33,8 +33,8 @@ import (
 type Buildah struct {
 	execCmds      []*exec.Cmd
 	Logger        *logrus.Logger
-	Metadata      []v1alpha1.ImageMeta
 	StorageDriver string
+	Metadata      []v1alpha1.ImageMetadata
 }
 
 var executor = exec.Command
@@ -72,7 +72,7 @@ func (b *Buildah) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 		}
 		buildResponses = append(buildResponses, out)
 
-		b.Metadata = append(b.Metadata, v1alpha1.ImageMeta{
+		b.Metadata = append(b.Metadata, v1alpha1.ImageMetadata{
 			BuildFile: fullPath,
 		})
 

@@ -374,7 +374,7 @@ type Command struct {
 }
 
 // Represents build image metadata
-type ImageMeta struct {
+type ImageMetadata struct {
 	// BuildFile is the path to the buildfile
 	BuildFile string
 }
