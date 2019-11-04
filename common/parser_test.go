@@ -27,7 +27,7 @@ import (
 )
 
 func TestParseDockerCommands(t *testing.T) {
-	path := "../testing/dummy/commands_basic_parser_test.txt"
+	path := "../testing/commands_basic_parser_test.txt"
 	dockerfile, err := ParseDockerCommands(&v1alpha1.DockerStep{
 		Path: path,
 	})
@@ -38,14 +38,14 @@ func TestParseDockerCommands(t *testing.T) {
 }
 
 func TestGenerateDockerfile(t *testing.T) {
-	file, err := ioutil.ReadFile("../testing/dummy/build.yaml")
+	file, err := ioutil.ReadFile("../testing/build.yaml")
 	assert.Equal(t, nil, err)
 
 	templates := []v1alpha1.BuildTemplate{{
 		Name: "template-1",
 		Cmd: []v1alpha1.BuildTemplateStep{{
 			Docker: &v1alpha1.DockerStep{
-				Path: "../testing/dummy/commands_basic_parser_test.txt",
+				Path: "../testing/commands_basic_parser_test.txt",
 			},
 		},
 	}}}
@@ -66,7 +66,7 @@ func TestGenerateDockerfile(t *testing.T) {
 }
 
 func TestGenerateDockerfileInline(t *testing.T) {
-	file, err := ioutil.ReadFile("../testing/dummy/build.yaml")
+	file, err := ioutil.ReadFile("../testing/build.yaml")
 	assert.Equal(t, nil, err)
 
 	template := []v1alpha1.BuildTemplate{{
@@ -96,12 +96,12 @@ func TestGenerateDockerfileInline(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedInlineDockerfile, string(dockerfile))
 
-	path, err = GenerateDockerfile(buildSpecification.Steps[0], template, "../testing/dummy")
+	path, err = GenerateDockerfile(buildSpecification.Steps[0], template, "../testing")
 	assert.Equal(t, nil, err)
 
-	dockerfile, err = ioutil.ReadFile("../testing/dummy/" + path)
+	dockerfile, err = ioutil.ReadFile("../testing/" + path)
 	assert.Equal(t, nil, err)
-	defer os.Remove("../testing/dummy/" + path)
+	defer os.Remove("../testing/" + path)
 
 	assert.Equal(t, expectedInlineDockerfile, string(dockerfile))
 }

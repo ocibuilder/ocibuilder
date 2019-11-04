@@ -47,7 +47,7 @@ func Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepaths ...string
 	if overlayPath != "" {
 		file, err = applyOverlay(file, overlayPath)
 		if err != nil {
-			log.WithError(err).WithField("path", overlayPath).Errorln("failed to apply overlay to spec at path")
+			log.WithError(err).Errorln("failed to apply overlay to spec")
 			return err
 		}
 	}
@@ -55,18 +55,18 @@ func Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepaths ...string
 	if err != nil {
 		log.Infoln("spec file not found, looking for individual specifications...")
 		if err := readIndividualSpecs(spec, dir); err != nil {
-			log.WithError(err).WithField("directory", dir).Errorln("failed to read individual specs")
+			log.WithError(err).Errorln("failed to read individual specs")
 			return err
 		}
 	}
 
 	if err = yaml.Unmarshal(file, spec); err != nil {
-		log.WithError(err).WithField("directory", dir).Errorln("failed to unmarshal spec at directory")
+		log.WithError(err).Errorln("failed to unmarshal spec")
 		return err
 	}
 
 	if err := Validate(spec); err != nil {
-		log.WithError(err).WithField("directory", dir).Errorln("failed to validate spec at directory")
+		log.WithError(err).Errorln("failed to validate spec")
 		return err
 	}
 
