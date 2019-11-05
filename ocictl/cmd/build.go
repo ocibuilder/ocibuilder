@@ -30,7 +30,7 @@ import (
 )
 
 const buildDesc = `
-This command runs an image build with the specification defined in your projects spec.yaml file.
+This command runs an image build with the specification defined in your projects ocibuilder.yaml file.
 It can run a build in both docker and buildah varieties.
 `
 
@@ -55,12 +55,12 @@ func newBuildCmd(out io.Writer) *cobra.Command {
 		},
 	}
 	f := cmd.Flags()
-	f.StringVarP(&bc.name, "name", "n", "", "Specify the name of your build or defined in spec.yaml")
-	f.StringVarP(&bc.path, "path", "p", "", "Path to your spec.yaml or build.yaml. By default will look in the current working directory")
+	f.StringVarP(&bc.name, "name", "n", "", "Specify the name of your build or defined in ocibuilder.yaml")
+	f.StringVarP(&bc.path, "path", "p", "", "Path to your ocibuilder.yaml or build.yaml. By default will look in the current working directory")
 	f.StringVarP(&bc.builder, "builder", "b", "docker", "Choose either docker and buildah as the targetted image builder. By default the builder is docker.")
 	f.BoolVarP(&bc.debug, "debug", "d", false, "Turn on debug logging")
 	f.StringVarP(&bc.overlay, "overlay", "o", "", "Path to your overlay.yaml file")
-	f.StringVarP(&bc.storageDriver, "storage-driver", "-s", "overlay", "Storage-driver for Buildah. vfs enables the use of buildah within an unprivileged container. By default the storage driver is overlay")
+	f.StringVarP(&bc.storageDriver, "storage-driver", "s", "overlay", "Storage-driver for Buildah. vfs enables the use of buildah within an unprivileged container. By default the storage driver is overlay")
 
 	return cmd
 }
@@ -86,11 +86,14 @@ func (b *buildCmd) run(args []string) error {
 				Client: cli,
 				Logger: common.GetLogger(b.debug),
 			}
+			log := d.Logger
+
 			res, err := d.Build(ociBuilderSpec)
 			if err != nil {
 				return err
 			}
 
+			log.WithField("responses", len(res)).Debugln("received responses and running build")
 			for idx, imageResponse := range res {
 				log.WithField("step: ", idx).Infoln("running build step")
 
@@ -98,11 +101,13 @@ func (b *buildCmd) run(args []string) error {
 					return errors.New("no response received from daemon - check if docker is installed and running")
 				}
 
-				err := utils.OutputJson(imageResponse)
-				if err != nil {
+				if err := utils.OutputJson(imageResponse); err != nil {
 					return err
 				}
+				log.WithField("response", idx).Debugln("response has finished executing")
 			}
+			log.Debugln("running build file cleanup")
+			d.Clean()
 			log.Infoln("docker build complete")
 		}
 
@@ -112,6 +117,7 @@ func (b *buildCmd) run(args []string) error {
 				Logger:        common.GetLogger(b.debug),
 				StorageDriver: b.storageDriver,
 			}
+			log := b.Logger
 
 			res, err := b.Build(ociBuilderSpec)
 			if err != nil {
@@ -119,12 +125,19 @@ func (b *buildCmd) run(args []string) error {
 				return err
 			}
 
+			log.WithField("responses", len(res)).Debugln("received responses and running build")
 			for idx, imageResponse := range res {
 				log.WithField("step: ", idx).Infoln("running build step")
 				if err := utils.Output(imageResponse); err != nil {
 					return err
 				}
+				if err := b.Wait(idx); err != nil {
+					return err
+				}
+				log.WithField("response", idx).Debugln("response has finished executing")
 			}
+			log.Debugln("running build file cleanup")
+			b.Clean()
 			log.Infoln("buildah build complete")
 		}
 

@@ -59,7 +59,7 @@ func newPushCmd(out io.Writer) *cobra.Command {
 		},
 	}
 	f := cmd.Flags()
-	f.StringVarP(&pc.path, "path", "p", "", "Path to your spec.yaml or push.yaml. By default will look in the current working directory")
+	f.StringVarP(&pc.path, "path", "p", "", "Path to your ocibuilder.yaml or push.yaml. By default will look in the current working directory")
 	f.StringVarP(&pc.builder, "builder", "b", "docker", "Choose either docker and buildah as the targetted image builder. By default the builder is docker.")
 	f.BoolVarP(&pc.debug, "debug", "d", false, "Turn on debug logging")
 	return cmd
@@ -81,21 +81,25 @@ func (p *pushCmd) run(args []string) error {
 				log.WithError(err).Errorln("failed to fetch docker client")
 				return err
 			}
+
 			d := docker.Docker{
 				Client: cli,
 				Logger: common.GetLogger(p.debug),
 			}
+			log := d.Logger
+
 			res, err := d.Push(ociBuilderSpec)
 			if err != nil {
 				return err
 			}
 
+			log.WithField("responses", len(res)).Debugln("received responses and running push")
 			for idx, imageResponse := range res {
 				log.WithField("step: ", idx).Infoln("running push step")
-				err := utils.OutputJson(imageResponse)
-				if err != nil {
+				if err := utils.OutputJson(imageResponse); err != nil {
 					return err
 				}
+				log.WithField("response", idx).Debugln("response has finished executing")
 			}
 			log.Infoln("docker push complete")
 		}
@@ -105,16 +109,23 @@ func (p *pushCmd) run(args []string) error {
 			b := buildah.Buildah{
 				Logger: common.GetLogger(p.debug),
 			}
+			log := b.Logger
+
 			res, err := b.Push(ociBuilderSpec)
 			if err != nil {
 				return err
 			}
 
+			log.WithField("responses", len(res)).Debugln("received responses and running push")
 			for idx, imageResponse := range res {
 				log.WithField("step: ", idx).Infoln("running push step")
 				if err := utils.Output(imageResponse); err != nil {
 					return err
 				}
+				if err := b.Wait(idx); err != nil {
+					return err
+				}
+				log.WithField("response", idx).Debugln("response has finished executing")
 			}
 			log.Infoln("buildah push complete")
 		}

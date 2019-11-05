@@ -52,7 +52,7 @@ func newLoginCmd(out io.Writer) *cobra.Command {
 		},
 	}
 	f := cmd.Flags()
-	f.StringVarP(&lc.path, "path", "p", "", "Path to your spec.yaml or login.yaml. By default will look in the current working directory")
+	f.StringVarP(&lc.path, "path", "p", "", "Path to your ocibuilder.yaml or login.yaml. By default will look in the current working directory")
 	f.StringVarP(&lc.builder, "builder", "b", "docker", "Choose either docker and buildah as the targetted image puller. By default the builder is docker.")
 	f.BoolVarP(&lc.debug, "debug", "d", false, "Turn on debug logging")
 	return cmd
@@ -79,17 +79,20 @@ func (l *loginCmd) run(args []string) error {
 				Client: cli,
 				Logger: common.GetLogger(l.debug),
 			}
+			log := d.Logger
 
-			out, err := d.Login(ociBuilderSpec)
+			res, err := d.Login(ociBuilderSpec)
 			if err != nil {
 				log.WithError(err).Errorln("failed to login to registry")
 				return err
 			}
 
-			for _, readCloser := range out {
-				if err := utils.Output(readCloser); err != nil {
+			log.WithField("responses", len(res)).Debugln("received responses and running login")
+			for idx, loginResponse := range res {
+				if err := utils.Output(loginResponse); err != nil {
 					return err
 				}
+				log.WithField("response", idx).Debugln("response has finished executing")
 			}
 			log.Infoln("docker login completed")
 		}
@@ -99,19 +102,25 @@ func (l *loginCmd) run(args []string) error {
 			b := buildah.Buildah{
 				Logger: common.GetLogger(l.debug),
 			}
+			log := b.Logger
 
-			out, err := b.Login(ociBuilderSpec)
+			res, err := b.Login(ociBuilderSpec)
 			if err != nil {
 				log.WithError(err).Errorln("failed to login to registry")
 				return err
 			}
 
-			for _, readCloser := range out {
-				if err := utils.Output(readCloser); err != nil {
+			log.WithField("responses", len(res)).Debugln("received responses and running login")
+			for idx, loginResponse := range res {
+				if err := utils.Output(loginResponse); err != nil {
 					return err
 				}
+				if err := b.Wait(idx); err != nil {
+					return err
+				}
+				log.WithField("response", idx).Debugln("response has finished executing")
 			}
-			log.Infoln("buildah login completed")
+			log.Infoln("buildah login complete")
 		}
 
 	default:
