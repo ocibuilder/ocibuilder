@@ -29,12 +29,12 @@ ocictl-mac:
 	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 make ocictl
 
 ocictl-package-build:
-	make ocictl-linux \
-	tar -czvf ocictl-linux-${VERSION}.tar.gz ${CURRENT_DIR}/dist/ocictl \
-	rm ${CURRENT_DIR}/dist/ocictl \
-	make ocictl-mac \
-	tar -czvf ocictl-mac-${VERSION}.tar.gz ${CURRENT_DIR}/dist/ocictl \
-	rm ${CURRENT_DIR}/dist/ocictl \
+	make ocictl-linux
+	tar -czvf dist/ocictl-linux-${VERSION}.tar.gz ./dist/ocictl
+	rm ${CURRENT_DIR}/dist/ocictl
+	make ocictl-mac
+	tar -czvf dist/ocictl-mac-${VERSION}.tar.gz ./dist/ocictl
+	rm ${CURRENT_DIR}/dist/ocictl
 
 test:
 	go test $(shell go list ./... | grep -v /vendor/ | grep -v /test/e2e/) -race -short -v -coverprofile=coverage.text
