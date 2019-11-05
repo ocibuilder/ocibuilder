@@ -31,10 +31,10 @@ import (
 
 // Buildah is  the struct which consists of a logger and context path
 type Buildah struct {
+	execCmds      []*exec.Cmd
 	Logger        *logrus.Logger
 	StorageDriver string
 	Metadata      []v1alpha1.ImageMetadata
-	execCmds      []*exec.Cmd
 }
 
 var executor = exec.Command
@@ -321,6 +321,11 @@ func (b Buildah) Clean() {
 
 // Wait calls wait for each exec command, handling any output to stderr and exiting the process
 func (b Buildah) Wait(idx int) error {
+	b.Logger.WithField("execCmds", b.execCmds).Debugln("exec wait called")
+	if len(b.execCmds) == 0 {
+		return errors.New("error waiting for command to finish executing")
+	}
+
 	if err := b.execCmds[idx].Wait(); err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {
 			fmt.Printf("Exit code is %d\n", exitError.ExitCode())
