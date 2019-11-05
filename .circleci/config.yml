@@ -89,12 +89,13 @@ jobs:
       - run:
           name: Run Ocictl Build
           command: |
-            export OCI_TAG=$(dist/ocictl version)
+            export OCI_TAG=v0.1.0
+            echo $OCI_TAG
             ocictl build -d
       - run:
           name: Run Docker Push
           command: |
-            export OCI_TAG=$(dist/ocictl version)
+            export OCI_TAG=v0.1.0
             echo $OCI_TAG
             ocictl push -d
   # push_bin pushes both the linux and mac binaries to a github release when a new tag is added to ocibuilder

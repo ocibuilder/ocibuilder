@@ -40,6 +40,6 @@ params:
   - dest: push.0.tag
     valueFromEnvVariable: OCI_TAG
   - dest: login.0.creds.plain.username
-    valueFromEnvVariable: OCI_REGISTRY_USER
+    valueFromEnvVariable: DOCKERHUB_USER
   - dest: login.0.creds.plain.password
-    valueFromEnvVariable: OCI_REGISTRY_TOKEN
+    valueFromEnvVariable: DOCKERHUB_TOKEN
