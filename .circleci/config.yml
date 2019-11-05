@@ -79,8 +79,6 @@ jobs:
   # push_container pushes the ocictl container to the ocibuilder docker registry when a new tag is added to ocibuilder
   # TODO: update push to build and push using an ocictl spec file
   push_container:
-    environment:
-      - OCI_TAG: v0.1.0-test
     docker:
       - image: ocibuilder/ocictl:0.1.0-alpha
     steps:
@@ -88,11 +86,11 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run: ls -l
-      - run: ls ./dist
       - run:
           name: Run Ocictl Build
-          command: ocictl build
+          command: |
+            export OCI_TAG=$(dist/ocictl --version)
+            ocictl build
       - run:
           name: Run Docker Push
           command: ocictl push
