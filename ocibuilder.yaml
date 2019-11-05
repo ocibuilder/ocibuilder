@@ -1,7 +1,7 @@
 build:
   steps:
     - metadata:
-        name: abegolli/ocictl
+        name: ocibuilder/ocictl
       stages:
         - metadata:
             name: binary
@@ -31,7 +31,7 @@ login:
 
 push:
   - registry: docker.io
-    image: abegolli/ocictl
+    image: ocibuilder/ocictl
     tag: TAG_REPLACED
 
 params:
