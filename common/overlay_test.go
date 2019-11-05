@@ -17,9 +17,10 @@ limitations under the License.
 package common
 
 import (
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestYttOverlay_Apply(t *testing.T) {

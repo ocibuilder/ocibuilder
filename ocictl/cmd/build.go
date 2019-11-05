@@ -101,7 +101,7 @@ func (b *buildCmd) run(args []string) error {
 					return errors.New("no response received from daemon - check if docker is installed and running")
 				}
 
-				if err := utils.OutputJson(imageResponse); err != nil {
+				if err := utils.OutputJSON(imageResponse); err != nil {
 					return err
 				}
 				log.WithField("response", idx).Debugln("response has finished executing")

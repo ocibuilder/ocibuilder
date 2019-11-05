@@ -17,9 +17,10 @@ limitations under the License.
 package cmd
 
 import (
+	"io"
+
 	"github.com/ocibuilder/ocibuilder/provenance"
 	"github.com/spf13/cobra"
-	"io"
 )
 
 type versionCmd struct {

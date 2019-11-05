@@ -53,7 +53,7 @@ test:
 	go test $(shell go list ./... | grep -v /vendor/ | grep -v /testing/) -race -short -v -coverprofile=coverage.text
 
 lint:
-	golangci-lint run
+	golangci-lint run -E gofmt -E goimports -E golint --skip-dirs='(pkg/client|testing/e2e)'
 
 e2e:
 	go test testing/e2e

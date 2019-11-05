@@ -19,7 +19,7 @@ package context
 import "io"
 
 type GitContext struct {
-	Url string
+	URL string
 }
 
 func (ctx GitContext) Read() (io.ReadCloser, error) {

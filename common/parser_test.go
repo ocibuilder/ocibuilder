@@ -21,8 +21,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ghodss/yaml"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -48,7 +48,7 @@ func TestGenerateDockerfile(t *testing.T) {
 				Path: "../testing/dummy/commands_basic_parser_test.txt",
 			},
 		},
-	}}}
+		}}}
 
 	buildSpecification := v1alpha1.BuildSpec{}
 	if err := yaml.Unmarshal(file, &buildSpecification); err != nil {

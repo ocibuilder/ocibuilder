@@ -18,11 +18,12 @@ package context
 
 import (
 	"fmt"
+	"io"
+	"os"
+
 	"github.com/mholt/archiver"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"io"
-	"os"
 )
 
 // LocalContext stores the path for your local build context, implements the ContextReader interface
@@ -38,7 +39,7 @@ func (ctx LocalContext) Read() (io.ReadCloser, error) {
 		return nil, errors.New("cannot have empty contextPath: specify . for current directory")
 	}
 
-	defer func(){
+	defer func() {
 		if r := recover(); r != nil {
 			logrus.Warnln("panic in context read, recovered for cleanup")
 		}

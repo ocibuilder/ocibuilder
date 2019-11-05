@@ -97,7 +97,7 @@ func (p *pullCmd) run(args []string) error {
 			for idx, imageResponse := range res {
 				log.WithField("step: ", idx).Infoln("running pull step")
 
-				if err := utils.OutputJson(imageResponse); err != nil {
+				if err := utils.OutputJSON(imageResponse); err != nil {
 					return err
 				}
 				log.WithField("response", idx).Debugln("response has finished executing")

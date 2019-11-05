@@ -17,14 +17,13 @@ limitations under the License.
 package context
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestS3Context_Read(t *testing.T) {
-	s3context := S3Context{
-
-	}
+	s3context := S3Context{}
 	_, err := s3context.Read()
 	assert.Equal(t, nil, err)
 }

@@ -20,16 +20,16 @@ import (
 	"io"
 	"os"
 
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/docker/pkg/term"
+	"github.com/ocibuilder/ocibuilder/common"
 )
 
 var log = common.GetLogger(false)
 
-// OutputJson streams and formats the output to stdout from returned ReadClosers by docker
+// OutputJSON streams and formats the output to stdout from returned ReadClosers by docker
 // commands.
-func OutputJson(ouput io.ReadCloser) error {
+func OutputJSON(ouput io.ReadCloser) error {
 
 	termFd, isTerm := term.GetFdInfo(os.Stdout)
 

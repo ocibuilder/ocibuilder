@@ -19,7 +19,6 @@ package context
 import "io"
 
 type S3Context struct {
-
 }
 
 func (ctx S3Context) Read() (io.ReadCloser, error) {

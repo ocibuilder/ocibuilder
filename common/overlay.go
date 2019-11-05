@@ -20,12 +20,13 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	cmdcore "github.com/k14s/ytt/pkg/cmd/core"
-	cmdtpl "github.com/k14s/ytt/pkg/cmd/template"
-	"github.com/k14s/ytt/pkg/files"
 	"io"
 	"io/ioutil"
 	"strings"
+
+	cmdcore "github.com/k14s/ytt/pkg/cmd/core"
+	cmdtpl "github.com/k14s/ytt/pkg/cmd/template"
+	"github.com/k14s/ytt/pkg/files"
 )
 
 // YttOverlay is the struct for handling overlays using ytt library https://github.com/k14s/ytt

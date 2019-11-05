@@ -17,13 +17,14 @@ limitations under the License.
 package context
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGitContext_Read(t *testing.T) {
 	gitContext := GitContext{
-		Url: "github.com/artbegolli/sickurl",
+		URL: "github.com/artbegolli/sickurl",
 	}
 	_, err := gitContext.Read()
 	assert.Equal(t, nil, err)

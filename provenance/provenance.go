@@ -18,9 +18,10 @@ package provenance
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"io"
 	"runtime"
+
+	"github.com/sirupsen/logrus"
 )
 
 // Version information set by link flags during build. We fall back to these sane

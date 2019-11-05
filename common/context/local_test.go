@@ -17,8 +17,9 @@ limitations under the License.
 package context
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestLocalContext_Read(t *testing.T) {
