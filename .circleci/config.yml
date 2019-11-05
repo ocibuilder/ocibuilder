@@ -38,8 +38,8 @@ jobs:
       - run:
           name: Run unit tests
           command: make test
-  # build_linux runs the build of the linux ocictl artifact and persists the binary to the circleci workspace
-  build_linux:
+  # build runs the build of the linux and mac ocictl artifacts and persists the packages to the circleci workspace
+  build:
     docker:
       - image: golang:1.13.1
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
@@ -52,26 +52,7 @@ jobs:
       - run: go get -u github.com/gobuffalo/packr/packr
       - run:
           name: Build Linux Artifact
-          command: "make ocictl-linux"
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ./dist/
-  # build_mac runs the build of the mac ocictl artifact and persists the binary to the circleci workspace
-  build_mac:
-    docker:
-      - image: golang:1.13.1
-    working_directory: /go/src/github.com/ocibuilder/ocibuilder
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}
-            - go-dep-cache-
-      - run: go get -u github.com/gobuffalo/packr/packr
-      - run:
-          name: Build Mac Artifact
-          command: "make ocictl-mac"
+          command: make ocictl-package-build
       - persist_to_workspace:
           root: .
           paths:
@@ -88,13 +69,13 @@ jobs:
       - run:
           name: Run Ocictl Build
           command: |
-            export OCI_TAG=$(dist/ocictl version)
+            export OCI_TAG=$(cat ./VERSION)
             echo $OCI_TAG
             ocictl build
       - run:
           name: Run Docker Push
           command: |
-            export OCI_TAG=$(dist/ocictl version)
+            export OCI_TAG=$(cat ./VERSION)
             echo $OCI_TAG
             ocictl push
   # push_bin pushes both the linux and mac binaries to a github release when a new tag is added to ocibuilder
@@ -105,13 +86,14 @@ jobs:
     docker:
       - image: golang:1.13.1-alpine
     steps:
+      - checkout
       - attach_workspace:
           at: .
       - run:
           name: Publish Release Binaries to GitHub
           command: |
+            export VERSION=$(cat ./VERSION)
             go get github.com/tcnksm/ghr
-            VERSION=$(dist/ocictl --version)
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./dist/
 
 #TODO: add contexts to share env variables between different jobs
@@ -123,25 +105,21 @@ workflows:
       - test:
           requires:
             - lint
-      - build_linux:
+      - build:
           requires:
             - test
-      - build_mac:
+      - push_bin:
           requires:
-            - test
-#      - push_bin:
-#          requires:
-#            - build_linux
-#            - build_mac
-#          filters:
-#            branches:
-#              ignore: /.*/
-#            tags:
-#              # only recognise tags with semantic versioning e.g. 0.1.0
-#              only: /^\d+\.\d+\.\d+$/
+            - build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              # only recognise tags with semantic versioning e.g. 0.1.0
+              only: /^\d+\.\d+\.\d+$/
       - push_container:
           requires:
-            - build_linux
+            - build
           filters:
             branches:
               ignore: /.*/
