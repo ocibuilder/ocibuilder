@@ -325,6 +325,7 @@ func (b Buildah) Wait(idx int) error {
 	if len(b.execCmds) == 0 {
 		return errors.New("error waiting for command to finish executing")
 	}
+
 	if err := b.execCmds[idx].Wait(); err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {
 			fmt.Printf("Exit code is %d\n", exitError.ExitCode())
