@@ -37,10 +37,10 @@ ocictl:
 	packr build -v -ldflags '${LDFLAGS}' -o ${DIST_DIR}/ocictl ${CURRENT_DIR}/ocictl/main.go
 
 ocictl-linux:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 packr build -v -ldflags '${LDFLAGS}' -o ${DIST_DIR}/ocictl-linux-${VERSION} ${CURRENT_DIR}/ocictl/main.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 make ocictl
 
 ocictl-mac:
-	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 packr build -v -ldflags '${LDFLAGS}' -o ${DIST_DIR}/ocictl-mac-${VERSION} ${CURRENT_DIR}/ocictl/main.go
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 make ocictl
 
 ocibuilder-linux:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 make ocibuilder
@@ -50,7 +50,13 @@ ocibuilder-image: ocibuilder-linux
 	@if [ "$(DOCKER_PUSH)" = "true" ] ; then  docker push $(IMAGE_PREFIX)ocibuilder:$(IMAGE_TAG) ; fi
 
 test:
-	go test $(shell go list ./... | grep -v /vendor/ | grep -v /test/e2e/) -race -short -v -coverprofile=coverage.text
+	go test $(shell go list ./... | grep -v /vendor/ | grep -v /testing/) -race -short -v -coverprofile=coverage.text
+
+lint:
+	golangci-lint run
+
+e2e:
+	go test testing/e2e
 
 clean:
 	-rm -rf ${CURRENT_DIR}/dist

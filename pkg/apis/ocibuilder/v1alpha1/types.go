@@ -332,9 +332,6 @@ type ImageBuildArgs struct {
 	// Dockerfile is the path to the generated Dockerfile
 	// +optional
 	Dockerfile string `json:"dockerfile,omitempty" protobuf:"bytes,3,opt,name=dockerfile"`
-	// Ansible step outlines the ansible steps in the build *optional
-	// +optional
-	Ansible AnsibleStep `json:"ansible,omitempty" protobuf:"bytes,4,opt,name=ansible"`
 	// Purge the image after it has been pushed
 	// defaults to false
 	// +optional
@@ -371,4 +368,10 @@ type Command struct {
 	// Value is the contents of the command (e.g `ubuntu:xenial`)
 	// +listType=map
 	Value []string `json:"value" protobuf:"bytes,7,opt,name=value"`
+}
+
+// Represents build image metadata
+type ImageMetadata struct {
+	// BuildFile is the path to the buildfile
+	BuildFile string
 }

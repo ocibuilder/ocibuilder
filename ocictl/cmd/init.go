@@ -20,22 +20,22 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/gobuffalo/packr"
+	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/spf13/cobra"
 )
 
 type initCmd struct {
-	out		io.Writer
-	dry		bool
-	debug	bool
+	out   io.Writer
+	dry   bool
+	debug bool
 }
 
 func newInitCmd(out io.Writer) *cobra.Command {
 	ic := &initCmd{out: out}
 	cmd := &cobra.Command{
 		Use:   "init",
-		Short: "Initialises a template spec.yaml file for ocibuilder",
+		Short: "Initialises a template ocibuilder.yaml file for ocibuilder",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return ic.run(args)
 		},
@@ -64,8 +64,8 @@ func (i *initCmd) run(args []string) error {
 		}
 	}
 
-	if err := ioutil.WriteFile("spec.yaml", template, 0777); err != nil {
-		log.WithError(err).Errorln("error generating spec.yaml template file")
+	if err := ioutil.WriteFile("ocibuilder.yaml", template, 0777); err != nil {
+		log.WithError(err).Errorln("error generating ocibuilder.yaml template file")
 		return err
 	}
 

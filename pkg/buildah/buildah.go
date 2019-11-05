@@ -31,13 +31,16 @@ import (
 
 // Buildah is  the struct which consists of a logger and context path
 type Buildah struct {
-	Logger *logrus.Logger
+	execCmds      []*exec.Cmd
+	Logger        *logrus.Logger
+	StorageDriver string
+	Metadata      []v1alpha1.ImageMetadata
 }
 
 var executor = exec.Command
 
 // Build performs a buildah build and returns an array of readclosers
-func (b Buildah) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
+func (b *Buildah) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	log := b.Logger
 	buildOpts, err := common.ParseBuildSpec(spec.Build)
 
@@ -56,26 +59,22 @@ func (b Buildah) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 			fullPath = "." + fullPath
 		}
 
-		buildCommand := createBuildCommand(opt)
+		buildCommand := createBuildCommand(opt, b.StorageDriver)
 		log.WithField("command", buildCommand).Debug("build command to be executed")
 
 		cmd := executor("buildah", buildCommand...)
 		out, err := pty.Start(cmd)
+		b.execCmds = append(b.execCmds, cmd)
+
 		if err != nil {
 			log.WithError(err).Errorln("failed to execute buildah bud...")
 			return nil, err
 		}
 		buildResponses = append(buildResponses, out)
 
-		if err := cmd.Wait(); err != nil {
-			log.WithError(err).Errorln("error waiting for cmd execution")
-			return nil, err
-		}
-
-		log.WithField("filepath", fullPath).Debugln("attempting to cleanup dockerfile")
-		if err := os.Remove(fullPath); err != nil {
-			log.WithError(err).Errorln("failed to remove dockerfile")
-		}
+		b.Metadata = append(b.Metadata, v1alpha1.ImageMetadata{
+			BuildFile: fullPath,
+		})
 
 		if opt.Purge {
 			purgeCommand := createPurgeCommand(imageName)
@@ -94,9 +93,12 @@ func (b Buildah) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 }
 
 // createBuildCommand is used to generate build command and build args
-func createBuildCommand(args v1alpha1.ImageBuildArgs) []string {
-	buildArgs := []string{"bud"}
-	buildArgs = append(buildArgs, "-f", args.Dockerfile)
+func createBuildCommand(args v1alpha1.ImageBuildArgs, storageDriver string) []string {
+	buildArgs := append([]string{"bud"}, "-f", args.Dockerfile)
+
+	if storageDriver != "" {
+		buildArgs = append(buildArgs, "--storage-driver", storageDriver)
+	}
 
 	image := ""
 	if args.Name != "" {
@@ -105,12 +107,15 @@ func createBuildCommand(args v1alpha1.ImageBuildArgs) []string {
 	if args.Tag != "" {
 		image += ":" + args.Tag
 	}
-	buildArgs = append(buildArgs, "-t", image, args.Context.LocalContext.ContextPath)
-	return buildArgs
+
+	if image != "" {
+		return append(buildArgs, "-t", image, args.Context.LocalContext.ContextPath)
+	}
+	return append(buildArgs, args.Context.LocalContext.ContextPath)
 }
 
-// Login performs a buildah login on all registries defined in spec.yaml or login.yaml
-func (b Buildah) Login(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
+// Login performs a buildah login on all registries defined in ocibuilder.yaml or login.yaml
+func (b *Buildah) Login(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	log := b.Logger
 
 	if err := common.ValidateLogin(spec); err != nil {
@@ -120,7 +125,6 @@ func (b Buildah) Login(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	var loginResponses []io.ReadCloser
 	for _, loginSpec := range spec.Login {
 		loginCommand, err := createLoginCommand(loginSpec)
-		log.WithField("command", loginCommand).Debug("login command to be executed")
 
 		if err != nil {
 			log.WithError(err).Errorln("error creating login command")
@@ -128,17 +132,14 @@ func (b Buildah) Login(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 		}
 
 		cmd := executor("buildah", loginCommand...)
+		b.execCmds = append(b.execCmds, cmd)
+
 		out, err := pty.Start(cmd)
 		if err != nil {
 			log.WithError(err).Errorln("failed to execute buildah login...")
 			return nil, err
 		}
 		loginResponses = append(loginResponses, out)
-
-		if err := cmd.Wait(); err != nil {
-			log.WithError(err).Errorln("error waiting for cmd execution")
-			return nil, err
-		}
 
 		log.Infoln("buildah login has been executed")
 	}
@@ -170,18 +171,12 @@ func createLoginCommand(args v1alpha1.LoginSpec) ([]string, error) {
 // Pull performs a buildah pull of a passed in image name. Pull will login to all
 // registries specified in the 'login' spec and attempt to pull the image
 // uses buildah login to login to directories specified
-func (b Buildah) Pull(spec v1alpha1.OCIBuilderSpec, imageName string) ([]io.ReadCloser, error) {
+func (b *Buildah) Pull(spec v1alpha1.OCIBuilderSpec, imageName string) ([]io.ReadCloser, error) {
 	log := b.Logger
-
-	if _, err := b.Login(spec); err != nil {
-		log.WithError(err).Errorln("error attempting to login")
-		return nil, err
-	}
 
 	var pullResponses []io.ReadCloser
 	for _, loginSpec := range spec.Login {
-		pullCommand, err := createPullCommand(imageName, loginSpec.Registry)
-		log.WithField("command", pullCommand).Debug("pull command to be executed")
+		pullCommand, err := b.createPullCommand(loginSpec.Registry, imageName, spec)
 
 		if err != nil {
 			log.WithError(err).Errorln("error attempting to create pull command")
@@ -190,16 +185,12 @@ func (b Buildah) Pull(spec v1alpha1.OCIBuilderSpec, imageName string) ([]io.Read
 
 		cmd := executor("buildah", pullCommand...)
 		out, err := pty.Start(cmd)
+		b.execCmds = append(b.execCmds, cmd)
 		if err != nil {
 			log.WithError(err).Errorln("failed to execute buildah pull...")
 			return nil, err
 		}
 		pullResponses = append(pullResponses, out)
-
-		if err := cmd.Wait(); err != nil {
-			log.WithError(err).Errorln("error waiting for cmd execution")
-			return nil, err
-		}
 
 		log.Infoln("buildah pull has been executed")
 	}
@@ -207,29 +198,25 @@ func (b Buildah) Pull(spec v1alpha1.OCIBuilderSpec, imageName string) ([]io.Read
 	return pullResponses, nil
 }
 
-func createPullCommand(imageName string, registry string) ([]string, error) {
-	pullArgs := []string{"pull"}
+func (b Buildah) createPullCommand(registry string, imageName string, spec v1alpha1.OCIBuilderSpec) ([]string, error) {
+	args := []string{"pull", "--creds"}
 
-	if imageName == "" {
-		return nil, errors.New("no image name specified to pull")
+	fullImageName := fmt.Sprintf("%s/%s", registry, imageName)
+	b.Logger.WithField("command", append(args, fullImageName)).Debugln("push command with AUTH REVOKED")
+
+	authString, err := getPushAuthRegistryString(registry, spec);
+	if err != nil {
+		return nil, err
 	}
+	args = append(args, authString)
 
-	if registry != "" {
-		registry = registry + "/"
-	}
-
-	return append(pullArgs, registry+imageName), nil
+	return append(args, fullImageName), nil
 }
 
 // Push performs a buildah push of a spec image to a chosen registry
 // uses buildah login to login to directories specified
-func (b Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
+func (b *Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	log := b.Logger
-
-	if _, err := b.Login(spec); err != nil {
-		log.WithError(err).Errorln("error attempting to login")
-		return nil, err
-	}
 
 	if err := common.ValidatePush(spec); err != nil {
 		return nil, err
@@ -237,11 +224,15 @@ func (b Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 
 	var pushResponses []io.ReadCloser
 	for _, pushSpec := range spec.Push {
-		pushImageName := fmt.Sprintf("%s/%s:%s", pushSpec.Registry, pushSpec.Image, pushSpec.Tag)
-		log.WithField("name:", pushImageName).Infoln("pushing image")
 
-		pushCommand, err := createPushCommand(pushSpec, pushImageName)
-		log.WithField("command", pushCommand).Debug("push command to be executed")
+		if err := common.ValidatePushSpec(pushSpec); err != nil {
+			return nil, err
+		}
+
+		imageName := fmt.Sprintf("%s:%s", pushSpec.Image, pushSpec.Tag)
+		log.WithFields(logrus.Fields{"name": imageName, "registry": pushSpec.Registry}).Infoln("pushing image")
+
+		pushCommand, err := b.createPushCommand(pushSpec.Registry, imageName, spec)
 
 		if err != nil {
 			log.WithError(err).Errorln("error attempting to create push command")
@@ -250,22 +241,19 @@ func (b Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 
 		cmd := executor("buildah", pushCommand...)
 		out, err := pty.Start(cmd)
+		b.execCmds = append(b.execCmds, cmd)
 		if err != nil {
 			log.WithError(err).Errorln("failed to execute buildah push...")
 			return nil, err
 		}
 		pushResponses = append(pushResponses, out)
 
-		if err := cmd.Wait(); err != nil {
-			log.WithError(err).Errorln("error waiting for cmd execution")
-			return nil, err
-		}
-
 		log.Infoln("buildah push has been executed")
 
 		if pushSpec.Purge {
-			purgeCommand := createPurgeCommand(pushImageName)
-			log.WithFields(logrus.Fields{"command": purgeCommand, "image": pushImageName}).Debug("purge command to be executed")
+			fullImageName := fmt.Sprintf("%s:%s", pushSpec.Registry, imageName)
+			purgeCommand := createPurgeCommand(fullImageName)
+			log.WithFields(logrus.Fields{"command": purgeCommand, "image": fullImageName}).Debug("purge command to be executed")
 
 			cmd = executor("buildah", purgeCommand...)
 			out, err = pty.Start(cmd)
@@ -279,16 +267,71 @@ func (b Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	return pushResponses, nil
 }
 
-func createPushCommand(spec v1alpha1.PushSpec, imageName string) ([]string, error) {
-	pushArgs := []string{"push"}
+func (b Buildah) createPushCommand(registry string, imageName string, spec v1alpha1.OCIBuilderSpec) ([]string, error) {
+	args := []string{"push", "--creds"}
+	fullImageName := fmt.Sprintf("%s/%s", registry, imageName)
+	b.Logger.WithField("command", append(args, fullImageName)).Debugln("push command with AUTH REVOKED")
 
-	if err := common.ValidatePushSpec(spec); err != nil {
+	authString, err := getPushAuthRegistryString(registry, spec);
+	if err != nil {
 		return nil, err
 	}
+	args = append(args, authString)
 
-	return append(pushArgs, imageName), nil
+	return append(args, fullImageName), nil
+}
+
+func getPushAuthRegistryString(registry string, spec v1alpha1.OCIBuilderSpec) (string, error) {
+	if err := common.ValidateLogin(spec); err != nil {
+		return "", err
+	}
+	for _, spec := range spec.Login {
+		if spec.Registry == registry {
+			user, err := common.ValidateLoginUsername(spec)
+			if err != nil {
+				return "", err
+			}
+
+			pass, err := common.ValidateLoginPassword(spec)
+			if err != nil {
+				return "", err
+			}
+			return fmt.Sprintf("%s:%s", user, pass), nil
+		}
+	}
+	return "", errors.New("no auth credentials matching registry: " + registry + " found")
 }
 
 func createPurgeCommand(imageName string) []string {
 	return append([]string{"rmi"}, imageName)
+}
+
+func (b Buildah) Clean() {
+	log := b.Logger
+	for _, m := range b.Metadata {
+		if m.BuildFile != "" {
+			log.WithField("filepath", m.BuildFile).Debugln("attempting to cleanup dockerfile")
+			if err := os.Remove(m.BuildFile); err != nil {
+				b.Logger.WithError(err).Errorln("error removing generated Dockerfile")
+				continue
+			}
+		}
+	}
+}
+
+// Wait calls wait for each exec command, handling any output to stderr and exiting the process
+func (b Buildah) Wait(idx int) error {
+	b.Logger.WithField("execCmds", b.execCmds).Debugln("exec wait called")
+	if len(b.execCmds) == 0 {
+		return errors.New("error waiting for command to finish executing")
+	}
+
+	if err := b.execCmds[idx].Wait(); err != nil {
+		if exitError, ok := err.(*exec.ExitError); ok {
+			fmt.Printf("Exit code is %d\n", exitError.ExitCode())
+			error := fmt.Sprintf("error in executing cmd, exited with code %d", exitError.ExitCode())
+			return errors.New(error)
+		}
+	}
+	return nil
 }
