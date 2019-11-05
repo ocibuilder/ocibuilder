@@ -53,6 +53,7 @@ jobs:
       - run:
           name: Build Linux Artifact
           command: make ocictl-package-build
+      - run: ls ./dist/
       - persist_to_workspace:
           root: .
           paths:
