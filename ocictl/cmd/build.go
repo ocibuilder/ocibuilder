@@ -92,11 +92,14 @@ func (b *buildCmd) run(args []string) error {
 				Client: cli,
 				Logger: logger,
 			}
+			log := d.Logger
+
 			res, err := d.Build(ociBuilderSpec)
 			if err != nil {
 				return err
 			}
 
+			log.WithField("responses", len(res)).Debugln("received responses and running build")
 			for idx, imageResponse := range res {
 				log.WithField("step: ", idx).Infoln("running build step")
 
@@ -104,12 +107,14 @@ func (b *buildCmd) run(args []string) error {
 					return errors.New("no response received from daemon - check if docker is installed and running")
 				}
 
-				err := utils.OutputJson(imageResponse)
-				if err != nil {
+				if err := utils.OutputJson(imageResponse); err != nil {
 					return err
 				}
+				log.WithField("response", idx).Debugln("response has finished executing")
 			}
+			log.Debugln("running build file cleanup")
 			d.Clean()
+			log.Infoln("docker build complete")
 		}
 
 	case v1alpha1.BuildahFramework:
@@ -118,6 +123,7 @@ func (b *buildCmd) run(args []string) error {
 				Logger:        logger,
 				StorageDriver: b.storageDriver,
 			}
+			log := b.Logger
 
 			res, err := b.Build(ociBuilderSpec)
 			if err != nil {
@@ -125,13 +131,20 @@ func (b *buildCmd) run(args []string) error {
 				return err
 			}
 
+			log.WithField("responses", len(res)).Debugln("received responses and running build")
 			for idx, imageResponse := range res {
 				log.WithField("step: ", idx).Infoln("running build step")
 				if err := utils.Output(imageResponse); err != nil {
 					return err
 				}
+				if err := b.Wait(idx); err != nil {
+					return err
+				}
+				log.WithField("response", idx).Debugln("response has finished executing")
 			}
+			log.Debugln("running build file cleanup")
 			b.Clean()
+			log.Infoln("buildah build complete")
 		}
 
 	default:

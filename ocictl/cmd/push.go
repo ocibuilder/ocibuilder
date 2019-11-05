@@ -86,21 +86,25 @@ func (p *pushCmd) run(args []string) error {
 				log.WithError(err).Errorln("failed to fetch docker client")
 				return err
 			}
+
 			d := docker.Docker{
 				Client: cli,
 				Logger: logger,
 			}
+			log := d.Logger
+
 			res, err := d.Push(ociBuilderSpec)
 			if err != nil {
 				return err
 			}
 
+			log.WithField("responses", len(res)).Debugln("received responses and running push")
 			for idx, imageResponse := range res {
 				log.WithField("step: ", idx).Infoln("running push step")
-				err := utils.OutputJson(imageResponse)
-				if err != nil {
+				if err := utils.OutputJson(imageResponse); err != nil {
 					return err
 				}
+				log.WithField("response", idx).Debugln("response has finished executing")
 			}
 			log.Infoln("docker push complete")
 		}
@@ -110,16 +114,23 @@ func (p *pushCmd) run(args []string) error {
 			b := buildah.Buildah{
 				Logger: logger,
 			}
+			log := b.Logger
+
 			res, err := b.Push(ociBuilderSpec)
 			if err != nil {
 				return err
 			}
 
+			log.WithField("responses", len(res)).Debugln("received responses and running push")
 			for idx, imageResponse := range res {
 				log.WithField("step: ", idx).Infoln("running push step")
 				if err := utils.Output(imageResponse); err != nil {
 					return err
 				}
+				if err := b.Wait(idx); err != nil {
+					return err
+				}
+				log.WithField("response", idx).Debugln("response has finished executing")
 			}
 			log.Infoln("buildah push complete")
 		}

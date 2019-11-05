@@ -84,17 +84,20 @@ func (l *loginCmd) run(args []string) error {
 				Client: cli,
 				Logger: logger,
 			}
+			log := d.Logger
 
-			out, err := d.Login(ociBuilderSpec)
+			res, err := d.Login(ociBuilderSpec)
 			if err != nil {
 				log.WithError(err).Errorln("failed to login to registry")
 				return err
 			}
 
-			for _, readCloser := range out {
-				if err := utils.Output(readCloser); err != nil {
+			log.WithField("responses", len(res)).Debugln("received responses and running login")
+			for idx, loginResponse := range res {
+				if err := utils.Output(loginResponse); err != nil {
 					return err
 				}
+				log.WithField("response", idx).Debugln("response has finished executing")
 			}
 			log.Infoln("docker login completed")
 		}
@@ -104,19 +107,25 @@ func (l *loginCmd) run(args []string) error {
 			b := buildah.Buildah{
 				Logger: logger,
 			}
+			log := b.Logger
 
-			out, err := b.Login(ociBuilderSpec)
+			res, err := b.Login(ociBuilderSpec)
 			if err != nil {
 				log.WithError(err).Errorln("failed to login to registry")
 				return err
 			}
 
-			for _, readCloser := range out {
-				if err := utils.Output(readCloser); err != nil {
+			log.WithField("responses", len(res)).Debugln("received responses and running login")
+			for idx, loginResponse := range res {
+				if err := utils.Output(loginResponse); err != nil {
 					return err
 				}
+				if err := b.Wait(idx); err != nil {
+					return err
+				}
+				log.WithField("response", idx).Debugln("response has finished executing")
 			}
-			log.Infoln("buildah login completed")
+			log.Infoln("buildah login complete")
 		}
 
 	default:

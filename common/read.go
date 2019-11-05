@@ -46,23 +46,23 @@ func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepath
 	if filepath != "" {
 		dir = filepath
 	}
-	log.WithField("filepath", dir + "/ocibuilder.yaml").Debugln("looking for spec.yaml")
+	log.WithField("filepath", dir+"/ocibuilder.yaml").Debugln("looking for spec.yaml")
 	file, err := ioutil.ReadFile(dir + "/ocibuilder.yaml")
 	if err != nil {
 		log.Infoln("spec file not found, looking for individual specifications...")
 		if err := r.readIndividualSpecs(spec, dir); err != nil {
-			log.WithError(err).Errorln("failed to read individual specs")
+			log.WithError(err).WithField("directory", dir).Errorln("failed to read individual specs")
 			return err
 		}
 	}
 
 	if err = yaml.Unmarshal(file, spec); err != nil {
-		log.WithError(err).Errorln("failed to unmarshal spec")
+		log.WithError(err).WithField("directory", dir).Errorln("failed to unmarshal spec at directory")
 		return err
 	}
 
 	if err := Validate(spec); err != nil {
-		log.WithError(err).Errorln("failed to validate spec")
+		log.WithError(err).WithField("directory", dir).Errorln("failed to validate spec at directory")
 		return err
 	}
 
@@ -70,7 +70,7 @@ func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepath
 		log.WithField("overlayPath", overlayPath).Debugln("overlay path not empty - looking for overlay file")
 		file, err = applyOverlay(file, overlayPath)
 		if err != nil {
-			log.WithError(err).Errorln("failed to apply overlay to spec")
+			log.WithError(err).WithField("path", overlayPath).Errorln("failed to apply overlay to spec at path")
 			return err
 		}
 	}
@@ -154,7 +154,7 @@ func (r Reader) applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error
 		if param.Value != "" {
 			log.WithFields(logrus.Fields{
 				"value": param.Value,
-				"dest" : param.Dest,
+				"dest":  param.Dest,
 			}).Debugln("setting param value at destination")
 
 			if err := ValidateParams(specJSON, param.Dest); err != nil {
@@ -171,7 +171,7 @@ func (r Reader) applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error
 		if param.ValueFromEnvVariable != "" {
 			log.WithFields(logrus.Fields{
 				"value": param.Value,
-				"dest" : param.Dest,
+				"dest":  param.Dest,
 			}).Debugln("setting param value at destination")
 
 			val := os.Getenv(param.ValueFromEnvVariable)

@@ -91,17 +91,21 @@ func (p *pullCmd) run(args []string) error {
 				Client: cli,
 				Logger: logger,
 			}
+			log := d.Logger
+
 			res, err := d.Pull(ociBuilderSpec, p.name)
 			if err != nil {
 				return err
 			}
 
+			log.WithField("responses", len(res)).Debugln("received responses and running pull")
 			for idx, imageResponse := range res {
 				log.WithField("step: ", idx).Infoln("running pull step")
-				err := utils.OutputJson(imageResponse)
-				if err != nil {
+
+				if err := utils.OutputJson(imageResponse); err != nil {
 					return err
 				}
+				log.WithField("response", idx).Debugln("response has finished executing")
 			}
 			log.Infoln("docker pull completed")
 		}
@@ -111,18 +115,25 @@ func (p *pullCmd) run(args []string) error {
 			b := buildah.Buildah{
 				Logger: logger,
 			}
+			log := b.Logger
+
 			res, err := b.Pull(ociBuilderSpec, p.name)
 			if err != nil {
 				return err
 			}
 
+			log.WithField("responses", len(res)).Debugln("received responses and running pull")
 			for idx, imageResponse := range res {
 				log.WithField("step: ", idx).Infoln("running pull step")
 				if err := utils.Output(imageResponse); err != nil {
 					return err
 				}
+				if err := b.Wait(idx); err != nil {
+					return err
+				}
+				log.WithField("response", idx).Debugln("response has finished executing")
 			}
-			log.Infoln("buildah pull completed")
+			log.Infoln("buildah pull complete")
 		}
 
 	default:
