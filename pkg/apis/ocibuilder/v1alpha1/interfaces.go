@@ -1,6 +1,11 @@
 package v1alpha1
 
-import "io"
+import (
+	"io"
+
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/registry"
+)
 
 // Builder provides an interface for both Buildah and Docker build tools
 type Builder interface {
@@ -20,4 +25,12 @@ type Overlay interface {
 // ContextReader provides an interface for reading from multiple different build contexts
 type ContextReader interface {
 	Read() (io.ReadCloser, error)
+}
+
+type BuilderClient interface {
+	ImageBuild(options OCIBuildOptions) (types.ImageBuildResponse, error)
+	ImagePull(options OCIPullOptions) (io.ReadCloser, error)
+	ImagePush(options OCIPushOptions) (io.ReadCloser, error)
+	ImageRemove(options OCIRemoveOptions) ([]types.ImageDeleteResponseItem, error)
+	RegistryLogin(options OCILoginOptions) (registry.AuthenticateOKBody, error)
 }

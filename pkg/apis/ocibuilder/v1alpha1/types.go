@@ -17,6 +17,10 @@ limitations under the License.
 package v1alpha1
 
 import (
+	ctx "context"
+	"io"
+
+	"github.com/docker/docker/api/types"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -374,4 +378,35 @@ type Command struct {
 type ImageMetadata struct {
 	// BuildFile is the path to the buildfile
 	BuildFile string
+}
+
+type OCIBuildOptions struct {
+	types.ImageBuildOptions
+	ContextPath   string
+	Ctx           ctx.Context
+	Context       io.Reader
+	StorageDriver string
+}
+
+type OCILoginOptions struct {
+	types.AuthConfig
+	Ctx ctx.Context
+}
+
+type OCIPullOptions struct {
+	types.ImagePullOptions
+	Ref string
+	Ctx ctx.Context
+}
+
+type OCIPushOptions struct {
+	types.ImagePushOptions
+	Ref string
+	Ctx ctx.Context
+}
+
+type OCIRemoveOptions struct {
+	types.ImageRemoveOptions
+	Image string
+	Ctx   ctx.Context
 }
