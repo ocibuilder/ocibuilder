@@ -26,6 +26,7 @@ import (
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/buildah"
 	"github.com/ocibuilder/ocibuilder/pkg/docker"
+	"github.com/ocibuilder/ocibuilder/pkg/oci"
 	"github.com/spf13/cobra"
 )
 
@@ -66,86 +67,78 @@ func newPushCmd(out io.Writer) *cobra.Command {
 }
 
 func (p *pushCmd) run(args []string) error {
+	var cli v1alpha1.BuilderClient
 	logger := common.GetLogger(p.debug)
-	reader := common.Reader{
-		Logger: logger,
-	}
+	reader := common.Reader{Logger: logger}
+	ociBuilderSpec := v1alpha1.OCIBuilderSpec{Daemon: true}
 
-	ociBuilderSpec := v1alpha1.OCIBuilderSpec{
-		Daemon: true,
-	}
 	if err := reader.Read(&ociBuilderSpec, "", p.path); err != nil {
 		log.WithError(err).Errorln("failed to read spec")
 		return err
 	}
 
 	// Prioritise builder passed in as argument, default builder is docker
-	builder := p.builder
+	builderType := p.builder
 	if !ociBuilderSpec.Daemon {
-		builder = "buildah"
+		builderType = "buildah"
 	}
 
-	switch v1alpha1.Framework(builder) {
+	switch v1alpha1.Framework(builderType) {
 
 	case v1alpha1.DockerFramework:
 		{
-			cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+			apiClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 			if err != nil {
-				log.WithError(err).Errorln("failed to fetch docker client")
+				log.WithError(err).Errorln("failed to fetch docker api client")
 				return err
 			}
 
-			d := docker.Docker{
-				Client: cli,
-				Logger: logger,
+			cli = docker.Client{
+				APIClient: apiClient,
+				Logger:    logger,
 			}
-			log := d.Logger
-
-			res, err := d.Push(ociBuilderSpec)
-			if err != nil {
-				return err
-			}
-
-			log.WithField("responses", len(res)).Debugln("received responses and running push")
-			for idx, imageResponse := range res {
-				log.WithField("step: ", idx).Infoln("running push step")
-				if err := utils.OutputJson(imageResponse); err != nil {
-					return err
-				}
-				log.WithField("response", idx).Debugln("response has finished executing")
-			}
-			log.Infoln("docker push complete")
 		}
 
 	case v1alpha1.BuildahFramework:
 		{
-			b := buildah.Buildah{
+			cli = buildah.Client{
 				Logger: logger,
 			}
-			log := b.Logger
-
-			res, err := b.Push(ociBuilderSpec)
-			if err != nil {
-				return err
-			}
-
-			log.WithField("responses", len(res)).Debugln("received responses and running push")
-			for idx, imageResponse := range res {
-				log.WithField("step: ", idx).Infoln("running push step")
-				if err := utils.Output(imageResponse); err != nil {
-					return err
-				}
-				if err := b.Wait(idx); err != nil {
-					return err
-				}
-				log.WithField("response", idx).Debugln("response has finished executing")
-			}
-			log.Infoln("buildah push complete")
 		}
 
 	default:
 		{
 			return errors.New("invalid builder specified, try --builder=docker or --builder=buildah")
+		}
+
+	}
+	builder := oci.Builder{
+		Logger: logger,
+		Client: cli,
+	}
+
+	res := make(chan v1alpha1.OCIPushResponse)
+	errChan := make(chan error)
+	go builder.Push(ociBuilderSpec, res, errChan)
+
+	select {
+
+	case err := <-errChan:
+		{
+			return err
+		}
+
+	case pushResponse := <-res:
+		{
+			if pushResponse.Metadata.Daemon {
+				if err := utils.OutputJson(pushResponse.Body); err != nil {
+					return err
+				}
+			} else {
+				if err := utils.Output(pushResponse.Body); err != nil {
+					return err
+				}
+			}
 		}
 
 	}

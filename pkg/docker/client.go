@@ -46,7 +46,7 @@ func (cli Client) RegistryLogin(options v1alpha1.OCILoginOptions) (registry.Auth
 func (cli Client) GenerateAuthRegistryString(auth types.AuthConfig) string {
 	encodedJSON, err := json.Marshal(auth)
 	if err != nil {
-		cli.Logger.WithError(err).Errorln("error trying to encode authconfig")
+		cli.Logger.WithError(err).Errorln("error trying to marshall auth config")
 	}
 	return base64.URLEncoding.EncodeToString(encodedJSON)
 }

@@ -122,6 +122,9 @@ func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPush
 
 		res <- v1alpha1.OCIPushResponse{
 			Body: pushResponse,
+			Metadata: v1alpha1.ImageMetadata{
+				Daemon: spec.Daemon,
+			},
 		}
 
 		if pushSpec.Purge {
