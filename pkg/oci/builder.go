@@ -2,6 +2,7 @@ package oci
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 
@@ -84,6 +85,57 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 	log.Infoln("build complete")
 }
 
+func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPushResponse, errChan chan<- error) {
+	log := b.Logger
+	cli := b.Client
+
+	for idx, pushSpec := range spec.Push {
+		log.WithField("step: ", idx).Infoln("running push step")
+		if err := common.ValidatePushSpec(pushSpec); err != nil {
+			errChan <- err
+		}
+
+		pushFullImageName := fmt.Sprintf("%s/%s:%s", pushSpec.Registry, pushSpec.Image, pushSpec.Tag)
+		log.WithField("name:", pushFullImageName).Infoln("pushing image")
+
+		authString, err := b.generateAuthRegistryString(pushSpec.Registry, spec)
+		if err != nil {
+			log.WithError(err).Errorln("unable to find login spec")
+			errChan <- err
+			return
+		}
+
+		pushOptions := v1alpha1.OCIPushOptions{
+			Ctx: context.Background(),
+			Ref: pushFullImageName,
+			ImagePushOptions: types.ImagePushOptions{
+				RegistryAuth: authString,
+			},
+		}
+
+		pushResponse, err := cli.ImagePush(pushOptions)
+		if err != nil {
+			log.WithError(err).Errorln("failed to push image")
+			errChan <- err
+			return
+		}
+
+		res <- v1alpha1.OCIPushResponse{
+			Body: pushResponse,
+		}
+
+		if pushSpec.Purge {
+			if err := b.Purge(pushFullImageName); err != nil {
+				log.WithError(err).Errorln("unable to complete image purge")
+				errChan <- err
+				return
+			}
+		}
+		log.WithField("response", idx).Debugln("response has finished executing")
+		log.Infoln("push complete")
+	}
+}
+
 func (b *Builder) Purge(imageName string) error {
 	log := b.Logger
 	cli := b.Client
@@ -117,4 +169,28 @@ func (b Builder) Clean() {
 			}
 		}
 	}
+}
+
+func (b Builder) generateAuthRegistryString(registry string, spec v1alpha1.OCIBuilderSpec) (string, error) {
+	if err := common.ValidateLogin(spec); err != nil {
+		return "", err
+	}
+	for _, spec := range spec.Login {
+		if spec.Registry == registry {
+			user, err := common.ValidateLoginUsername(spec)
+			if err != nil {
+				return "", err
+			}
+
+			pass, err := common.ValidateLoginPassword(spec)
+			if err != nil {
+				return "", err
+			}
+			return b.Client.GenerateAuthRegistryString(types.AuthConfig{
+				Username: user,
+				Password: pass,
+			}), nil
+		}
+	}
+	return "", errors.New("no auth credentials matching registry: " + registry + " found")
 }

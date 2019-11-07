@@ -1,6 +1,7 @@
 package buildah
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/docker/docker/api/types"
@@ -109,6 +110,6 @@ func (cli Client) RegistryLogin(options v1alpha1.OCILoginOptions) (registry.Auth
 	}, nil
 }
 
-func (cli Client) GenerateAuthRegistryString(registry string) (string, error) {
-	return "", nil
+func (cli Client) GenerateAuthRegistryString(auth types.AuthConfig) string {
+	return fmt.Sprintf("%s:%s", auth.Username, auth.Password)
 }

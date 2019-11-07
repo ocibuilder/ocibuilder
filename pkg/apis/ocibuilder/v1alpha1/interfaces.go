@@ -33,5 +33,5 @@ type BuilderClient interface {
 	ImagePush(options OCIPushOptions) (io.ReadCloser, error)
 	ImageRemove(options OCIRemoveOptions) ([]types.ImageDeleteResponseItem, error)
 	RegistryLogin(options OCILoginOptions) (registry.AuthenticateOKBody, error)
-	GenerateAuthRegistryString(registry string) (string, error)
+	GenerateAuthRegistryString(auth types.AuthConfig) string
 }

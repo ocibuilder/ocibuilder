@@ -1,6 +1,8 @@
 package docker
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"io"
 
 	"github.com/sirupsen/logrus"
@@ -41,6 +43,10 @@ func (cli Client) RegistryLogin(options v1alpha1.OCILoginOptions) (registry.Auth
 	return apiCli.RegistryLogin(options.Ctx, options.AuthConfig)
 }
 
-func (cli Client) GenerateAuthRegistryString(registry string) (string, error) {
-	return "", nil
+func (cli Client) GenerateAuthRegistryString(auth types.AuthConfig) string {
+	encodedJSON, err := json.Marshal(auth)
+	if err != nil {
+		cli.Logger.WithError(err).Errorln("error trying to encode authconfig")
+	}
+	return base64.URLEncoding.EncodeToString(encodedJSON)
 }

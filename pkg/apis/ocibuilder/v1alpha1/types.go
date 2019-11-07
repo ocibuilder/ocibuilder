@@ -417,3 +417,7 @@ type OCIBuildResponse struct {
 	Body     io.ReadCloser
 	Metadata ImageMetadata
 }
+
+type OCIPushResponse struct {
+	Body io.ReadCloser
+}
