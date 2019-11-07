@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/docker/docker/api/types/registry"
+
 	"github.com/docker/docker/api/types"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
@@ -185,6 +187,51 @@ func (b *Builder) Pull(spec v1alpha1.OCIBuilderSpec, imageName string, res chan<
 	close(res)
 	close(errChan)
 	log.Infoln("pull complete")
+}
+
+func (b *Builder) Login(spec v1alpha1.OCIBuilderSpec, res chan<- registry.AuthenticateOKBody, errChan chan<- error) {
+	log := b.Logger
+	cli := b.Client
+
+	if err := common.ValidateLogin(spec); err != nil {
+		errChan <- err
+		return
+	}
+
+	for _, loginSpec := range spec.Login {
+		log.WithFields(logrus.Fields{"registry": loginSpec.Registry}).Infoln("attempting to login to registry")
+		username, err := common.ValidateLoginUsername(loginSpec)
+		if err != nil {
+			errChan <- err
+			return
+		}
+
+		password, err := common.ValidateLoginPassword(loginSpec)
+		if err != nil {
+			errChan <- err
+			return
+		}
+		loginOptions := v1alpha1.OCILoginOptions{
+			Ctx: context.Background(),
+			AuthConfig: types.AuthConfig{
+				Username:      username,
+				Password:      password,
+				ServerAddress: loginSpec.Registry,
+			},
+		}
+
+		loginResponse, err := cli.RegistryLogin(loginOptions)
+		if err != nil {
+			log.WithError(err).Errorln("failed to pull image")
+			errChan <- err
+			return
+		}
+
+		res <- loginResponse
+	}
+	close(res)
+	close(errChan)
+	log.Infoln("login complete")
 }
 
 func (b *Builder) Purge(imageName string) error {
