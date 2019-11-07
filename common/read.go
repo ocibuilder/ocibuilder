@@ -46,7 +46,7 @@ func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepath
 	if filepath != "" {
 		dir = filepath
 	}
-	log.WithField("filepath", dir + "/ocibuilder.yaml").Debugln("looking for ocibuilder.yaml")
+	log.WithField("filepath", dir+"/ocibuilder.yaml").Debugln("looking for ocibuilder.yaml")
 	file, err := ioutil.ReadFile(dir + "/ocibuilder.yaml")
 	if overlayPath != "" {
 		file, err = applyOverlay(file, overlayPath)
@@ -162,7 +162,7 @@ func (r Reader) applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error
 		if param.Value != "" {
 			log.WithFields(logrus.Fields{
 				"value": param.Value,
-				"dest" : param.Dest,
+				"dest":  param.Dest,
 			}).Debugln("setting param value at destination")
 
 			if err := ValidateParams(specJSON, param.Dest); err != nil {
@@ -179,7 +179,7 @@ func (r Reader) applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error
 		if param.ValueFromEnvVariable != "" {
 			log.WithFields(logrus.Fields{
 				"value": param.Value,
-				"dest" : param.Dest,
+				"dest":  param.Dest,
 			}).Debugln("setting param value at destination")
 
 			val := os.Getenv(param.ValueFromEnvVariable)
@@ -206,19 +206,23 @@ func (r Reader) applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error
 }
 
 // ReadContext reads the user supplied context for the image build
-func (r Reader) ReadContext(ctx v1alpha1.ImageContext) (io.ReadCloser, error) {
+func (r Reader) ReadContext(ctx v1alpha1.ImageContext) (context io.ReadCloser, path string, error error) {
+	log := r.Logger
 
 	if ctx.GitContext != nil {
-		return nil, errors.New("git context is not supported in this version of the ocibuilder")
+		log.WithField("context", ctx.GitContext).Debugln("using Git as context")
+		return nil, "", errors.New("git context is not supported in this version of the ocibuilder")
 	}
 
 	if ctx.S3Context != nil {
-		return nil, errors.New("s3 context is not supported in this version of the ocibuilder")
+		log.WithField("context", ctx.S3Context).Debugln("using S3 as context")
+		return nil, "", errors.New("s3 context is not supported in this version of the ocibuilder")
 	}
 
 	if ctx.LocalContext != nil {
+		log.WithField("context", ctx.LocalContext.ContextPath).Debugln("using local path as context")
 		return ctx.LocalContext.Read()
 	}
 
-	return nil, errors.New("no context has been defined")
+	return nil, "", errors.New("no context has been defined")
 }

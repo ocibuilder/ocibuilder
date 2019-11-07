@@ -20,12 +20,14 @@ import (
 	"errors"
 	"io"
 
+	"github.com/ocibuilder/ocibuilder/ocictl/pkg/utils"
+
 	"github.com/docker/docker/client"
 	"github.com/ocibuilder/ocibuilder/common"
-	"github.com/ocibuilder/ocibuilder/ocictl/pkg/utils"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/buildah"
 	"github.com/ocibuilder/ocibuilder/pkg/docker"
+	"github.com/ocibuilder/ocibuilder/pkg/oci"
 	"github.com/spf13/cobra"
 )
 
@@ -66,15 +68,10 @@ func newBuildCmd(out io.Writer) *cobra.Command {
 }
 
 func (b *buildCmd) run(args []string) error {
+	var cli v1alpha1.BuilderClient
 	logger := common.GetLogger(b.debug)
-
-	reader := common.Reader{
-		Logger: logger,
-	}
-
-	ociBuilderSpec := v1alpha1.OCIBuilderSpec{
-		Daemon: true,
-	}
+	reader := common.Reader{Logger: logger}
+	ociBuilderSpec := v1alpha1.OCIBuilderSpec{Daemon: true}
 
 	if err := reader.Read(&ociBuilderSpec, b.overlay, b.path); err != nil {
 		log.WithError(err).Errorln("failed to read spec")
@@ -82,78 +79,32 @@ func (b *buildCmd) run(args []string) error {
 	}
 
 	// Prioritise builder passed in as argument, default builder is docker
-	builder := b.builder
+	builderType := b.builder
 	if !ociBuilderSpec.Daemon {
-		builder = "buildah"
+		builderType = "buildah"
 	}
 
-	switch v1alpha1.Framework(builder) {
+	switch v1alpha1.Framework(builderType) {
 
 	case v1alpha1.DockerFramework:
 		{
-			cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+			apiClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 			if err != nil {
-				log.WithError(err).Errorln("failed to fetch docker client")
+				log.WithError(err).Errorln("failed to fetch docker api client")
 				return err
 			}
 
-			d := docker.Docker{
-				Client: cli,
-				Logger: logger,
+			cli = docker.Client{
+				APIClient: apiClient,
+				Logger:    logger,
 			}
-			log := d.Logger
-
-			res, err := d.Build(ociBuilderSpec)
-			if err != nil {
-				return err
-			}
-
-			log.WithField("responses", len(res)).Debugln("received responses and running build")
-			for idx, imageResponse := range res {
-				log.WithField("step: ", idx).Infoln("running build step")
-
-				if imageResponse == nil {
-					return errors.New("no response received from daemon - check if docker is installed and running")
-				}
-
-				if err := utils.OutputJson(imageResponse); err != nil {
-					return err
-				}
-				log.WithField("response", idx).Debugln("response has finished executing")
-			}
-			log.Debugln("running build file cleanup")
-			d.Clean()
-			log.Infoln("docker build complete")
 		}
 
 	case v1alpha1.BuildahFramework:
 		{
-			b := buildah.Buildah{
-				Logger:        logger,
-				StorageDriver: b.storageDriver,
+			cli = buildah.Client{
+				Logger: logger,
 			}
-			log := b.Logger
-
-			res, err := b.Build(ociBuilderSpec)
-			if err != nil {
-				log.WithError(err).Errorln("error executing build on ocibuilder spec")
-				return err
-			}
-
-			log.WithField("responses", len(res)).Debugln("received responses and running build")
-			for idx, imageResponse := range res {
-				log.WithField("step: ", idx).Infoln("running build step")
-				if err := utils.Output(imageResponse); err != nil {
-					return err
-				}
-				if err := b.Wait(idx); err != nil {
-					return err
-				}
-				log.WithField("response", idx).Debugln("response has finished executing")
-			}
-			log.Debugln("running build file cleanup")
-			b.Clean()
-			log.Infoln("buildah build complete")
 		}
 
 	default:
@@ -163,5 +114,35 @@ func (b *buildCmd) run(args []string) error {
 
 	}
 
+	builder := oci.Builder{
+		Logger: logger,
+		Client: cli,
+	}
+
+	res := make(chan v1alpha1.OCIBuildResponse)
+	errChan := make(chan error)
+	go builder.Build(ociBuilderSpec, res, errChan)
+
+	select {
+
+	case err := <-errChan:
+		{
+			return err
+		}
+
+	case buildResponse := <-res:
+		{
+			if buildResponse.Metadata.Daemon {
+				if err := utils.OutputJson(buildResponse.Body); err != nil {
+					return err
+				}
+			} else {
+				if err := utils.Output(buildResponse.Body); err != nil {
+					return err
+				}
+			}
+		}
+
+	}
 	return nil
 }

@@ -378,6 +378,8 @@ type Command struct {
 type ImageMetadata struct {
 	// BuildFile is the path to the buildfile
 	BuildFile string
+	// Daemon is whether the daemon was used to build or not (Docker or Buildah)
+	Daemon bool
 }
 
 type OCIBuildOptions struct {
@@ -409,4 +411,9 @@ type OCIRemoveOptions struct {
 	types.ImageRemoveOptions
 	Image string
 	Ctx   ctx.Context
+}
+
+type OCIBuildResponse struct {
+	Body     io.ReadCloser
+	Metadata ImageMetadata
 }

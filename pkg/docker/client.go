@@ -3,6 +3,8 @@ package docker
 import (
 	"io"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/client"
@@ -11,6 +13,7 @@ import (
 
 type Client struct {
 	APIClient client.APIClient
+	Logger    *logrus.Logger
 }
 
 func (cli Client) ImageBuild(options v1alpha1.OCIBuildOptions) (types.ImageBuildResponse, error) {
@@ -36,4 +39,8 @@ func (cli Client) ImageRemove(options v1alpha1.OCIRemoveOptions) ([]types.ImageD
 func (cli Client) RegistryLogin(options v1alpha1.OCILoginOptions) (registry.AuthenticateOKBody, error) {
 	apiCli := cli.APIClient
 	return apiCli.RegistryLogin(options.Ctx, options.AuthConfig)
+}
+
+func (cli Client) GenerateAuthRegistryString(registry string) (string, error) {
+	return "", nil
 }

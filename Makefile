@@ -64,6 +64,9 @@ clean:
 dep:
 	dep ensure -v
 
+install:
+	packr install -v -ldflags '${LDFLAGS}' ./ocictl/main.go
+
 openapigen:
 	hack/update-openapigen.sh
 

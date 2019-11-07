@@ -28,6 +28,7 @@ type CommandBuilder struct {
 type Flag struct {
 	Name  string
 	Value string
+	Short bool
 }
 
 func (builder *CommandBuilder) Build() Command {
@@ -90,7 +91,11 @@ func (c Command) constructCommand() []string {
 	var commandVector = []string{c.command}
 
 	for _, flag := range c.flags {
-		commandVector = append(commandVector, fmt.Sprintf("-%s", flag.Name), flag.Value)
+		if flag.Short {
+			commandVector = append(commandVector, fmt.Sprintf("-%s", flag.Name), flag.Value)
+		} else {
+			commandVector = append(commandVector, fmt.Sprintf("--%s", flag.Name), flag.Value)
+		}
 	}
 
 	for _, arg := range c.args {
