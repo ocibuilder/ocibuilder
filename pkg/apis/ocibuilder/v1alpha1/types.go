@@ -413,12 +413,7 @@ type OCIRemoveOptions struct {
 	Ctx   ctx.Context
 }
 
-type OCIBuildResponse struct {
-	Body     io.ReadCloser
-	Metadata ImageMetadata
-}
-
-type OCIPushResponse struct {
+type OCIResponse struct {
 	Body     io.ReadCloser
 	Metadata ImageMetadata
 }

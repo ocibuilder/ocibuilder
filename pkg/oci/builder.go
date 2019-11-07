@@ -18,7 +18,7 @@ type Builder struct {
 	Metadata []v1alpha1.ImageMetadata
 }
 
-func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBuildResponse, errChan chan<- error) {
+func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIResponse, errChan chan<- error) {
 	log := b.Logger
 	cli := b.Client
 
@@ -61,7 +61,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 			errChan <- err
 			return
 		}
-		res <- v1alpha1.OCIBuildResponse{
+		res <- v1alpha1.OCIResponse{
 			Body: buildResponse.Body,
 			Metadata: v1alpha1.ImageMetadata{
 				BuildFile: fmt.Sprintf("%s/%s", path, opt.Dockerfile),
@@ -85,7 +85,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 	log.Infoln("build complete")
 }
 
-func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPushResponse, errChan chan<- error) {
+func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIResponse, errChan chan<- error) {
 	log := b.Logger
 	cli := b.Client
 
@@ -120,7 +120,7 @@ func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPush
 			return
 		}
 
-		res <- v1alpha1.OCIPushResponse{
+		res <- v1alpha1.OCIResponse{
 			Body: pushResponse,
 			Metadata: v1alpha1.ImageMetadata{
 				Daemon: spec.Daemon,
@@ -135,8 +135,56 @@ func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPush
 			}
 		}
 		log.WithField("response", idx).Debugln("response has finished executing")
-		log.Infoln("push complete")
 	}
+	close(res)
+	close(errChan)
+	log.Infoln("push complete")
+}
+
+func (b *Builder) Pull(spec v1alpha1.OCIBuilderSpec, imageName string, res chan<- v1alpha1.OCIResponse, errChan chan<- error) {
+	log := b.Logger
+	cli := b.Client
+
+	log.Infoln("attempting to pull from logged in registries")
+	for idx, loginSpec := range spec.Login {
+		registry := loginSpec.Registry
+		if registry != "" {
+			registry = registry + "/"
+		}
+
+		authString, err := b.generateAuthRegistryString(registry, spec)
+		if err != nil {
+			errChan <- err
+			return
+		}
+
+		pullOptions := v1alpha1.OCIPullOptions{
+			Ctx: context.Background(),
+			Ref: registry + imageName,
+			ImagePullOptions: types.ImagePullOptions{
+				RegistryAuth: authString,
+			},
+		}
+
+		pullResponse, err := cli.ImagePull(pullOptions)
+		if err != nil {
+			log.WithError(err).Errorln("failed to pull image")
+			errChan <- err
+			return
+		}
+
+		res <- v1alpha1.OCIResponse{
+			Body: pullResponse,
+			Metadata: v1alpha1.ImageMetadata{
+				Daemon: spec.Daemon,
+			},
+		}
+
+		log.WithField("response", idx).Debugln("response has finished executing")
+	}
+	close(res)
+	close(errChan)
+	log.Infoln("pull complete")
 }
 
 func (b *Builder) Purge(imageName string) error {

@@ -112,12 +112,13 @@ func (p *pushCmd) run(args []string) error {
 		}
 
 	}
+
 	builder := oci.Builder{
 		Logger: logger,
 		Client: cli,
 	}
 
-	res := make(chan v1alpha1.OCIPushResponse)
+	res := make(chan v1alpha1.OCIResponse)
 	errChan := make(chan error)
 	go builder.Push(ociBuilderSpec, res, errChan)
 
