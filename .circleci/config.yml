@@ -178,7 +178,7 @@ workflows:
               ignore: /.*/
             tags:
               # only recognise tags with semantic versioning e.g. 0.1.0
-              only: /^\d+\.\d+\.\d+$/
+              only: /^\d+\.\d+\.\d+.*$/
       - push_container:
           requires:
             - build
@@ -187,4 +187,4 @@ workflows:
               ignore: /.*/
             tags:
               # only recognise tags with semantic versioning e.g. 0.1.0
-              only: /^\d+\.\d+\.\d+$/
+              only: /^\d+\.\d+\.\d+.*$/
