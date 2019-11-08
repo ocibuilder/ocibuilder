@@ -59,13 +59,26 @@ func newLoginCmd(out io.Writer) *cobra.Command {
 }
 
 func (l *loginCmd) run(args []string) error {
-	ociBuilderSpec := v1alpha1.OCIBuilderSpec{}
-	if err := common.Read(&ociBuilderSpec, "", l.path); err != nil {
+	ociBuilderSpec := v1alpha1.OCIBuilderSpec{
+		Daemon: true,
+	}
+	logger := common.GetLogger(l.debug)
+
+	reader := common.Reader{
+		Logger: logger,
+	}
+	if err := reader.Read(&ociBuilderSpec, "", l.path); err != nil {
 		log.WithError(err).Errorln("failed to read spec")
 		return err
 	}
 
-	switch v1alpha1.Framework(l.builder) {
+	// Prioritise builder passed in as argument, default builder is docker
+	builder := l.builder
+	if !ociBuilderSpec.Daemon {
+		builder = "buildah"
+	}
+
+	switch v1alpha1.Framework(builder) {
 
 	case v1alpha1.DockerFramework:
 		{
@@ -77,19 +90,22 @@ func (l *loginCmd) run(args []string) error {
 
 			d := docker.Docker{
 				Client: cli,
-				Logger: common.GetLogger(l.debug),
+				Logger: logger,
 			}
+			log := d.Logger
 
-			out, err := d.Login(ociBuilderSpec)
+			res, err := d.Login(ociBuilderSpec)
 			if err != nil {
 				log.WithError(err).Errorln("failed to login to registry")
 				return err
 			}
 
-			for _, readCloser := range out {
-				if err := utils.Output(readCloser); err != nil {
+			log.WithField("responses", len(res)).Debugln("received responses and running login")
+			for idx, loginResponse := range res {
+				if err := utils.Output(loginResponse); err != nil {
 					return err
 				}
+				log.WithField("response", idx).Debugln("response has finished executing")
 			}
 			log.Infoln("docker login completed")
 		}
@@ -97,21 +113,27 @@ func (l *loginCmd) run(args []string) error {
 	case v1alpha1.BuildahFramework:
 		{
 			b := buildah.Buildah{
-				Logger: common.GetLogger(l.debug),
+				Logger: logger,
 			}
+			log := b.Logger
 
-			out, err := b.Login(ociBuilderSpec)
+			res, err := b.Login(ociBuilderSpec)
 			if err != nil {
 				log.WithError(err).Errorln("failed to login to registry")
 				return err
 			}
 
-			for _, readCloser := range out {
-				if err := utils.Output(readCloser); err != nil {
+			log.WithField("responses", len(res)).Debugln("received responses and running login")
+			for idx, loginResponse := range res {
+				if err := utils.Output(loginResponse); err != nil {
 					return err
 				}
+				if err := b.Wait(idx); err != nil {
+					return err
+				}
+				log.WithField("response", idx).Debugln("response has finished executing")
 			}
-			log.Infoln("buildah login completed")
+			log.Infoln("buildah login complete")
 		}
 
 	default:

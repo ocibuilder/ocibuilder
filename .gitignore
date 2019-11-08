@@ -18,4 +18,4 @@ vendor/
 *.out
 
 # ignore coverage.text
-coverage.text
+coverage/

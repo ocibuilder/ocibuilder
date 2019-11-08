@@ -66,13 +66,27 @@ func newBuildCmd(out io.Writer) *cobra.Command {
 }
 
 func (b *buildCmd) run(args []string) error {
-	ociBuilderSpec := v1alpha1.OCIBuilderSpec{}
-	if err := common.Read(&ociBuilderSpec, b.overlay, b.path); err != nil {
+	logger := common.GetLogger(b.debug)
+	ociBuilderSpec := v1alpha1.OCIBuilderSpec{
+		Daemon: true,
+	}
+
+	reader := common.Reader{
+		Logger: logger,
+	}
+
+	if err := reader.Read(&ociBuilderSpec, b.overlay, b.path); err != nil {
 		log.WithError(err).Errorln("failed to read spec")
 		return err
 	}
 
-	switch v1alpha1.Framework(b.builder) {
+	// Prioritise builder passed in as argument, default builder is docker
+	builder := b.builder
+	if !ociBuilderSpec.Daemon {
+		builder = "buildah"
+	}
+
+	switch v1alpha1.Framework(builder) {
 
 	case v1alpha1.DockerFramework:
 		{
@@ -84,13 +98,16 @@ func (b *buildCmd) run(args []string) error {
 
 			d := docker.Docker{
 				Client: cli,
-				Logger: common.GetLogger(b.debug),
+				Logger: logger,
 			}
+			log := d.Logger
+
 			res, err := d.Build(ociBuilderSpec)
 			if err != nil {
 				return err
 			}
 
+			log.WithField("responses", len(res)).Debugln("received responses and running build")
 			for idx, imageResponse := range res {
 				log.WithField("step: ", idx).Infoln("running build step")
 
@@ -98,20 +115,23 @@ func (b *buildCmd) run(args []string) error {
 					return errors.New("no response received from daemon - check if docker is installed and running")
 				}
 
-				err := utils.OutputJson(imageResponse)
-				if err != nil {
+				if err := utils.OutputJson(imageResponse); err != nil {
 					return err
 				}
+				log.WithField("response", idx).Debugln("response has finished executing")
 			}
+			log.Debugln("running build file cleanup")
 			d.Clean()
+			log.Infoln("docker build complete")
 		}
 
 	case v1alpha1.BuildahFramework:
 		{
 			b := buildah.Buildah{
-				Logger:        common.GetLogger(b.debug),
+				Logger:        logger,
 				StorageDriver: b.storageDriver,
 			}
+			log := b.Logger
 
 			res, err := b.Build(ociBuilderSpec)
 			if err != nil {
@@ -119,13 +139,20 @@ func (b *buildCmd) run(args []string) error {
 				return err
 			}
 
+			log.WithField("responses", len(res)).Debugln("received responses and running build")
 			for idx, imageResponse := range res {
 				log.WithField("step: ", idx).Infoln("running build step")
 				if err := utils.Output(imageResponse); err != nil {
 					return err
 				}
+				if err := b.Wait(idx); err != nil {
+					return err
+				}
+				log.WithField("response", idx).Debugln("response has finished executing")
 			}
+			log.Debugln("running build file cleanup")
 			b.Clean()
+			log.Infoln("buildah build complete")
 		}
 
 	default:

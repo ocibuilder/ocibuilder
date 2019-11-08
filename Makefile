@@ -37,7 +37,13 @@ ocictl-package-build:
 	rm ${CURRENT_DIR}/dist/ocictl
 
 test:
-	go test $(shell go list ./... | grep -v /vendor/ | grep -v /test/e2e/) -race -short -v -coverprofile=coverage.text
+	go test $(shell go list ./... | grep -v /vendor/ | grep -v /testing/) -race -short -v -coverprofile=coverage.text
+
+lint:
+	golangci-lint run
+
+e2e:
+	go test testing/e2e
 
 clean:
 	-rm -rf ${CURRENT_DIR}/dist

@@ -38,7 +38,7 @@ import (
 type Docker struct {
 	Logger   *logrus.Logger
 	Client   client.APIClient
-	Metadata []v1alpha1.ImageMeta
+	Metadata []v1alpha1.ImageMetadata
 }
 
 // Build is used to execute docker build and optionally purge the image after the build
@@ -47,6 +47,10 @@ func (d *Docker) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	cli := d.Client
 	buildOpts, err := common.ParseBuildSpec(spec.Build)
 
+	reader := common.Reader{
+		Logger: log,
+	}
+
 	if err != nil {
 		log.WithError(err).Errorln("error in parsing build spec...")
 		return nil, err
@@ -54,8 +58,12 @@ func (d *Docker) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 
 	var buildResponses []io.ReadCloser
 	for _, opt := range buildOpts {
-
-		ctx, err := common.ReadContext(opt.Context)
+		ctx, err := reader.ReadContext(opt.Context)
+		log.WithFields(logrus.Fields{
+			"localContext": opt.Context.LocalContext,
+			"gitContext":   opt.Context.GitContext,
+			"s3Context":    opt.Context.S3Context,
+		}).Debugln("running docker build with context")
 		if err != nil {
 			log.WithError(err).Errorln("error reading image build context")
 			continue
@@ -68,6 +76,7 @@ func (d *Docker) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 			Tags:       []string{imageName},
 			Context:    ctx,
 		}
+		log.WithField("imageName", imageName).Debugln("building image with name")
 		buildResponse, err := cli.ImageBuild(context.Background(), ctx, dockerOpt)
 		if err != nil {
 			log.WithError(err).Errorln("error building image...")
@@ -75,11 +84,12 @@ func (d *Docker) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 		}
 		buildResponses = append(buildResponses, buildResponse.Body)
 
-		d.Metadata = append(d.Metadata, v1alpha1.ImageMeta{
+		d.Metadata = append(d.Metadata, v1alpha1.ImageMetadata{
 			BuildFile: opt.Context.LocalContext.ContextPath + "/" + opt.Dockerfile,
 		})
 
 		if opt.Purge {
+			log.Debugln("purge enabled, attempting to purge image after build")
 			res, err := cli.ImageRemove(context.Background(), imageName, types.ImageRemoveOptions{})
 			if err != nil {
 				log.WithError(err).Errorln("unable to purge image after build")
@@ -169,7 +179,7 @@ func (d Docker) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 
 	var pushResponses []io.ReadCloser
 	for _, pushSpec := range spec.Push {
-		if err := common.ValidatePushSpec(pushSpec); err != nil {
+		if err := common.ValidatePushSpec(&pushSpec); err != nil {
 			return nil, err
 		}
 
