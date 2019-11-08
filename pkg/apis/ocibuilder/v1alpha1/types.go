@@ -370,8 +370,8 @@ type Command struct {
 	Value []string `json:"value" protobuf:"bytes,7,opt,name=value"`
 }
 
-// Represents build image metadata
+// ImageMetadata represents build image metadata
 type ImageMetadata struct {
 	// BuildFile is the path to the buildfile
-	BuildFile string
+	BuildFile string `json:"buildFile" protobuf:"bytes,1,name=buildFile"`
 }

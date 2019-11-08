@@ -61,7 +61,7 @@ func TestDocker_Pull(t *testing.T) {
 
 func (t testClient) ImageBuild(ctx context.Context, context io.Reader, options types.ImageBuildOptions) (types.ImageBuildResponse, error) {
 	return types.ImageBuildResponse{
-		Body: nil,
+		Body:   nil,
 		OSType: "",
 	}, nil
 }

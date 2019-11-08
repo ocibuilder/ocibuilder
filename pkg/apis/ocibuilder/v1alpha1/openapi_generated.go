@@ -41,6 +41,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.EnvCreds":          schema_pkg_apis_ocibuilder_v1alpha1_EnvCreds(ref),
 		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.ImageBuildArgs":    schema_pkg_apis_ocibuilder_v1alpha1_ImageBuildArgs(ref),
 		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.ImageContext":      schema_pkg_apis_ocibuilder_v1alpha1_ImageContext(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.ImageMetadata":     schema_pkg_apis_ocibuilder_v1alpha1_ImageMetadata(ref),
 		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.K8sCreds":          schema_pkg_apis_ocibuilder_v1alpha1_K8sCreds(ref),
 		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.LoginSpec":         schema_pkg_apis_ocibuilder_v1alpha1_LoginSpec(ref),
 		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Metadata":          schema_pkg_apis_ocibuilder_v1alpha1_Metadata(ref),
@@ -551,12 +552,6 @@ func schema_pkg_apis_ocibuilder_v1alpha1_ImageBuildArgs(ref common.ReferenceCall
 							Format:      "",
 						},
 					},
-					"ansible": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Ansible step outlines the ansible steps in the build *optional",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AnsibleStep"),
-						},
-					},
 					"purge": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Purge the image after it has been pushed defaults to false",
@@ -575,7 +570,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_ImageBuildArgs(ref common.ReferenceCall
 			},
 		},
 		Dependencies: []string{
-			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AnsibleStep", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.ImageContext"},
+			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.ImageContext"},
 	}
 }
 
@@ -608,6 +603,27 @@ func schema_pkg_apis_ocibuilder_v1alpha1_ImageContext(ref common.ReferenceCallba
 		},
 		Dependencies: []string{
 			"github.com/ocibuilder/ocibuilder/common/context.GitContext", "github.com/ocibuilder/ocibuilder/common/context.LocalContext", "github.com/ocibuilder/ocibuilder/common/context.S3Context"},
+	}
+}
+
+func schema_pkg_apis_ocibuilder_v1alpha1_ImageMetadata(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ImageMetadata represents build image metadata",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"buildFile": {
+						SchemaProps: spec.SchemaProps{
+							Description: "BuildFile is the path to the buildfile",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"buildFile"},
+			},
+		},
 	}
 }
 
