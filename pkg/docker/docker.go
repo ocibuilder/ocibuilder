@@ -175,7 +175,7 @@ func (d Docker) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 
 	var pushResponses []io.ReadCloser
 	for _, pushSpec := range spec.Push {
-		if err := common.ValidatePushSpec(pushSpec); err != nil {
+		if err := common.ValidatePushSpec(&pushSpec); err != nil {
 			return nil, err
 		}
 

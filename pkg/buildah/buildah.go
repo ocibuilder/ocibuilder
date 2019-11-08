@@ -204,7 +204,7 @@ func (b Buildah) createPullCommand(registry string, imageName string, spec v1alp
 	fullImageName := fmt.Sprintf("%s/%s", registry, imageName)
 	b.Logger.WithField("command", append(args, fullImageName)).Debugln("push command with AUTH REVOKED")
 
-	authString, err := getPushAuthRegistryString(registry, spec);
+	authString, err := getPushAuthRegistryString(registry, spec)
 	if err != nil {
 		return nil, err
 	}
@@ -225,7 +225,7 @@ func (b *Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	var pushResponses []io.ReadCloser
 	for _, pushSpec := range spec.Push {
 
-		if err := common.ValidatePushSpec(pushSpec); err != nil {
+		if err := common.ValidatePushSpec(&pushSpec); err != nil {
 			return nil, err
 		}
 
@@ -272,7 +272,7 @@ func (b Buildah) createPushCommand(registry string, imageName string, spec v1alp
 	fullImageName := fmt.Sprintf("%s/%s", registry, imageName)
 	b.Logger.WithField("command", append(args, fullImageName)).Debugln("push command with AUTH REVOKED")
 
-	authString, err := getPushAuthRegistryString(registry, spec);
+	authString, err := getPushAuthRegistryString(registry, spec)
 	if err != nil {
 		return nil, err
 	}
