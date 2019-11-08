@@ -62,7 +62,7 @@ func TestApplyInvalidParams(t *testing.T) {
 	reader := Reader{
 		Logger: GetLogger(true),
 	}
-	file, err := ioutil.ReadFile("../testing/spec_read_test.yaml")
+	file, err := ioutil.ReadFile("../testing/dummy/spec_read_test.yaml")
 	assert.Equal(t, nil, err)
 
 	spec.Login = loginSpec
@@ -105,7 +105,7 @@ func TestApplyInvalidParamsEnvVariable(t *testing.T) {
 	reader := Reader{
 		Logger: GetLogger(true),
 	}
-	file, err := ioutil.ReadFile("../testing/spec_read_test.yaml")
+	file, err := ioutil.ReadFile("../testing/dummy/spec_read_test.yaml")
 	assert.Equal(t, nil, err)
 
 	spec.Login = loginSpec
