@@ -22,6 +22,7 @@ import (
 	"github.com/ocibuilder/ocibuilder/common/context"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/pkg/errors"
+	"github.com/tidwall/gjson"
 )
 
 // Validate validates a ocibuilder spec.
@@ -122,4 +123,11 @@ func ValidateContext(spec v1alpha1.ImageContext) v1alpha1.ImageContext {
 		}
 	}
 	return spec
+}
+
+func ValidateParams(specJSON []byte, src string) error {
+	if res := gjson.GetBytes(specJSON, src); res.Str == "" {
+		return errors.New("path to dest is invalid in a set param")
+	}
+	return nil
 }

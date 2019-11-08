@@ -62,7 +62,12 @@ func (l *loginCmd) run(args []string) error {
 	ociBuilderSpec := v1alpha1.OCIBuilderSpec{
 		Daemon: true,
 	}
-	if err := common.Read(&ociBuilderSpec, "", l.path); err != nil {
+	logger := common.GetLogger(l.debug)
+
+	reader := common.Reader{
+		Logger: logger,
+	}
+	if err := reader.Read(&ociBuilderSpec, "", l.path); err != nil {
 		log.WithError(err).Errorln("failed to read spec")
 		return err
 	}
@@ -85,7 +90,7 @@ func (l *loginCmd) run(args []string) error {
 
 			d := docker.Docker{
 				Client: cli,
-				Logger: common.GetLogger(l.debug),
+				Logger: logger,
 			}
 			log := d.Logger
 
@@ -108,7 +113,7 @@ func (l *loginCmd) run(args []string) error {
 	case v1alpha1.BuildahFramework:
 		{
 			b := buildah.Buildah{
-				Logger: common.GetLogger(l.debug),
+				Logger: logger,
 			}
 			log := b.Logger
 
