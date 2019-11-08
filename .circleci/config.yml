@@ -36,7 +36,7 @@ jobs:
       - run: curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.21.0
       - run: make lint
   # test runs the ocibuilder unit tests and stores test results in TEMP_RESULTS
-  unit_test:
+  test:
     docker:
       - image: golang:1.13.1
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
@@ -93,8 +93,8 @@ jobs:
             go get -u github.com/onsi/ginkgo/ginkgo
             go get -u github.com/onsi/gomega/...
             ginkgo ./testing/e2e
-  # build_linux runs the build of the linux ocictl artifact and persists the binary to the circleci workspace
-  build_linux:
+  # build runs the build of the linux and mac ocictl artifacts and persists the packages to the circleci workspace
+  build:
     docker:
       - image: golang:1.13.1
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
@@ -107,47 +107,33 @@ jobs:
       - run: go get -u github.com/gobuffalo/packr/packr
       - run:
           name: Build Linux Artifact
-          command: make ocictl-linux
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ./dist/
-  # build_mac runs the build of the mac ocictl artifact and persists the binary to the circleci workspace
-  build_mac:
-    docker:
-      - image: golang:1.13.1
-    working_directory: /go/src/github.com/ocibuilder/ocibuilder
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v1
-            - go-dep-cache-
-      - run: go get -u github.com/gobuffalo/packr/packr
-      - run:
-          name: Build Mac Artifact
-          command: "make ocictl-mac"
+          command: make ocictl-package-build
+      - run: ls ./dist/
       - persist_to_workspace:
           root: .
           paths:
             - ./dist/
   # push_container pushes the ocictl container to the ocibuilder docker registry when a new tag is added to ocibuilder
-  # TODO: update push to build and push using an ocictl spec file
   push_container:
     docker:
-      - image: golang:1.13.1-alpine
+      - image: ocibuilder/ocictl:0.1.0-alpha
     steps:
       - setup_remote_docker
       - checkout
+      - attach_workspace:
+          at: .
       - run:
-          name: Run Docker Build
+          name: Run Ocictl Build
           command: |
-            echo "Docker Build Step"
+            export OCI_TAG=$(cat ./VERSION)
+            echo $OCI_TAG
+            ocictl build
       - run:
           name: Run Docker Push
           command: |
-            VERSION=$(dist/ocictl --version)
-            echo "Docker Push Step"
+            export OCI_TAG=$(cat ./VERSION)
+            echo $OCI_TAG
+            ocictl push
   # push_bin pushes both the linux and mac binaries to a github release when a new tag is added to ocibuilder
   push_bin:
     environment:
@@ -156,13 +142,14 @@ jobs:
     docker:
       - image: golang:1.13.1-alpine
     steps:
+      - checkout
       - attach_workspace:
           at: .
       - run:
           name: Publish Release Binaries to GitHub
           command: |
+            export VERSION=$(cat ./VERSION)
             go get github.com/tcnksm/ghr
-            VERSION=$(dist/ocictl --version)
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./dist/
 
 #TODO: add contexts to share env variables between different jobs
@@ -174,22 +161,18 @@ workflows:
       - lint:
           requires:
             - install_dep
-      - unit_test:
+      - test:
           requires:
             - lint
       - e2e_test:
           requires:
-            - unit_test
-      - build_linux:
-          requires:
-            - e2e_test
-      - build_mac:
+            - test
+      - build:
           requires:
             - e2e_test
       - push_bin:
           requires:
-            - build_linux
-            - build_mac
+            - build
           filters:
             branches:
               ignore: /.*/
@@ -198,7 +181,7 @@ workflows:
               only: /^\d+\.\d+\.\d+$/
       - push_container:
           requires:
-            - build_linux
+            - build
           filters:
             branches:
               ignore: /.*/
