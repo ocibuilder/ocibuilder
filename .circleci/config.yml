@@ -157,19 +157,34 @@ workflows:
   version: 2
   build_test_deploy:
     jobs:
-      - install_dep
+      - install_dep:
+          filters:
+            tags:
+              only: /.*/
       - lint:
           requires:
             - install_dep
+          filters:
+            tags:
+              only: /.*/
       - test:
           requires:
             - lint
+          filters:
+            tags:
+              only: /.*/
       - e2e_test:
           requires:
             - test
+          filters:
+            tags:
+              only: /.*/
       - build:
           requires:
             - e2e_test
+          filters:
+            tags:
+              only: /.*/
       - push_bin:
           requires:
             - build
