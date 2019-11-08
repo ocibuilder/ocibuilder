@@ -59,7 +59,9 @@ func newLoginCmd(out io.Writer) *cobra.Command {
 }
 
 func (l *loginCmd) run(args []string) error {
-	ociBuilderSpec := v1alpha1.OCIBuilderSpec{}
+	ociBuilderSpec := v1alpha1.OCIBuilderSpec{
+		Daemon: true,
+	}
 	logger := common.GetLogger(l.debug)
 
 	reader := common.Reader{
@@ -70,7 +72,13 @@ func (l *loginCmd) run(args []string) error {
 		return err
 	}
 
-	switch v1alpha1.Framework(l.builder) {
+	// Prioritise builder passed in as argument, default builder is docker
+	builder := l.builder
+	if !ociBuilderSpec.Daemon {
+		builder = "buildah"
+	}
+
+	switch v1alpha1.Framework(builder) {
 
 	case v1alpha1.DockerFramework:
 		{

@@ -17,11 +17,12 @@ limitations under the License.
 package common
 
 import (
+	"os"
+
 	"github.com/ocibuilder/ocibuilder/common/context"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
-	"os"
 )
 
 // Validate validates a ocibuilder spec.
@@ -100,9 +101,9 @@ func ValidatePush(spec v1alpha1.OCIBuilderSpec) error {
 }
 
 // ValidatePushSpec validates the lower level push specification
-func ValidatePushSpec(spec v1alpha1.PushSpec) error {
+func ValidatePushSpec(spec *v1alpha1.PushSpec) error {
 	if spec.Registry == "" {
-		return errors.New("push registry must be specified for push")
+		spec.Registry = DefaultImageRegistry
 	}
 	if spec.Image == "" {
 		return errors.New("image name must be specified for push")
