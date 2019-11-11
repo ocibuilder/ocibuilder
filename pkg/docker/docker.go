@@ -179,42 +179,30 @@ func (d Docker) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 
 	var pushResponses []io.ReadCloser
 
-	// buildSpec, err := common.ParseBuildSpec(spec.Build)
+	buildSpec, err := common.ParseBuildSpec(spec.Build)
 
-	// if err != nil {
-	// 	log.WithError(err).Errorln("error in parsing build spec...")
-	// 	return nil, err
-	// }
+	if err != nil {
+		log.WithError(err).Errorln("error in parsing build spec...")
+		return nil, err
+	}
 
-	for _, pushSpec := range spec.Push {
-		if err := common.ValidatePushSpec(&pushSpec); err != nil {
+	for i, pushSpec := range spec.Push {
+		if err := common.ValidatePushSpec(pushSpec); err != nil {
 			return nil, err
 		}
 
 		pushImageName := fmt.Sprintf("%s/%s/%s:%s", pushSpec.Registry, pushSpec.User, pushSpec.Image, pushSpec.Tag)
 
-		// log.Error("aniket: ", buildSpec[i].Name)
-		// log.Error("aniket: ", buildSpec)
-		// log.Error("LOL: ", i)
-
-		// err := cli.ImageTag(context.Background(), buildSpec[i].Name, pushImageName)
-		// if err != nil {
-		// 	log.WithError(err).Errorln("failed to tag image")
-		// 	return nil, err
-		// }
-
-		containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{
-			Size:  true,
-			All:   true,
-			Since: "container",
-		})
-		log.Infoln(containers)
+		err := cli.ImageTag(context.Background(), buildSpec[i].Name, pushImageName)
+		if err != nil {
+			log.WithError(err).Errorln("failed to tag image before pushing")
+			return nil, err
+		}
 
 		authString, err := getPushAuthRegistryString(pushSpec.Registry, spec)
 		if err != nil {
 			log.WithError(err).Errorln("unable to find login spec")
 		}
-
 		log.WithField("name:", pushImageName).Infoln("pushing image")
 
 		pushResponse, err := cli.ImagePush(context.Background(), pushImageName, types.ImagePushOptions{
