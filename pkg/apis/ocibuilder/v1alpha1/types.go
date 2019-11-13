@@ -478,6 +478,23 @@ type AliyunOSSContext struct {
 	Bucket *S3Bucket `json:"bucket" protobuf:"bytes,5,name=bucket"`
 }
 
+// GCSContext refers to the context stored on GCP Storage
+type GCSContext struct {
+	// CredentialsFilePath refers to the credentials file path
+	CredentialsFilePath string `json:"credentialsFilePath,omitempty" protobuf:"bytes,1,opt,name=credentialsFilePath"`
+	// APIKeyEnv refers to the api key stored in environment variable
+	APIKeyEnv string `json:"apiKeyEnv,omitempty" protobuf:"bytes,2,opt,name=apiKeyEnv"`
+	// APIKeyPlain refers to api key stored in plain text
+	APIKeyPlain string `json:"apiKeyPlain,omitempty" protobuf:"bytes,3,opt,name=apiKeyPlain"`
+	// APIKeySecret refers to K8s secret that holds the API key
+	APIKeySecret *corev1.SecretKeySelector `json:"apiKeySecret,omitempty" protobuf:"bytes,4,opt,name=apiKeySecret"`
+	// AuthRequired checks if authentication is required to connect to GCS
+	AuthRequired bool      `json:"authRequired" protobuf:"bytes,1,name=authRequired"`
+	Endpoint     string    `json:"endpoint" protobuf:"bytes,1,name=endpoint"`
+	Bucket       *S3Bucket `json:"bucket" protobuf:"bytes,2,name=bucket"`
+	Region       string    `json:"region,omitempty" protobuf:"bytes,3,opt,name=region"`
+}
+
 // Command Represents a single line in a Dockerfile
 type Command struct {
 	// Cmd lowercased command name (e.g `from`)
