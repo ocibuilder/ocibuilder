@@ -117,10 +117,8 @@ func (contextReader *S3BuildContextReader) Read() error {
 	if err != nil {
 		return err
 	}
-
 	s3Downloader := s3manager.NewDownloader(awsSession)
 	contextFilePath := fmt.Sprintf("%s/%s", common.ContextDirectory, common.ContextFile)
-
 	if err := os.MkdirAll(common.ContextDirectory, 0750); err != nil {
 		return err
 	}

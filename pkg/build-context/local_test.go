@@ -17,22 +17,8 @@ limitations under the License.
 package build_context
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestLocalContext_Read(t *testing.T) {
-	localContext := LocalContext{
-		ContextPath: "../../testing",
-	}
-	_, err := localContext.Read()
-	assert.Equal(t, nil, err)
-}
-
-func TestLocalContext_Read2(t *testing.T) {
-	localContext := LocalContext{
-		ContextPath: "",
-	}
-	_, err := localContext.Read()
-	assert.Error(t, err, "cannot have empty contextPath: specify . for current directory")
 }
