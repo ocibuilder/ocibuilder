@@ -17,14 +17,15 @@ limitations under the License.
 package build_context
 
 import (
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"cloud.google.com/go/storage"
+	"context"
+	"google.golang.org/api/option"
 )
 
-// LocalBuildContextReader implements BuildContextReader for local build contexts
-type LocalBuildContextReader struct {
-	buildContext *v1alpha1.LocalContext
+type GCSBuildContextReader struct {
 }
 
-func (contextReader *LocalBuildContextReader) Read() (string, error) {
-	return contextReader.buildContext.ContextPath, nil
+func (contextReader *GCSBuildContextReader) Read() (string, error) {
+	ctx := context.Background()
+	storage.NewClient(ctx, option.Wi())
 }
