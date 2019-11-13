@@ -19,6 +19,7 @@ package build_context
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
@@ -72,24 +73,44 @@ func getSSHKeyAuth(sshKeyFile string) (transport.AuthMethod, error) {
 }
 
 func (contextReader *GitBuildContextReader) getGitAuth() (transport.AuthMethod, error) {
+	if contextReader.buildContext.PlainCreds == nil {
+		return &http.BasicAuth{
+			Username: contextReader.buildContext.PlainCreds.Username,
+			Password: contextReader.buildContext.PlainCreds.Password,
+		}, nil
+	}
+	if contextReader.buildContext.EnvVarCreds == nil {
+		username, ok := os.LookupEnv(contextReader.buildContext.EnvVarCreds.EnvVarUsername)
+		if !ok {
+			return nil, errors.New("username is not provided")
+		}
+		password, ok := os.LookupEnv(contextReader.buildContext.EnvVarCreds.EnvVarPassword)
+		if !ok {
+			return nil, errors.New("password is not provided")
+		}
+		return &http.BasicAuth{
+			Username: username,
+			Password: password,
+		}, nil
+	}
+	if contextReader.buildContext.K8sCreds != nil {
+		username, err := common.ReadFromSecret(contextReader.k8sClient, contextReader.buildContext.K8sCreds.Namespace, contextReader.buildContext.K8sCreds.Username)
+		if err != nil {
+			return nil, fmt.Errorf("failed to retrieve username: err: %+v", err)
+		}
+		password, err := common.ReadFromSecret(contextReader.k8sClient, contextReader.buildContext.K8sCreds.Namespace, contextReader.buildContext.K8sCreds.Password)
+		if err != nil {
+			return nil, fmt.Errorf("failed to retrieve password: err: %+v", err)
+		}
+		return &http.BasicAuth{
+			Username: string(username),
+			Password: string(password),
+		}, err
+	}
 	if contextReader.buildContext.SSHKeyPath != "" {
 		return getSSHKeyAuth(contextReader.buildContext.SSHKeyPath)
 	}
-	username, err := common.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.Username)
-	if err != nil {
-		return nil, err
-	}
-	password, err := common.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.Password)
-	if err != nil {
-		return nil, err
-	}
-	if username == "" && password == "" {
-		return nil, nil
-	}
-	return &http.BasicAuth{
-		Username: username,
-		Password: password,
-	}, nil
+	return nil, nil
 }
 
 func (contextReader *GitBuildContextReader) pullFromRepository(r *git.Repository) error {
@@ -168,7 +189,9 @@ func (contextReader *GitBuildContextReader) pullFromRepository(r *git.Repository
 
 func (contextReader *GitBuildContextReader) getBranchOrTag() *git.CheckoutOptions {
 	opts := &git.CheckoutOptions{}
+
 	opts.Branch = plumbing.NewBranchReferenceName(DefaultBranch)
+
 	if contextReader.buildContext.Branch != "" {
 		opts.Branch = plumbing.NewBranchReferenceName(contextReader.buildContext.Branch)
 	}
@@ -178,6 +201,7 @@ func (contextReader *GitBuildContextReader) getBranchOrTag() *git.CheckoutOption
 	if contextReader.buildContext.Ref != "" {
 		opts.Branch = plumbing.ReferenceName(contextReader.buildContext.Ref)
 	}
+
 	return opts
 }
 
@@ -216,12 +240,4 @@ func (contextReader *GitBuildContextReader) Read() (string, error) {
 		return "", errors.Errorf("failed to pull latest changes from the repository. err: %+v", err)
 	}
 	return common.ContextDirectory, nil
-}
-
-// NewGitBuildContextReader returns a build context stored on the git
-func NewGitBuildContextReader(buildContext *v1alpha1.GitContext, k8sClient kubernetes.Interface) *GitBuildContextReader {
-	return &GitBuildContextReader{
-		k8sClient,
-		buildContext,
-	}
 }

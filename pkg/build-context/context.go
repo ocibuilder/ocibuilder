@@ -16,45 +16,6 @@ limitations under the License.
 
 package build_context
 
-import (
-	"github.com/ocibuilder/ocibuilder/common"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/pkg/errors"
-	"k8s.io/client-go/kubernetes"
-)
-
-// BuildContextReader enables reading build context from a store
 type BuildContextReader interface {
 	Read() (string, error)
-}
-
-// GetBuildContextReader returns a build context based on the store
-func GetBuildContextReader(buildContext *v1alpha1.BuildContext, k8sConfigPath string) (BuildContextReader, error) {
-	kubeConfig, err := common.GetClientConfig(k8sConfigPath)
-	if err != nil {
-		return nil, err
-	}
-	k8sClient, err := kubernetes.NewForConfig(kubeConfig)
-	if err != nil {
-		return nil, err
-	}
-	if buildContext.AliyunOSSContext != nil {
-		return NewAliyunOSSBuildContextReader(buildContext.AliyunOSSContext, k8sClient), nil
-	}
-	if buildContext.AzureBlobContext != nil {
-		return NewAzureBlobBuildContextReader(buildContext.AzureBlobContext, k8sClient), nil
-	}
-	if buildContext.GitContext != nil {
-		return NewGitBuildContextReader(buildContext.GitContext, k8sClient), nil
-	}
-	if buildContext.GCSContext != nil {
-		return NewGCSBuildContextReader(buildContext.GCSContext, k8sClient), nil
-	}
-	if buildContext.LocalContext != nil {
-		return NewLocalBuildContextReader(buildContext.LocalContext), nil
-	}
-	if buildContext.S3Context != nil {
-		return NewS3BuildContextReader(buildContext.S3Context, k8sClient), nil
-	}
-	return nil, errors.New("unknown build context")
 }

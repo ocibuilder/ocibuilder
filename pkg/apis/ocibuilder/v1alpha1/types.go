@@ -440,12 +440,15 @@ type GitRemoteConfig struct {
 type GitContext struct {
 	// Git URL
 	URL string `json:"url" protobuf:"bytes,1,name=url"`
-	// Directory to clone the repository. We clone complete directory because GitArtifact is not limited to any specific Git service providers.
-	// Hence we don't use any specific git provider client.
-	CloneDirectory string `json:"cloneDirectory" protobuf:"bytes,2,name=cloneDirectory"`
-	// Creds contain reference to git username and password
+	// EnvVarCreds refers to environment variables that holds the git credentials
 	// +optional
-	Creds *GitK8sCreds `json:"creds,omitempty" protobuf:"bytes,3,opt,name=creds"`
+	EnvVarCreds *GitEnvCreds `json:"envVarCreds,omitempty" protobuf:"bytes,5,opt,name=envVarCreds"`
+	// PlainCreds refers to the plain text git credentials
+	// +optional
+	PlainCreds *GitPlainCreds `json:"plainCreds,omitempty" protobuf:"bytes,6,opt,name=plainCreds"`
+	// K8sCreds refers to K8s secret that holds the git credentials
+	// +optional
+	K8sCreds *GitK8sCreds `json:"creds,omitempty" protobuf:"bytes,3,opt,name=creds"`
 	// SSHKeyPath is path to your ssh key path. Use this if you don't want to provide username and password.
 	// ssh key path must be mounted in sensor pod.
 	// +optional

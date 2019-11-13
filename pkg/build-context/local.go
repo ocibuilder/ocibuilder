@@ -17,22 +17,40 @@ limitations under the License.
 package build_context
 
 import (
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"fmt"
+	"github.com/mholt/archiver"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+	"io"
+	"os"
 )
 
-// LocalBuildContextReader implements BuildContextReader for local build contexts
-type LocalBuildContextReader struct {
-	buildContext *v1alpha1.LocalContext
-}
+func (ctx LocalContext) Read() (io.ReadCloser, error) {
+	fullPath := fmt.Sprintf("%s/docker-buildContext.tar", ctx.ContextPath)
 
-// NewLocalBuildContextReader returns a local build context reader
-func NewLocalBuildContextReader(buildContext *v1alpha1.LocalContext) *LocalBuildContextReader {
-	return &LocalBuildContextReader{
-		buildContext,
+	if ctx.ContextPath == "" {
+		return nil, errors.New("cannot have empty contextPath: specify . for current directory")
 	}
-}
 
-// Read reads the build context from the local
-func (contextReader *LocalBuildContextReader) Read() (string, error) {
-	return contextReader.buildContext.ContextPath, nil
+	defer func() {
+		if r := recover(); r != nil {
+			logrus.Warnln("panic in context read, recovered for cleanup")
+		}
+		if err := os.Remove(fullPath); err != nil {
+			logrus.WithError(err).Errorln("error cleaning up context file")
+		}
+	}()
+
+	if err := archiver.Archive([]string{ctx.ContextPath + "/"}, fullPath); err != nil {
+		logrus.WithError(err).Errorln("error in building context...")
+		return nil, err
+	}
+
+	reader, err := os.Open(fullPath)
+	if err != nil {
+		logrus.WithError(err).Errorln("error in opening docker context...")
+		return nil, err
+	}
+
+	return reader, nil
 }
