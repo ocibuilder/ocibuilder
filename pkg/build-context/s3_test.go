@@ -14,17 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package context
+package build_context
 
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-func TestGitContext_Read(t *testing.T) {
-	gitContext := GitContext{
-		Url: "github.com/artbegolli/sickurl",
-	}
-	_, err := gitContext.Read()
+func TestS3Context_Read(t *testing.T) {
+	s3context := S3BuildContextReader{}
+	_, err := s3context.Read()
 	assert.Equal(t, nil, err)
 }

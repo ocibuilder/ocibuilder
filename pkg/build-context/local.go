@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package context
+package build_context
 
 import (
 	"fmt"
@@ -26,7 +26,7 @@ import (
 )
 
 func (ctx LocalContext) Read() (io.ReadCloser, error) {
-	fullPath := fmt.Sprintf("%s/docker-ctx.tar", ctx.ContextPath)
+	fullPath := fmt.Sprintf("%s/docker-buildContext.tar", ctx.ContextPath)
 
 	if ctx.ContextPath == "" {
 		return nil, errors.New("cannot have empty contextPath: specify . for current directory")
