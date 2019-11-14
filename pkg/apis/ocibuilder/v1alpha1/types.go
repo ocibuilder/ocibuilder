@@ -203,10 +203,10 @@ type BuildStep struct {
 	// defaults to false
 	// +optional
 	Purge bool `json:"purge,omitempty" protobuf:"bytes,8,opt,name=purge"`
-	// Context used for image build
+	// BuildContext used for image build
 	// default looks at the current working directory
 	// +optional
-	Context BuildContext `json:"context,omitempty" protobuf:"bytes,9,opt,name=context"`
+	BuildContext *BuildContext `json:"context,omitempty" protobuf:"bytes,9,opt,name=context"`
 }
 
 // Stage represents a stage within the build
@@ -340,7 +340,7 @@ type ImageBuildArgs struct {
 	// defaults to false
 	// +optional
 	Purge bool `json:"purge,omitempty" protobuf:"bytes,5,opt,name=purge"`
-	// Context is the context for Docker and Buildah
+	// BuildContext is the context for Docker and Buildah
 	// defaults to LocalContext in current working directory
 	// +optional
 	Context BuildContext `json:"context,omitempty" protobuf:"bytes,6,opt,name=context"`
@@ -459,7 +459,7 @@ type GCSContext struct {
 // AzureBlobContext refers to configuration required to fetch context from Azure Storage Blob
 type AzureBlobContext struct {
 	// AzureStorageAccount refers to the account name
-	Account *Credentials `json:"azureStorageAccount" protobuf:"bytes,1,name=azureStorageAccount"`
+	Account *Credentials `json:"account" protobuf:"bytes,1,name=account"`
 	// AccessKey refers to the access key
 	AccessKey *Credentials `json:"accessKey" protobuf:"bytes,2,name=accessKey"`
 	// URL refers to blob's URL
