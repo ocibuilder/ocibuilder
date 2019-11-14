@@ -25,6 +25,14 @@ type LocalBuildContextReader struct {
 	buildContext *v1alpha1.LocalContext
 }
 
+// NewLocalBuildContextReader returns a local build context reader
+func NewLocalBuildContextReader(buildContext *v1alpha1.LocalContext) *LocalBuildContextReader {
+	return &LocalBuildContextReader{
+		buildContext,
+	}
+}
+
+// Read reads the build context from the local
 func (contextReader *LocalBuildContextReader) Read() (string, error) {
 	return contextReader.buildContext.ContextPath, nil
 }

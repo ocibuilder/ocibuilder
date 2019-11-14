@@ -86,3 +86,11 @@ func (contextReader *GCSBuildContextReader) Read() (string, error) {
 	}
 	return common.ContextDirectoryUncompressed, nil
 }
+
+// NewGCSBuildContextReader returns a new build context reader for GCS
+func NewGCSBuildContextReader(buildContext *v1alpha1.GCSContext, k8sClient kubernetes.Interface) BuildContextReader {
+	return &GCSBuildContextReader{
+		buildContext,
+		k8sClient,
+	}
+}
