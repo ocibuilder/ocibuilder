@@ -48,6 +48,10 @@ required = [
   name = "cloud.google.com/go"
   version = "v0.48.0"
 
+[[constraint]]
+  version = "0.3.0"
+  name = "github.com/Azure/azure-storage-blob-go"
+
 [prune]
   go-tests = true
   unused-packages = true

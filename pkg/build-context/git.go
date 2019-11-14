@@ -23,12 +23,12 @@ import (
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/pkg/errors"
-	"github.com/src-d/go-git/plumbing/transport/http"
 	"golang.org/x/crypto/ssh"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/config"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport"
+	"gopkg.in/src-d/go-git.v4/plumbing/transport/http"
 	go_git_ssh "gopkg.in/src-d/go-git.v4/plumbing/transport/ssh"
 	"k8s.io/client-go/kubernetes"
 )
@@ -168,9 +168,7 @@ func (contextReader *GitBuildContextReader) pullFromRepository(r *git.Repository
 
 func (contextReader *GitBuildContextReader) getBranchOrTag() *git.CheckoutOptions {
 	opts := &git.CheckoutOptions{}
-
 	opts.Branch = plumbing.NewBranchReferenceName(DefaultBranch)
-
 	if contextReader.buildContext.Branch != "" {
 		opts.Branch = plumbing.NewBranchReferenceName(contextReader.buildContext.Branch)
 	}
@@ -180,7 +178,6 @@ func (contextReader *GitBuildContextReader) getBranchOrTag() *git.CheckoutOption
 	if contextReader.buildContext.Ref != "" {
 		opts.Branch = plumbing.ReferenceName(contextReader.buildContext.Ref)
 	}
-
 	return opts
 }
 
