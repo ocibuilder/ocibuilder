@@ -18,6 +18,8 @@ package common
 
 import (
 	"archive/zip"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/pkg/errors"
 	"io"
 	"os"
 	"path/filepath"
@@ -76,4 +78,30 @@ func ReadFromSecret(client kubernetes.Interface, namespace string, keySelector *
 		return nil, err
 	}
 	return secret.Data[keySelector.Key], nil
+}
+
+// ReadCredentials reads the credentials
+func ReadCredentials(client kubernetes.Interface, creds *v1alpha1.Credentials) (string, error) {
+	if creds.Plain != "" {
+		return creds.Plain, nil
+	}
+	if creds.Env != "" {
+		value, ok := os.LookupEnv(creds.Env)
+		if !ok {
+			return "", errors.Errorf("environment variable %s for the credentials not found", creds.Env)
+		}
+		return value, nil
+	}
+	if creds.KubeSecret != nil {
+		secret, err := client.CoreV1().Secrets(creds.KubeSecret.Namespace).Get(creds.KubeSecret.Secret.Name, metav1.GetOptions{})
+		if err != nil {
+			return "", err
+		}
+		value, ok := secret.Data[creds.KubeSecret.Secret.Key]
+		if !ok {
+			return "", errors.Errorf("key %s not found in secret %s", creds.KubeSecret.Secret.Key, creds.KubeSecret.Secret.Name)
+		}
+		return string(value), nil
+	}
+	return "", errors.New("unknown credentials format")
 }

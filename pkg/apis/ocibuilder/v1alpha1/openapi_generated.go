@@ -40,7 +40,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.DockerStep":        schema_pkg_apis_ocibuilder_v1alpha1_DockerStep(ref),
 		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.EnvCreds":          schema_pkg_apis_ocibuilder_v1alpha1_EnvCreds(ref),
 		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.ImageBuildArgs":    schema_pkg_apis_ocibuilder_v1alpha1_ImageBuildArgs(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.ImageContext":      schema_pkg_apis_ocibuilder_v1alpha1_ImageContext(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildContext":      schema_pkg_apis_ocibuilder_v1alpha1_ImageContext(ref),
 		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.K8sCreds":          schema_pkg_apis_ocibuilder_v1alpha1_K8sCreds(ref),
 		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.LoginSpec":         schema_pkg_apis_ocibuilder_v1alpha1_LoginSpec(ref),
 		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Metadata":          schema_pkg_apis_ocibuilder_v1alpha1_Metadata(ref),
@@ -289,7 +289,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_BuildStep(ref common.ReferenceCallback)
 					"context": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Context used for image build default looks at the current working directory",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.ImageContext"),
+							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildContext"),
 						},
 					},
 				},
@@ -297,7 +297,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_BuildStep(ref common.ReferenceCallback)
 			},
 		},
 		Dependencies: []string{
-			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.ImageContext", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Stage"},
+			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildContext", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Stage"},
 	}
 }
 
@@ -567,7 +567,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_ImageBuildArgs(ref common.ReferenceCall
 					"context": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Context is the context for Docker and Buildah defaults to LocalContext in current working directory",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.ImageContext"),
+							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildContext"),
 						},
 					},
 				},
@@ -575,7 +575,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_ImageBuildArgs(ref common.ReferenceCall
 			},
 		},
 		Dependencies: []string{
-			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AnsibleStep", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.ImageContext"},
+			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AnsibleStep", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildContext"},
 	}
 }
 
@@ -583,7 +583,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_ImageContext(ref common.ReferenceCallba
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ImageContext stores the chosen build context for your build, this can be Local, S3 or Git",
+				Description: "BuildContext stores the chosen build context for your build, this can be Local, S3 or Git",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"localContext": {

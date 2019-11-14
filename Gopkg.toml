@@ -44,6 +44,10 @@ required = [
   name = "github.com/aws/aws-sdk-go"
   version = "v1.5.33"
 
+[[constraint]]
+  name = "cloud.google.com/go"
+  version = "v0.48.0"
+
 [prune]
   go-tests = true
   unused-packages = true
@@ -55,4 +59,3 @@ required = [
   [[prune.project]]
     name = "k8s.io/gengo"
     unused-packages = false
-

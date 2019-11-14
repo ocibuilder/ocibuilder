@@ -118,7 +118,7 @@ var buildArgs = v1alpha1.ImageBuildArgs{
 	Name:       "image-name",
 	Tag:        "1.0.0",
 	Dockerfile: "path/to/Dockerfile",
-	Context: v1alpha1.ImageContext{
+	Context: v1alpha1.BuildContext{
 		LocalContext: &context.LocalContext{
 			ContextPath: ".",
 		}},

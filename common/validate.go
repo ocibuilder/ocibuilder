@@ -37,7 +37,7 @@ func Validate(spec *v1alpha1.OCIBuilderSpec) error {
 	return nil
 }
 
-// ValidateBuildTemplateStep validates build template step
+// ValidateBuildTempalteStep validates build template step
 func ValidateBuildTemplateStep(step v1alpha1.BuildTemplateStep) error {
 	if step.Ansible == nil && step.Docker == nil {
 		return errors.New("at least one step type should be defined")
@@ -114,7 +114,7 @@ func ValidatePushSpec(spec v1alpha1.PushSpec) error {
 
 // ValidateContext validates image context, returns the current local directory as a default if none
 // exists
-func ValidateContext(spec v1alpha1.ImageContext) v1alpha1.ImageContext {
+func ValidateContext(spec v1alpha1.BuildContext) v1alpha1.BuildContext {
 	if spec.LocalContext == nil && spec.GitContext == nil && spec.S3Context == nil {
 		spec.LocalContext = &context.LocalContext{
 			ContextPath: ".",
