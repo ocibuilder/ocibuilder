@@ -14,17 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package pkg
+package common
 
 import (
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"os"
 	"strings"
 
 	"github.com/ghodss/yaml"
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/pkg/errors"
 	"github.com/tidwall/sjson"
 )
 
@@ -35,6 +36,7 @@ import (
 func Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepaths ...string) error {
 	dir, err := os.Getwd()
 	if err != nil {
+		log.WithError(err).Errorln("failed to get current working directory")
 		return err
 	}
 	filepath := strings.Join(filepaths[:], "/")
@@ -42,29 +44,39 @@ func Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepaths ...string
 		dir = filepath
 	}
 	file, err := ioutil.ReadFile(dir + "/spec.yaml")
-	if err != nil {
-		common.Logger.Infoln("spec file not found, looking for individual specifications...")
-		if err := readIndividualSpecs(spec, dir); err != nil {
-			return err
-		}
-	}
 	if overlayPath != "" {
 		file, err = applyOverlay(file, overlayPath)
 		if err != nil {
+			log.WithError(err).Errorln("failed to apply overlay to spec")
 			return err
 		}
 	}
+
+	if err != nil {
+		log.Infoln("spec file not found, looking for individual specifications...")
+		if err := readIndividualSpecs(spec, dir); err != nil {
+			log.WithError(err).Errorln("failed to read individual specs")
+			return err
+		}
+	}
+
 	if err = yaml.Unmarshal(file, spec); err != nil {
+		log.WithError(err).Errorln("failed to unmarshal spec")
 		return err
 	}
+
 	if err := Validate(spec); err != nil {
+		log.WithError(err).Errorln("failed to validate spec")
 		return err
 	}
+
 	if spec.Params != nil {
 		if err = applyParams(file, spec); err != nil {
+			log.WithError(err).Errorln("failed to apply params to spec")
 			return err
 		}
 	}
+
 	return nil
 }
 
@@ -77,23 +89,24 @@ func readIndividualSpecs(spec *v1alpha1.OCIBuilderSpec, path string) error {
 
 	if file, err := ioutil.ReadFile(path + "/login.yaml"); err == nil {
 		if err := yaml.Unmarshal(file, &loginSpec); err != nil {
-			common.Logger.WithError(err).Errorln("failed to unmarshal login.yaml")
+			log.WithError(err).Errorln("failed to unmarshal login.yaml")
 			return err
 		}
 		spec.Login = loginSpec
 	}
 	if file, err := ioutil.ReadFile(path + "/build.yaml"); err == nil {
 		if err := yaml.Unmarshal(file, &buildSpec); err != nil {
-			common.Logger.WithError(err).Errorln("failed to unmarshal build.yaml")
+			log.WithError(err).Errorln("failed to unmarshal build.yaml")
 			return err
 		}
 		spec.Build = buildSpec
 	}
 	if file, err := ioutil.ReadFile(path + "/push.yaml"); err == nil {
 		if err := yaml.Unmarshal(file, &pushSpec); err != nil {
-			common.Logger.WithError(err).Errorln("failed to unmarshal push.yaml")
+			log.WithError(err).Errorln("failed to unmarshal push.yaml")
 			return err
 		}
+
 		spec.Push = pushSpec
 	}
 	return nil
@@ -102,10 +115,12 @@ func readIndividualSpecs(spec *v1alpha1.OCIBuilderSpec, path string) error {
 // applyOverlay applys a ytt overalay to the specification
 func applyOverlay(yamlTemplate []byte, overlayPath string) ([]byte, error) {
 	file, err := os.Open(overlayPath)
+
 	if err != nil {
-		common.Logger.WithError(err).Errorln("unable to read overlay file...")
+		log.WithError(err).Errorln("unable to read overlay file...")
 		return nil, err
 	}
+
 	yttOverlay := YttOverlay{
 		spec: yamlTemplate,
 		overlay: OverlayFile{
@@ -113,11 +128,13 @@ func applyOverlay(yamlTemplate []byte, overlayPath string) ([]byte, error) {
 			file: file,
 		},
 	}
+
 	overlayedSpec, err := yttOverlay.Apply()
 	if err != nil {
-		common.Logger.WithError(err).Errorln("unable to apply overlay to spec...")
+		log.WithError(err).Errorln("unable to apply overlay to spec...")
 		return nil, err
 	}
+
 	return overlayedSpec, nil
 }
 
@@ -126,6 +143,7 @@ func applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error {
 	if err != nil {
 		return err
 	}
+
 	for _, param := range spec.Params {
 		if param.Value != "" {
 			tmp, err := sjson.SetBytes(specJson, param.Dest, param.Value)
@@ -137,8 +155,9 @@ func applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error {
 		if param.ValueFromEnvVariable != "" {
 			val := os.Getenv(param.ValueFromEnvVariable)
 			if val == "" {
-				common.Logger.Warn("env variable ", param.ValueFromEnvVariable, " is empty")
+				log.Warn("env variable ", param.ValueFromEnvVariable, " is empty")
 			}
+
 			tmp, err := sjson.SetBytes(specJson, param.Dest, val)
 			if err != nil {
 				return err
@@ -146,8 +165,27 @@ func applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error {
 			specJson = tmp
 		}
 	}
+
 	if err := json.Unmarshal(specJson, spec); err != nil {
 		return err
 	}
 	return nil
+}
+
+// ReadContext reads the user supplied context for the image build
+func ReadContext(ctx v1alpha1.BuildContext) (io.ReadCloser, error) {
+
+	if ctx.GitContext != nil {
+		return nil, errors.New("git context is not supported in this version of the ocibuilder")
+	}
+
+	if ctx.S3Context != nil {
+		return nil, errors.New("s3 context is not supported in this version of the ocibuilder")
+	}
+
+	if ctx.LocalContext != nil {
+		return ctx.LocalContext.Read()
+	}
+
+	return nil, errors.New("no context has been defined")
 }

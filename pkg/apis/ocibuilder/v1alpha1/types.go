@@ -203,10 +203,10 @@ type BuildStep struct {
 	// defaults to false
 	// +optional
 	Purge bool `json:"purge,omitempty" protobuf:"bytes,8,opt,name=purge"`
-	// BuildContext used for image build
+	// Context used for image build
 	// default looks at the current working directory
 	// +optional
-	BuildContext *BuildContext `json:"context,omitempty" protobuf:"bytes,9,opt,name=context"`
+	Context BuildContext `json:"context,omitempty" protobuf:"bytes,9,opt,name=context"`
 }
 
 // Stage represents a stage within the build
@@ -340,26 +340,20 @@ type ImageBuildArgs struct {
 	// defaults to false
 	// +optional
 	Purge bool `json:"purge,omitempty" protobuf:"bytes,5,opt,name=purge"`
-	// BuildContextPath is the path of the build context for Docker and Buildah
+	// Context is the context for Docker and Buildah
 	// defaults to LocalContext in current working directory
 	// +optional
-	BuildContextPath string `json:"buildContextPath,omitempty" protobuf:"bytes,6,opt,name=buildContextPath"`
+	Context BuildContext `json:"context,omitempty" protobuf:"bytes,6,opt,name=context"`
 }
 
 // BuildContext stores the chosen build context for your build, this can be Local, S3 or Git
 type BuildContext struct {
 	// Local context contains local context information for a build
-	LocalContext *LocalContext `json:"localContext,omitempty" protobuf:"bytes,1,opt,name=localContext"`
+	LocalContext *LocalContext `json:"localContext" protobuf:"bytes,1,opt,name=localContext"`
 	// S3Context refers to the context stored on S3 bucket for a build
-	S3Context *S3Context `json:"s3Context,omitempty" protobuf:"bytes,2,opt,name=s3Context"`
+	S3Context *S3Context `json:"s3Context" protobuf:"bytes,2,opt,name=s3Context"`
 	// GitContext refers to the context stored on Git repository
-	GitContext *GitContext `json:"gitContext,omitempty" protobuf:"bytes,3,opt,name=gitContext"`
-	// GCSContext refers to the context stored on the GCS
-	GCSContext *GCSContext `json:"gcsContext,omitempty" protobuf:"bytes,4,opt,name=gcsContext"`
-	// AzureBlobContext refers to the context stored on the Azure Storage Blob
-	AzureBlobContext *AzureBlobContext `json:"azureBlobContext,omitempty" protobuf:"bytes,5,opt,name=azureBlobContext"`
-	// AliyunOSSContext refers to the context stored on the Aliyun OSS
-	AliyunOSSContext *AliyunOSSContext `json:"aliyunOSSContext,omitempty" protobuf:"bytes,6,opt,name=aliyunOSSContext"`
+	GitContext *GitContext `json:"gitContext" protobuf:"bytes,3,opt,name=gitContext"`
 }
 
 // LocalContext stores the path for your local build context, implements the ContextReader interface
@@ -454,45 +448,6 @@ type GCSContext struct {
 	Bucket *S3Bucket `json:"bucket" protobuf:"bytes,5,name=bucket"`
 	// Region refers to GCS region
 	Region string `json:"region,omitempty" protobuf:"bytes,6,opt,name=region"`
-}
-
-// AzureBlobContext refers to configuration required to fetch context from Azure Storage Blob
-type AzureBlobContext struct {
-	// AzureStorageAccount refers to the account name
-	Account *Credentials `json:"account" protobuf:"bytes,1,name=account"`
-	// AccessKey refers to the access key
-	AccessKey *Credentials `json:"accessKey" protobuf:"bytes,2,name=accessKey"`
-	// URL refers to blob's URL
-	URL *Credentials `json:"url" protobuf:"bytes,3,name=url"`
-}
-
-// AliyunOSSContext refers to configuration required to fetch context from Aliyun OSS
-type AliyunOSSContext struct {
-	// AccessId refers to access id
-	AccessId *Credentials `json:"accessId" protobuf:"bytes,1,name=accessId"`
-	// AccessSecret refers to access secret
-	AccessSecret *Credentials `json:"accessSecret" protobuf:"bytes,2,name=accessSecret"`
-	// Endpoint is the storage to connect to
-	Endpoint string `json:"endpoint" protobuf:"bytes,4,name=endpoint"`
-	// Bucket refers to the bucket name on gcs
-	Bucket *S3Bucket `json:"bucket" protobuf:"bytes,5,name=bucket"`
-}
-
-// GCSContext refers to the context stored on GCP Storage
-type GCSContext struct {
-	// CredentialsFilePath refers to the credentials file path
-	CredentialsFilePath string `json:"credentialsFilePath,omitempty" protobuf:"bytes,1,opt,name=credentialsFilePath"`
-	// APIKeyEnv refers to the api key stored in environment variable
-	APIKeyEnv string `json:"apiKeyEnv,omitempty" protobuf:"bytes,2,opt,name=apiKeyEnv"`
-	// APIKeyPlain refers to api key stored in plain text
-	APIKeyPlain string `json:"apiKeyPlain,omitempty" protobuf:"bytes,3,opt,name=apiKeyPlain"`
-	// APIKeySecret refers to K8s secret that holds the API key
-	APIKeySecret *corev1.SecretKeySelector `json:"apiKeySecret,omitempty" protobuf:"bytes,4,opt,name=apiKeySecret"`
-	// AuthRequired checks if authentication is required to connect to GCS
-	AuthRequired bool      `json:"authRequired" protobuf:"bytes,1,name=authRequired"`
-	Endpoint     string    `json:"endpoint" protobuf:"bytes,1,name=endpoint"`
-	Bucket       *S3Bucket `json:"bucket" protobuf:"bytes,2,name=bucket"`
-	Region       string    `json:"region,omitempty" protobuf:"bytes,3,opt,name=region"`
 }
 
 // Command Represents a single line in a Dockerfile

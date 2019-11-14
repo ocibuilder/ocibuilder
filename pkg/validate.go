@@ -14,13 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package pkg
+package common
 
 import (
-	"os"
-
+	"github.com/ocibuilder/ocibuilder/common/context"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/pkg/errors"
+	"os"
 )
 
 // Validate validates a ocibuilder spec.
@@ -110,4 +110,15 @@ func ValidatePushSpec(spec v1alpha1.PushSpec) error {
 		return errors.New("tag must be specified for push")
 	}
 	return nil
+}
+
+// ValidateContext validates image context, returns the current local directory as a default if none
+// exists
+func ValidateContext(spec v1alpha1.BuildContext) v1alpha1.BuildContext {
+	if spec.LocalContext == nil && spec.GitContext == nil && spec.S3Context == nil {
+		spec.LocalContext = &context.LocalContext{
+			ContextPath: ".",
+		}
+	}
+	return spec
 }

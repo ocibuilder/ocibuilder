@@ -19,13 +19,55 @@ package build_context
 import (
 	"cloud.google.com/go/storage"
 	"context"
+	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/pkg/errors"
 	"google.golang.org/api/option"
+	"k8s.io/client-go/kubernetes"
 )
 
+// GCSBuildContextReader implements the BuildContextReader to read build context from Google Cloud Storage
 type GCSBuildContextReader struct {
+	// buildContext contains configuration required to read build context from GCS
+	buildContext *v1alpha1.GCSContext
+	// k8sClient is a Kubernetes client
+	k8sClient kubernetes.Interface
 }
 
-func (contextReader *GCSBuildContextReader) Read() (string, error) {
+// newClient returns the new GCS client based on authentication methods
+func (contextReader *GCSBuildContextReader) newClient() (*storage.Client, error) {
 	ctx := context.Background()
-	storage.NewClient(ctx, option.Wi())
+	if !contextReader.buildContext.AuthRequired {
+		return storage.NewClient(ctx, option.WithoutAuthentication(), option.WithEndpoint(contextReader.buildContext.Endpoint))
+	}
+	if contextReader.buildContext.CredentialsFilePath != "" {
+		return storage.NewClient(ctx, option.WithCredentialsFile(contextReader.buildContext.CredentialsFilePath), option.WithEndpoint(contextReader.buildContext.Endpoint))
+	}
+	if contextReader.buildContext.APIKey != nil {
+		apiKey, err := common.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.APIKey)
+		if err != nil {
+			return nil, err
+		}
+		return storage.NewClient(ctx, option.WithAPIKey(apiKey), option.WithEndpoint(contextReader.buildContext.Endpoint))
+	}
+	return nil, errors.New("no authentication method provided. If no authentication is required, set the `authRequired` to true")
+}
+
+// Read reads the build context from GCS
+func (contextReader *GCSBuildContextReader) Read() (string, error) {
+	client, err := contextReader.newClient()
+	if err != nil {
+		return "", err
+	}
+
+	reader, err := client.Bucket(contextReader.buildContext.Bucket.Name).Object(contextReader.buildContext.Bucket.Key).NewReader(context.Background())
+	if err != nil {
+		return "", err
+	}
+
+	var contextBody []byte
+	if _, err := reader.Read(contextBody); err != nil {
+		return "", nil
+	}
+
 }
