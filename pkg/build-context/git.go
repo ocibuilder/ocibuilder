@@ -19,17 +19,16 @@ package build_context
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
 
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/pkg/errors"
+	"github.com/src-d/go-git/plumbing/transport/http"
 	"golang.org/x/crypto/ssh"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/config"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport"
-	"gopkg.in/src-d/go-git.v4/plumbing/transport/http"
 	go_git_ssh "gopkg.in/src-d/go-git.v4/plumbing/transport/ssh"
 	"k8s.io/client-go/kubernetes"
 )
@@ -73,44 +72,24 @@ func getSSHKeyAuth(sshKeyFile string) (transport.AuthMethod, error) {
 }
 
 func (contextReader *GitBuildContextReader) getGitAuth() (transport.AuthMethod, error) {
-	if contextReader.buildContext.PlainCreds == nil {
-		return &http.BasicAuth{
-			Username: contextReader.buildContext.PlainCreds.Username,
-			Password: contextReader.buildContext.PlainCreds.Password,
-		}, nil
-	}
-	if contextReader.buildContext.EnvVarCreds == nil {
-		username, ok := os.LookupEnv(contextReader.buildContext.EnvVarCreds.EnvVarUsername)
-		if !ok {
-			return nil, errors.New("username is not provided")
-		}
-		password, ok := os.LookupEnv(contextReader.buildContext.EnvVarCreds.EnvVarPassword)
-		if !ok {
-			return nil, errors.New("password is not provided")
-		}
-		return &http.BasicAuth{
-			Username: username,
-			Password: password,
-		}, nil
-	}
-	if contextReader.buildContext.K8sCreds != nil {
-		username, err := common.ReadFromSecret(contextReader.k8sClient, contextReader.buildContext.K8sCreds.Namespace, contextReader.buildContext.K8sCreds.Username)
-		if err != nil {
-			return nil, fmt.Errorf("failed to retrieve username: err: %+v", err)
-		}
-		password, err := common.ReadFromSecret(contextReader.k8sClient, contextReader.buildContext.K8sCreds.Namespace, contextReader.buildContext.K8sCreds.Password)
-		if err != nil {
-			return nil, fmt.Errorf("failed to retrieve password: err: %+v", err)
-		}
-		return &http.BasicAuth{
-			Username: string(username),
-			Password: string(password),
-		}, err
-	}
 	if contextReader.buildContext.SSHKeyPath != "" {
 		return getSSHKeyAuth(contextReader.buildContext.SSHKeyPath)
 	}
-	return nil, nil
+	username, err := common.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.Username)
+	if err != nil {
+		return nil, err
+	}
+	password, err := common.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.Password)
+	if err != nil {
+		return nil, err
+	}
+	if username == "" && password == "" {
+		return nil, nil
+	}
+	return &http.BasicAuth{
+		Username: username,
+		Password: password,
+	}, nil
 }
 
 func (contextReader *GitBuildContextReader) pullFromRepository(r *git.Repository) error {

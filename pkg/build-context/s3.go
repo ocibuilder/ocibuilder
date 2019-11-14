@@ -27,7 +27,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -39,101 +38,50 @@ type S3BuildContextReader struct {
 	k8sClient kubernetes.Interface
 }
 
-// credentials holds the S3 credentials
-type credentials struct {
-	accesskey string
-	secretkey string
-}
-
-// readSecret reads S3BuildContextReader credentials stored in a Kubernetes secret
-func (contextReader *S3BuildContextReader) readFromSecret() (*credentials, error) {
-	access, err := common.ReadFromSecret(contextReader.k8sClient, contextReader.buildContext.K8sCreds.Namespace, contextReader.buildContext.K8sCreds.AccessKey)
-	if err != nil {
-		return nil, err
-	}
-	secret, err := common.ReadFromSecret(contextReader.k8sClient, contextReader.buildContext.K8sCreds.Namespace, contextReader.buildContext.K8sCreds.SecretKey)
-	if err != nil {
-		return nil, err
-	}
-	return &credentials{
-		accesskey: string(access),
-		secretkey: string(secret),
-	}, nil
-}
-
-// readFromEnv reads S3BuildContextReader credentials from environment variables
-func (contextReader *S3BuildContextReader) readFromEnv() (*credentials, error) {
-	access, ok := os.LookupEnv(contextReader.buildContext.EnvVarCreds.EnvVarAccessKey)
-	if !ok {
-		return nil, errors.New("access key environment variable not found")
-	}
-	secret, ok := os.LookupEnv(contextReader.buildContext.EnvVarCreds.EnvVarSecretKey)
-	if !ok {
-		return nil, errors.New("secret key environment variable not found")
-	}
-	return &credentials{
-		accesskey: access,
-		secretkey: secret,
-	}, nil
-}
-
-// getCredentials returns the S3BuildContextReader credentials based on the type of secret store
-func (contextReader *S3BuildContextReader) getCredentials() (*credentials, error) {
-	if contextReader.buildContext.PlainCreds != nil {
-		return &credentials{
-			accesskey: contextReader.buildContext.PlainCreds.AccessKey,
-			secretkey: contextReader.buildContext.PlainCreds.SecretKey,
-		}, nil
-	}
-	if contextReader.buildContext.EnvVarCreds != nil {
-		return contextReader.readFromEnv()
-	}
-	if contextReader.buildContext.K8sCreds != nil {
-		return contextReader.readFromSecret()
-	}
-	return nil, errors.New("contextReader credentials are not provided")
-}
-
 // newSession returns a S3BuildContextReader session
-func (contextReader *S3BuildContextReader) newSession(creds *credentials) (*session.Session, error) {
+func (contextReader *S3BuildContextReader) newSession(accessKey, secretKey string) (*session.Session, error) {
 	return session.NewSession(&aws.Config{
 		Endpoint: &contextReader.buildContext.Endpoint,
 		Region:   &contextReader.buildContext.Region,
 		Credentials: awscreds.NewStaticCredentialsFromCreds(awscreds.Value{
-			AccessKeyID:     creds.accesskey,
-			SecretAccessKey: creds.secretkey,
+			AccessKeyID:     accessKey,
+			SecretAccessKey: secretKey,
 		}),
 		DisableSSL: &contextReader.buildContext.Insecure,
 	})
 }
 
 // Read reads the context stored on S3BuildContextReader
-func (contextReader *S3BuildContextReader) Read() error {
-	creds, err := contextReader.getCredentials()
+func (contextReader *S3BuildContextReader) Read() (string, error) {
+	accessKey, err := common.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.AccessKey)
 	if err != nil {
-		return err
+		return "", err
 	}
-	awsSession, err := contextReader.newSession(creds)
+	secretKey, err := common.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.SecretKey)
 	if err != nil {
-		return err
+		return "", err
+	}
+	awsSession, err := contextReader.newSession(accessKey, secretKey)
+	if err != nil {
+		return "", err
 	}
 	s3Downloader := s3manager.NewDownloader(awsSession)
 	contextFilePath := fmt.Sprintf("%s/%s", common.ContextDirectory, common.ContextFile)
 	if err := os.MkdirAll(common.ContextDirectory, 0750); err != nil {
-		return err
+		return "", err
 	}
 	contextFile, err := os.Create(contextFilePath)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if _, err := s3Downloader.Download(contextFile, &awss3.GetObjectInput{
 		Bucket: aws.String(contextReader.buildContext.Bucket.Name),
 		Key:    aws.String(contextReader.buildContext.Bucket.Key),
 	}); err != nil {
-		return err
+		return "", err
 	}
 	if err := common.UntarFile(contextFilePath, common.ContextDirectoryUncompressed); err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	return common.ContextDirectoryUncompressed, nil
 }
