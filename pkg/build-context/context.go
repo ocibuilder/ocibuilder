@@ -17,7 +17,6 @@ limitations under the License.
 package build_context
 
 import (
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
@@ -29,15 +28,7 @@ type BuildContextReader interface {
 }
 
 // GetBuildContextReader returns a build context based on the store
-func GetBuildContextReader(buildContext *v1alpha1.BuildContext, k8sConfigPath string) (BuildContextReader, error) {
-	kubeConfig, err := common.GetClientConfig(k8sConfigPath)
-	if err != nil {
-		return nil, err
-	}
-	k8sClient, err := kubernetes.NewForConfig(kubeConfig)
-	if err != nil {
-		return nil, err
-	}
+func GetBuildContextReader(buildContext *v1alpha1.BuildContext, k8sClient kubernetes.Interface) (BuildContextReader, error) {
 	if buildContext.AliyunOSSContext != nil {
 		return NewAliyunOSSBuildContextReader(buildContext.AliyunOSSContext, k8sClient), nil
 	}
