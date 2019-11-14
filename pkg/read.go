@@ -18,14 +18,12 @@ package common
 
 import (
 	"encoding/json"
-	"io"
 	"io/ioutil"
 	"os"
 	"strings"
 
 	"github.com/ghodss/yaml"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/pkg/errors"
 	"github.com/tidwall/sjson"
 )
 
@@ -170,22 +168,4 @@ func applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error {
 		return err
 	}
 	return nil
-}
-
-// ReadContext reads the user supplied context for the image build
-func ReadContext(ctx v1alpha1.BuildContext) (io.ReadCloser, error) {
-
-	if ctx.GitContext != nil {
-		return nil, errors.New("git context is not supported in this version of the ocibuilder")
-	}
-
-	if ctx.S3Context != nil {
-		return nil, errors.New("s3 context is not supported in this version of the ocibuilder")
-	}
-
-	if ctx.LocalContext != nil {
-		return ctx.LocalContext.Read()
-	}
-
-	return nil, errors.New("no context has been defined")
 }

@@ -14,12 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package pkg
+package common
 
 import (
 	"bytes"
 	"errors"
 	"fmt"
+	build_context "github.com/ocibuilder/ocibuilder/pkg/build-context"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -28,49 +29,45 @@ import (
 
 	"github.com/gobuffalo/packr"
 	"github.com/moby/buildkit/frontend/dockerfile/parser"
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	build_context "github.com/ocibuilder/ocibuilder/pkg/build-context"
 )
 
 // ParseBuildSpec parses the build specification which is read in through spec.yml
-// or build.yaml and generates an array of build arguments
+// or build.yaml and generates an array of build argumenets
 func ParseBuildSpec(spec *v1alpha1.BuildSpec) ([]v1alpha1.ImageBuildArgs, error) {
 	var imageBuilds []v1alpha1.ImageBuildArgs
-	kubeConfig, ok := os.LookupEnv(common.EnvVarKubeConfig)
-	if !ok {
-		kubeConfig = ""
-	}
 	for _, step := range spec.Steps {
-		buildContext, err := build_context.GetBuildContextReader(step.BuildContext, kubeConfig)
+
+		buildContext, err := build_context.GetBuildContextReader(step.BuildContext, "")
 		if err != nil {
-			return nil, err
+
 		}
-		buildContextPath, err := buildContext.Read()
-		if err != nil {
-			return nil, err
-		}
-		dockerfilePath, err := GenerateDockerfile(step, spec.Templates, buildContextPath)
+
+		// TODO: support for more than just local context path in dockerfile generation
+		dockerfilePath, err := GenerateDockerfile(step, spec.Templates, step.BuildContext.LocalContext.ContextPath)
+
 		// Perform cleanup of generated files if parse errors out
 		if err != nil {
 			for _, args := range imageBuilds {
 				if err := os.Remove(args.Dockerfile); err != nil {
-					common.Logger.WithError(err).Errorln("error cleaning up generated files")
+					log.WithError(err).Errorln("error cleaning up generated files")
 				}
 			}
 			if err := os.Remove(dockerfilePath); err != nil {
-				common.Logger.WithError(err).Errorln("error cleaning up generated files")
+				log.WithError(err).Errorln("error cleaning up generated files")
 			}
 			return nil, err
 		}
+
 		imageBuild := v1alpha1.ImageBuildArgs{
-			Name:             step.Name,
-			Tag:              step.Tag,
-			Dockerfile:       dockerfilePath,
-			Purge:            step.Purge,
-			BuildContextPath: buildContextPath,
+			Name:       step.Name,
+			Tag:        step.Tag,
+			Dockerfile: dockerfilePath,
+			Purge:      step.Purge,
+			Context:    step.BuildContext,
 		}
 		imageBuilds = append(imageBuilds, imageBuild)
+
 	}
 	return imageBuilds, nil
 }
@@ -110,13 +107,16 @@ func GenerateDockerfile(step v1alpha1.BuildStep, templates []v1alpha1.BuildTempl
 	if contextPath == "" {
 		contextPath = "."
 	}
+
 	file, err := ioutil.TempFile(contextPath, "Dockerfile")
 	if err != nil {
 		return "", err
 	}
+
 	if _, err = file.Write(dockerfile); err != nil {
 		return "", err
 	}
+
 	return filepath.Base(file.Name()), nil
 }
 
@@ -125,10 +125,12 @@ func GenerateDockerfile(step v1alpha1.BuildStep, templates []v1alpha1.BuildTempl
 func parseCmdType(cmds []v1alpha1.BuildTemplateStep) ([]byte, error) {
 	var dockerfile []byte
 	for _, cmd := range cmds {
+
 		err := ValidateBuildTemplateStep(cmd)
 		if err != nil {
 			return nil, err
 		}
+
 		if cmd.Ansible != nil {
 			tmp, err := ParseAnsibleCommands(cmd.Ansible)
 			if err != nil {
@@ -136,6 +138,7 @@ func parseCmdType(cmds []v1alpha1.BuildTemplateStep) ([]byte, error) {
 			}
 			dockerfile = append(dockerfile, tmp...)
 		}
+
 		if cmd.Docker != nil {
 			tmp, err := ParseDockerCommands(cmd.Docker)
 			if err != nil {
@@ -156,64 +159,79 @@ func ParseAnsibleCommands(ansibleStep *v1alpha1.AnsibleStep) ([]byte, error) {
 	box := packr.NewBox("../templates/ansible")
 
 	if ansibleStep.Local != nil {
+
 		file, err := box.Find(v1alpha1.AnsiblePath)
 		if err != nil {
 			return nil, err
 		}
+
 		tmpl, err := template.New("ansibleLocal").Parse(string(file))
 		if err != nil {
 			return nil, err
 		}
+
 		if err = tmpl.Execute(&buf, ansibleStep.Local); err != nil {
 			return nil, err
 		}
 		dockerfileBytes := buf.Bytes()
 		dockerfile = append(dockerfile, dockerfileBytes...)
+
 		return dockerfile, nil
 	}
+
 	if ansibleStep.Galaxy != nil {
 		file, err := box.Find(v1alpha1.AnsibleGalaxyPath)
 		if err != nil {
 			return nil, err
 		}
+
 		tmpl, err := template.New("ansibleGalaxy").Parse(string(file))
 		if err != nil {
 			return nil, err
 		}
+
 		if err = tmpl.Execute(&buf, ansibleStep.Galaxy); err != nil {
 			return nil, err
 		}
 		dockerfileBytes := buf.Bytes()
 		dockerfile = append(dockerfile, dockerfileBytes...)
+
 		return dockerfile, nil
 	}
+
 	return nil, errors.New("no ansible galaxy or local definitions found")
 }
 
 // ParseDockerCommands parses the inputted docker commands and adds to dockerfile
 func ParseDockerCommands(dockerStep *v1alpha1.DockerStep) ([]byte, error) {
 	var dockerfile []byte
+
 	if dockerStep.Inline != nil {
 		return append(dockerfile, strings.Join(dockerStep.Inline, "\n")...), nil
 	}
+
 	if dockerStep.Path != "" {
 		file, err := os.Open(dockerStep.Path)
 		if err != nil {
 			return nil, err
 		}
+
 		defer func() {
 			if r := recover(); r != nil {
-				common.Logger.Warnln("panic recovered to execute final cleanup", r)
+				log.Warnln("panic recovered to execute final cleanup", r)
 			}
 			if err := file.Close(); err != nil {
-				common.Logger.WithError(err).Errorln("error closing file")
+				log.WithError(err).Errorln("error closing file")
 			}
 		}()
+
 		res, err := parser.Parse(file)
 		if err != nil {
 			return nil, err
 		}
+
 		var commands []v1alpha1.Command
+
 		for _, child := range res.AST.Children {
 			cmd := v1alpha1.Command{
 				Cmd:       child.Value,
@@ -221,10 +239,12 @@ func ParseDockerCommands(dockerStep *v1alpha1.DockerStep) ([]byte, error) {
 				StartLine: child.StartLine,
 				Flags:     child.Flags,
 			}
+
 			if child.Next != nil && len(child.Next.Children) > 0 {
 				cmd.SubCmd = child.Next.Children[0].Value
 				child = child.Next.Children[0]
 			}
+
 			cmd.IsJSON = child.Attributes["json"]
 			for n := child.Next; n != nil; n = n.Next {
 				cmd.Value = append(cmd.Value, n.Value)
@@ -233,6 +253,7 @@ func ParseDockerCommands(dockerStep *v1alpha1.DockerStep) ([]byte, error) {
 		}
 		return addCommandsToDockerfile(commands, dockerfile), nil
 	}
+
 	return nil, errors.New("no docker cmd path or inline docker commands defined")
 }
 
@@ -240,15 +261,19 @@ func ParseDockerCommands(dockerStep *v1alpha1.DockerStep) ([]byte, error) {
 // and as conditions
 func parseBaseImage(base v1alpha1.Base, name string) string {
 	baseImage := fmt.Sprintf("FROM %s", base.Image)
+
 	if base.Platform != "" {
 		baseImage = fmt.Sprintf("%s:%s", baseImage, base.Platform)
 	}
+
 	if base.Tag != "" {
 		baseImage = fmt.Sprintf("%s:%s", baseImage, base.Tag)
 	}
+
 	if name != "" {
 		baseImage = fmt.Sprintf("%s AS %s", baseImage, name)
 	}
+
 	return fmt.Sprintf("%s\n", baseImage)
 }
 
@@ -256,6 +281,7 @@ func parseBaseImage(base v1alpha1.Base, name string) string {
 func addCommandsToDockerfile(commands []v1alpha1.Command, dockerfile []byte) []byte {
 	for _, command := range commands {
 		cmd := command.Cmd
+
 		if cmd == "from" {
 			cmd = "\n" + cmd
 		}
