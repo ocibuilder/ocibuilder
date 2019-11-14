@@ -450,6 +450,16 @@ type GCSContext struct {
 	Region string `json:"region,omitempty" protobuf:"bytes,6,opt,name=region"`
 }
 
+// AzureBlobContext
+type AzureBlobContext struct {
+	// AzureStorageAccount refers to the account name
+	Account *Credentials `json:"azureStorageAccount" protobuf:"bytes,1,name=azureStorageAccount"`
+	// AccessKey refers to the access key
+	AccessKey *Credentials `json:"accessKey" protobuf:"bytes,2,name=accessKey"`
+	// URL refers to blob's URL
+	URL *Credentials `json:"url" protobuf:"bytes,3,name=url"`
+}
+
 // Command Represents a single line in a Dockerfile
 type Command struct {
 	// Cmd lowercased command name (e.g `from`)
