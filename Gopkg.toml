@@ -52,6 +52,10 @@ required = [
   version = "0.3.0"
   name = "github.com/Azure/azure-storage-blob-go"
 
+[[constraint]]
+  name = "github.com/aliyun/aliyun-oss-go-sdk"
+  version = "v2.0.3"
+
 [prune]
   go-tests = true
   unused-packages = true

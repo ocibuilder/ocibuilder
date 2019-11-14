@@ -450,7 +450,7 @@ type GCSContext struct {
 	Region string `json:"region,omitempty" protobuf:"bytes,6,opt,name=region"`
 }
 
-// AzureBlobContext
+// AzureBlobContext refers to configuration required to fetch context from Azure Storage Blob
 type AzureBlobContext struct {
 	// AzureStorageAccount refers to the account name
 	Account *Credentials `json:"azureStorageAccount" protobuf:"bytes,1,name=azureStorageAccount"`
@@ -458,6 +458,18 @@ type AzureBlobContext struct {
 	AccessKey *Credentials `json:"accessKey" protobuf:"bytes,2,name=accessKey"`
 	// URL refers to blob's URL
 	URL *Credentials `json:"url" protobuf:"bytes,3,name=url"`
+}
+
+// AliyunOSSContext refers to configuration required to fetch context from Aliyun OSS
+type AliyunOSSContext struct {
+	// AccessId refers to access id
+	AccessId *Credentials `json:"accessId" protobuf:"bytes,1,name=accessId"`
+	// AccessSecret refers to access secret
+	AccessSecret *Credentials `json:"accessSecret" protobuf:"bytes,2,name=accessSecret"`
+	// Endpoint is the storage to connect to
+	Endpoint string `json:"endpoint" protobuf:"bytes,4,name=endpoint"`
+	// Bucket refers to the bucket name on gcs
+	Bucket *S3Bucket `json:"bucket" protobuf:"bytes,5,name=bucket"`
 }
 
 // Command Represents a single line in a Dockerfile
