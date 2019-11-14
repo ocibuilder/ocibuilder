@@ -24,7 +24,6 @@ import (
 	"os"
 	"path/filepath"
 
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -69,15 +68,6 @@ func UntarFile(input, destination string) error {
 		}
 	}
 	return nil
-}
-
-// ReadFromSecret reads a value from a secret
-func ReadFromSecret(client kubernetes.Interface, namespace string, keySelector *corev1.SecretKeySelector) ([]byte, error) {
-	secret, err := client.CoreV1().Secrets(namespace).Get(keySelector.Name, metav1.GetOptions{})
-	if err != nil {
-		return nil, err
-	}
-	return secret.Data[keySelector.Key], nil
 }
 
 // ReadCredentials reads the credentials

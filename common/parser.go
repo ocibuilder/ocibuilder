@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	build_context "github.com/ocibuilder/ocibuilder/pkg/build-context"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -37,10 +38,13 @@ func ParseBuildSpec(spec *v1alpha1.BuildSpec) ([]v1alpha1.ImageBuildArgs, error)
 	var imageBuilds []v1alpha1.ImageBuildArgs
 	for _, step := range spec.Steps {
 
-		step.Context = ValidateContext(step.Context)
+		buildContext, err := build_context.GetBuildContextReader(step.BuildContext, "")
+		if err != nil {
+
+		}
 
 		// TODO: support for more than just local context path in dockerfile generation
-		dockerfilePath, err := GenerateDockerfile(step, spec.Templates, step.Context.LocalContext.ContextPath)
+		dockerfilePath, err := GenerateDockerfile(step, spec.Templates, step.BuildContext.LocalContext.ContextPath)
 
 		// Perform cleanup of generated files if parse errors out
 		if err != nil {
@@ -60,7 +64,7 @@ func ParseBuildSpec(spec *v1alpha1.BuildSpec) ([]v1alpha1.ImageBuildArgs, error)
 			Tag:        step.Tag,
 			Dockerfile: dockerfilePath,
 			Purge:      step.Purge,
-			Context:    step.Context,
+			Context:    step.BuildContext,
 		}
 		imageBuilds = append(imageBuilds, imageBuild)
 

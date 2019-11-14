@@ -18,7 +18,7 @@ limitations under the License.
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned/scheme"
 	"k8s.io/client-go/rest"
 )
