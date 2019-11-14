@@ -17,8 +17,11 @@ limitations under the License.
 package build_context
 
 import (
-	"cloud.google.com/go/storage"
 	"context"
+	"fmt"
+	"os"
+
+	"cloud.google.com/go/storage"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/pkg/errors"
@@ -59,15 +62,27 @@ func (contextReader *GCSBuildContextReader) Read() (string, error) {
 	if err != nil {
 		return "", err
 	}
-
 	reader, err := client.Bucket(contextReader.buildContext.Bucket.Name).Object(contextReader.buildContext.Bucket.Key).NewReader(context.Background())
 	if err != nil {
 		return "", err
 	}
-
 	var contextBody []byte
 	if _, err := reader.Read(contextBody); err != nil {
 		return "", nil
 	}
-
+	contextFilePath := fmt.Sprintf("%s/%s", common.ContextDirectory, common.ContextFile)
+	if err := os.MkdirAll(common.ContextDirectory, 0750); err != nil {
+		return "", err
+	}
+	contextFile, err := os.Create(contextFilePath)
+	if err != nil {
+		return "", err
+	}
+	if _, err := contextFile.Write(contextBody); err != nil {
+		return "", nil
+	}
+	if err := common.UntarFile(contextFilePath, common.ContextDirectoryUncompressed); err != nil {
+		return "", err
+	}
+	return common.ContextDirectoryUncompressed, nil
 }
