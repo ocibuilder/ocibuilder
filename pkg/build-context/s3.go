@@ -85,3 +85,11 @@ func (contextReader *S3BuildContextReader) Read() (string, error) {
 	}
 	return common.ContextDirectoryUncompressed, nil
 }
+
+// NewS3BuildContextReader returns a new build context reader for S3
+func NewS3BuildContextReader(buildContext *v1alpha1.S3Context, k8sClient kubernetes.Interface) BuildContextReader {
+	return &S3BuildContextReader{
+		buildContext,
+		k8sClient,
+	}
+}

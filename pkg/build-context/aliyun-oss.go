@@ -67,3 +67,11 @@ func (contextReader *AliyunOSSBuildContextReader) Read() (string, error) {
 	}
 	return common.ContextDirectoryUncompressed, nil
 }
+
+// NewAliyunOSSBuildContextReader returns a new Aliyun OSS build context reader
+func NewAliyunOSSBuildContextReader(buildContext *v1alpha1.AliyunOSSContext, k8sClient kubernetes.Interface) *AliyunOSSBuildContextReader {
+	return &AliyunOSSBuildContextReader{
+		buildContext,
+		k8sClient,
+	}
+}

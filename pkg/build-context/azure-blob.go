@@ -89,3 +89,11 @@ func (contextReader *AzureBlobBuildContextReader) Read() (string, error) {
 	}
 	return common.ContextDirectoryUncompressed, nil
 }
+
+// NewAzureBlobBuildContextReader returns a new build context reader for Azure Storage Blob
+func NewAzureBlobBuildContextReader(buildContext *v1alpha1.AzureBlobContext, k8sClient kubernetes.Interface) *AzureBlobBuildContextReader {
+	return &AzureBlobBuildContextReader{
+		buildContext,
+		k8sClient,
+	}
+}
