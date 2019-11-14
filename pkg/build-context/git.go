@@ -217,3 +217,11 @@ func (contextReader *GitBuildContextReader) Read() (string, error) {
 	}
 	return common.ContextDirectory, nil
 }
+
+// NewGitBuildContextReader returns a build context stored on the git
+func NewGitBuildContextReader(buildContext *v1alpha1.GitContext, k8sClient kubernetes.Interface) *GitBuildContextReader {
+	return &GitBuildContextReader{
+		k8sClient,
+		buildContext,
+	}
+}
