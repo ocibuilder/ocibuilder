@@ -66,10 +66,10 @@ func (y YttOverlay) Apply() ([]byte, error) {
 
 	defer func() {
 		if r := recover(); r != nil {
-			common.log.Warnln("panic recovered to execute final cleanup", r)
+			common.Logger.Warnln("panic recovered to execute final cleanup", r)
 		}
 		if err := y.overlay.file.Close(); err != nil {
-			common.log.WithError(err).Errorln("error closing file")
+			common.Logger.WithError(err).Errorln("error closing file")
 		}
 	}()
 
