@@ -24,7 +24,7 @@ import (
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/common/context"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/dummy"
+	"github.com/ocibuilder/ocibuilder/pkg/fake"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -36,7 +36,7 @@ func TestBuildah_Build(t *testing.T) {
 	b := Buildah{
 		Logger: common.GetLogger(true),
 	}
-	_, err := b.Build(dummy.Spec)
+	_, err := b.Build(fake.Spec)
 	assert.Equal(t, nil, err)
 }
 
@@ -48,7 +48,7 @@ func TestBuildah_Login(t *testing.T) {
 	b := Buildah{
 		Logger: common.GetLogger(true),
 	}
-	_, err := b.Login(dummy.Spec)
+	_, err := b.Login(fake.Spec)
 	assert.Equal(t, nil, err)
 }
 
@@ -60,7 +60,7 @@ func TestBuildah_Push(t *testing.T) {
 	b := Buildah{
 		Logger: common.GetLogger(true),
 	}
-	_, err := b.Push(dummy.Spec)
+	_, err := b.Push(fake.Spec)
 	assert.Equal(t, nil, err)
 }
 
@@ -72,7 +72,7 @@ func TestBuildah_Pull(t *testing.T) {
 	b := Buildah{
 		Logger: common.GetLogger(true),
 	}
-	_, err := b.Pull(dummy.Spec, "alpine")
+	_, err := b.Pull(fake.Spec, "alpine")
 	assert.Equal(t, nil, err)
 }
 
@@ -93,7 +93,7 @@ func TestCreateBuildCommandStorageDriver(t *testing.T) {
 func TestCreateLoginCommand(t *testing.T) {
 	expectedLoginCommand := []string{"login", "-u", "username", "-p", "ThiSiSalOgInToK3N", "example-registry"}
 
-	loginCommand, err := createLoginCommand(dummy.LoginSpec[0])
+	loginCommand, err := createLoginCommand(fake.LoginSpec[0])
 	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedLoginCommand, loginCommand)
 }
@@ -109,7 +109,7 @@ func TestCreatePullCommand(t *testing.T) {
 func TestCreatePushCommand(t *testing.T) {
 	expectedPushCommand := []string{"push", "example-registry/example-image:1.0.0"}
 
-	pushCommand, err := createPushCommand(dummy.PushSpec[0], "example-registry/example-image:1.0.0")
+	pushCommand, err := createPushCommand(fake.PushSpec[0], "example-registry/example-image:1.0.0")
 	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedPushCommand, pushCommand)
 }
@@ -118,7 +118,7 @@ var buildArgs = v1alpha1.ImageBuildArgs{
 	Name:       "image-name",
 	Tag:        "1.0.0",
 	Dockerfile: "path/to/Dockerfile",
-	Context: v1alpha1.BuildContext{
+	BuildContext: v1alpha1.BuildContext{
 		LocalContext: &context.LocalContext{
 			ContextPath: ".",
 		}},

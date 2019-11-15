@@ -14,12 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package common
+package pkg
 
 import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/ocibuilder/ocibuilder/common"
 	build_context "github.com/ocibuilder/ocibuilder/pkg/build-context"
 	"io/ioutil"
 	"os"
@@ -33,41 +34,43 @@ import (
 )
 
 // ParseBuildSpec parses the build specification which is read in through spec.yml
-// or build.yaml and generates an array of build argumenets
+// or build.yaml and generates an array of build arguments
 func ParseBuildSpec(spec *v1alpha1.BuildSpec) ([]v1alpha1.ImageBuildArgs, error) {
 	var imageBuilds []v1alpha1.ImageBuildArgs
+	kubeConfig, ok := os.LookupEnv(common.EnvVarKubeConfig)
+	if !ok {
+		kubeConfig = ""
+	}
 	for _, step := range spec.Steps {
-
-		buildContext, err := build_context.GetBuildContextReader(step.BuildContext, "")
+		buildContext, err := build_context.GetBuildContextReader(step.BuildContext, kubeConfig)
 		if err != nil {
-
+			return nil, err
 		}
-
-		// TODO: support for more than just local context path in dockerfile generation
-		dockerfilePath, err := GenerateDockerfile(step, spec.Templates, step.BuildContext.LocalContext.ContextPath)
-
+		buildContextPath, err := buildContext.Read()
+		if err != nil {
+			return nil, err
+		}
+		dockerfilePath, err := GenerateDockerfile(step, spec.Templates, buildContextPath)
 		// Perform cleanup of generated files if parse errors out
 		if err != nil {
 			for _, args := range imageBuilds {
 				if err := os.Remove(args.Dockerfile); err != nil {
-					log.WithError(err).Errorln("error cleaning up generated files")
+					common.log.WithError(err).Errorln("error cleaning up generated files")
 				}
 			}
 			if err := os.Remove(dockerfilePath); err != nil {
-				log.WithError(err).Errorln("error cleaning up generated files")
+				common.log.WithError(err).Errorln("error cleaning up generated files")
 			}
 			return nil, err
 		}
-
 		imageBuild := v1alpha1.ImageBuildArgs{
-			Name:       step.Name,
-			Tag:        step.Tag,
-			Dockerfile: dockerfilePath,
-			Purge:      step.Purge,
-			Context:    step.BuildContext,
+			Name:         step.Name,
+			Tag:          step.Tag,
+			Dockerfile:   dockerfilePath,
+			Purge:        step.Purge,
+			BuildContext: step.BuildContext,
 		}
 		imageBuilds = append(imageBuilds, imageBuild)
-
 	}
 	return imageBuilds, nil
 }
@@ -218,10 +221,10 @@ func ParseDockerCommands(dockerStep *v1alpha1.DockerStep) ([]byte, error) {
 
 		defer func() {
 			if r := recover(); r != nil {
-				log.Warnln("panic recovered to execute final cleanup", r)
+				common.log.Warnln("panic recovered to execute final cleanup", r)
 			}
 			if err := file.Close(); err != nil {
-				log.WithError(err).Errorln("error closing file")
+				common.log.WithError(err).Errorln("error closing file")
 			}
 		}()
 
