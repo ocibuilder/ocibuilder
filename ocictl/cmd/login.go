@@ -18,6 +18,7 @@ package cmd
 
 import (
 	"errors"
+	"github.com/ocibuilder/ocibuilder/pkg"
 	"io"
 
 	"github.com/docker/docker/client"

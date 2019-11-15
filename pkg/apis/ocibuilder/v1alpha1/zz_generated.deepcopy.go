@@ -480,7 +480,7 @@ func (in *GitRemoteConfig) DeepCopy() *GitRemoteConfig {
 func (in *ImageBuildArgs) DeepCopyInto(out *ImageBuildArgs) {
 	*out = *in
 	in.Ansible.DeepCopyInto(&out.Ansible)
-	in.Context.DeepCopyInto(&out.Context)
+	in.BuildContext.DeepCopyInto(&out.BuildContext)
 	return
 }
 

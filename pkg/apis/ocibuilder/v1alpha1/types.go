@@ -343,7 +343,7 @@ type ImageBuildArgs struct {
 	// BuildContext is the context for Docker and Buildah
 	// defaults to LocalContext in current working directory
 	// +optional
-	Context BuildContext `json:"context,omitempty" protobuf:"bytes,6,opt,name=context"`
+	BuildContext *BuildContext `json:"context,omitempty" protobuf:"bytes,6,opt,name=context"`
 }
 
 // BuildContext stores the chosen build context for your build, this can be Local, S3 or Git
