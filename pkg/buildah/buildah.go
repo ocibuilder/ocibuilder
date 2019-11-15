@@ -18,6 +18,7 @@ package buildah
 
 import (
 	"fmt"
+	"github.com/ocibuilder/ocibuilder/pkg"
 	"io"
 	"os"
 	"os/exec"
@@ -31,7 +32,7 @@ import (
 
 // Buildah is  the struct which consists of a logger and context path
 type Buildah struct {
-	Logger      *logrus.Logger
+	Logger        *logrus.Logger
 	StorageDriver string
 }
 
@@ -40,7 +41,7 @@ var executor = exec.Command
 // Build performs a buildah build and returns an array of readclosers
 func (b Buildah) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	log := b.Logger
-	buildOpts, err := common.ParseBuildSpec(spec.Build)
+	buildOpts, err := pkg.ParseBuildSpec(spec.Build)
 
 	if err != nil {
 		log.WithError(err).Errorln("failed to parse build spec...")
@@ -50,10 +51,10 @@ func (b Buildah) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	var buildResponses []io.ReadCloser
 	for _, opt := range buildOpts {
 		imageName := fmt.Sprintf("%s:%s", opt.Name, opt.Tag)
-		opt.Context = common.ValidateContext(opt.Context)
+		opt.BuildContext = common.ValidateContext(opt.BuildContext)
 
-		fullPath := opt.Context.LocalContext.ContextPath + "/" + opt.Dockerfile
-		if opt.Context.LocalContext.ContextPath == "" {
+		fullPath := opt.BuildContext.LocalContext.ContextPath + "/" + opt.Dockerfile
+		if opt.BuildContext.LocalContext.ContextPath == "" {
 			fullPath = "." + fullPath
 		}
 
@@ -111,16 +112,16 @@ func createBuildCommand(args v1alpha1.ImageBuildArgs, storageDriver string) []st
 	}
 
 	if image != "" {
-		return append(buildArgs, "-t", image, args.Context.LocalContext.ContextPath)
+		return append(buildArgs, "-t", image, args.BuildContext.LocalContext.ContextPath)
 	}
-	return append(buildArgs, args.Context.LocalContext.ContextPath)
+	return append(buildArgs, args.BuildContext.LocalContext.ContextPath)
 }
 
 // Login performs a buildah login on all registries defined in spec.yaml or login.yaml
 func (b Buildah) Login(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	log := b.Logger
 
-	if err := common.ValidateLogin(spec); err != nil {
+	if err := pkg.ValidateLogin(spec); err != nil {
 		return nil, err
 	}
 
@@ -161,12 +162,12 @@ func createLoginCommand(args v1alpha1.LoginSpec) ([]string, error) {
 		return nil, errors.New("no registry has been specified for login")
 	}
 
-	username, err := common.ValidateLoginUsername(args)
+	username, err := pkg.ValidateLoginUsername(args)
 	if err != nil {
 		return nil, err
 	}
 
-	password, err := common.ValidateLoginPassword(args)
+	password, err := pkg.ValidateLoginPassword(args)
 	if err != nil {
 		return nil, err
 	}
@@ -238,7 +239,7 @@ func (b Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 		return nil, err
 	}
 
-	if err := common.ValidatePush(spec); err != nil {
+	if err := pkg.ValidatePush(spec); err != nil {
 		return nil, err
 	}
 
@@ -289,7 +290,7 @@ func (b Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 func createPushCommand(spec v1alpha1.PushSpec, imageName string) ([]string, error) {
 	pushArgs := []string{"push"}
 
-	if err := common.ValidatePushSpec(spec); err != nil {
+	if err := pkg.ValidatePushSpec(spec); err != nil {
 		return nil, err
 	}
 

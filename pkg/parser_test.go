@@ -14,15 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package common
+package pkg
 
 import (
 	"io/ioutil"
 	"os"
 	"testing"
 
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ghodss/yaml"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -48,7 +48,7 @@ func TestGenerateDockerfile(t *testing.T) {
 				Path: "../testing/commands_basic_parser_test.txt",
 			},
 		},
-	}}}
+		}}}
 
 	buildSpecification := v1alpha1.BuildSpec{}
 	if err := yaml.Unmarshal(file, &buildSpecification); err != nil {

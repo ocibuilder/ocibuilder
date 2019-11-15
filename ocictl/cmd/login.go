@@ -18,6 +18,7 @@ package cmd
 
 import (
 	"errors"
+	"github.com/ocibuilder/ocibuilder/pkg"
 	"io"
 
 	"github.com/docker/docker/client"
@@ -60,7 +61,7 @@ func newLoginCmd(out io.Writer) *cobra.Command {
 
 func (l *loginCmd) run(args []string) error {
 	ociBuilderSpec := v1alpha1.OCIBuilderSpec{}
-	if err := common.Read(&ociBuilderSpec, "", l.path); err != nil {
+	if err := pkg.Read(&ociBuilderSpec, "", l.path); err != nil {
 		log.WithError(err).Errorln("failed to read spec")
 		return err
 	}

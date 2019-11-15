@@ -24,7 +24,7 @@ import (
 	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/client"
 	"github.com/ocibuilder/ocibuilder/common"
-	"github.com/ocibuilder/ocibuilder/pkg/dummy"
+	"github.com/ocibuilder/ocibuilder/pkg/fake"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 )
@@ -36,31 +36,31 @@ var docker = Docker{
 
 // TestDocker_Build is the test for a docker build
 func TestDocker_Build(t *testing.T) {
-	_, err := docker.Build(dummy.Spec)
+	_, err := docker.Build(fake.Spec)
 	assert.Equal(t, nil, err)
 }
 
 // TestDocker_Login is the test for a docker login
 func TestDocker_Login(t *testing.T) {
-	_, err := docker.Login(dummy.Spec)
+	_, err := docker.Login(fake.Spec)
 	assert.Equal(t, nil, err)
 }
 
 // TestDocker_Push is the test for a docker push
 func TestDocker_Push(t *testing.T) {
-	_, err := docker.Push(dummy.Spec)
+	_, err := docker.Push(fake.Spec)
 	assert.Equal(t, nil, err)
 }
 
 // TestDocker_Pull is the test for a docker pull
 func TestDocker_Pull(t *testing.T) {
-	_, err := docker.Pull(dummy.Spec, "testImage")
+	_, err := docker.Pull(fake.Spec, "testImage")
 	assert.Equal(t, nil, err)
 }
 
 func (t testClient) ImageBuild(ctx context.Context, context io.Reader, options types.ImageBuildOptions) (types.ImageBuildResponse, error) {
 	return types.ImageBuildResponse{
-		Body: nil,
+		Body:   nil,
 		OSType: "",
 	}, nil
 }

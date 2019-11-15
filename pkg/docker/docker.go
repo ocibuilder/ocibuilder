@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/ocibuilder/ocibuilder/pkg"
 	"io"
 	"io/ioutil"
 	"os"
@@ -44,7 +45,7 @@ type Docker struct {
 func (d Docker) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	log := d.Logger
 	cli := d.Client
-	buildOpts, err := common.ParseBuildSpec(spec.Build)
+	buildOpts, err := pkg.ParseBuildSpec(spec.Build)
 
 	if err != nil {
 		log.WithError(err).Errorln("error in parsing build spec...")
@@ -54,7 +55,7 @@ func (d Docker) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	var buildResponses []io.ReadCloser
 	for _, opt := range buildOpts {
 
-		ctx, err := common.ReadContext(opt.Context)
+		ctx, err := common.ReadContext(opt.BuildContext)
 		if err != nil {
 			log.WithError(err).Errorln("error reading image build context")
 			continue
@@ -73,7 +74,7 @@ func (d Docker) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 			continue
 		}
 
-		if err = os.Remove(opt.Context.LocalContext.ContextPath + "/" + opt.Dockerfile); err != nil {
+		if err = os.Remove(opt.BuildContext.LocalContext.ContextPath + "/" + opt.Dockerfile); err != nil {
 			log.WithError(err).Errorln("error removing generated dockerfile")
 		}
 		buildResponses = append(buildResponses, buildResponse.Body)
@@ -101,12 +102,12 @@ func (d Docker) Login(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	var loginResponses []io.ReadCloser
 	for _, loginSpec := range spec.Login {
 		log.WithFields(logrus.Fields{"registry": loginSpec.Registry}).Infoln("attempting to login to registry")
-		username, err := common.ValidateLoginUsername(loginSpec)
+		username, err := pkg.ValidateLoginUsername(loginSpec)
 		if err != nil {
 			return nil, err
 		}
 
-		password, err := common.ValidateLoginPassword(loginSpec)
+		password, err := pkg.ValidateLoginPassword(loginSpec)
 		if err != nil {
 			return nil, err
 		}
@@ -168,7 +169,7 @@ func (d Docker) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 
 	var pushResponses []io.ReadCloser
 	for _, pushSpec := range spec.Push {
-		if err := common.ValidatePushSpec(pushSpec); err != nil {
+		if err := pkg.ValidatePushSpec(pushSpec); err != nil {
 			return nil, err
 		}
 
@@ -205,7 +206,7 @@ func (d Docker) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 
 // getPushAuthRegistryString is used to match a push registry with a passed in login specification, returning an auth string
 func getPushAuthRegistryString(registry string, spec v1alpha1.OCIBuilderSpec) (string, error) {
-	if err := common.ValidateLogin(spec); err != nil {
+	if err := pkg.ValidateLogin(spec); err != nil {
 		return "", err
 	}
 	for _, spec := range spec.Login {
@@ -222,12 +223,12 @@ func getPushAuthRegistryString(registry string, spec v1alpha1.OCIBuilderSpec) (s
 
 // encodeAuth is used to generate a base64 encoded auth string to be used in push auth
 func encodeAuth(spec v1alpha1.LoginSpec) (string, error) {
-	user, err := common.ValidateLoginUsername(spec)
+	user, err := pkg.ValidateLoginUsername(spec)
 	if err != nil {
 		return "", err
 	}
 
-	pass, err := common.ValidateLoginPassword(spec)
+	pass, err := pkg.ValidateLoginPassword(spec)
 	if err != nil {
 		return "", err
 	}

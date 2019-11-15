@@ -22,6 +22,7 @@ import "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder"
 const (
 	// EnvVarControllerConfigMap is the name of the configmap to use for the controller
 	EnvVarControllerConfigMap = "CONTROLLER_CONFIG_MAP"
+	EnvVarKubeConfig          = "KUBE_CONFIG"
 )
 
 // Controller labels

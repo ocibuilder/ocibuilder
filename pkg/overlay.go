@@ -14,18 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package common
+package pkg
 
 import (
 	"bufio"
 	"errors"
 	"fmt"
-	cmdcore "github.com/k14s/ytt/pkg/cmd/core"
-	cmdtpl "github.com/k14s/ytt/pkg/cmd/template"
-	"github.com/k14s/ytt/pkg/files"
 	"io"
 	"io/ioutil"
 	"strings"
+
+	cmdcore "github.com/k14s/ytt/pkg/cmd/core"
+	cmdtpl "github.com/k14s/ytt/pkg/cmd/template"
+	"github.com/k14s/ytt/pkg/files"
+	"github.com/ocibuilder/ocibuilder/common"
 )
 
 // YttOverlay is the struct for handling overlays using ytt library https://github.com/k14s/ytt
@@ -64,10 +66,10 @@ func (y YttOverlay) Apply() ([]byte, error) {
 
 	defer func() {
 		if r := recover(); r != nil {
-			log.Warnln("panic recovered to execute final cleanup", r)
+			common.log.Warnln("panic recovered to execute final cleanup", r)
 		}
 		if err := y.overlay.file.Close(); err != nil {
-			log.WithError(err).Errorln("error closing file")
+			common.log.WithError(err).Errorln("error closing file")
 		}
 	}()
 
