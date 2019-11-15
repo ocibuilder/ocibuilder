@@ -20,11 +20,9 @@ import (
 	"fmt"
 	"github.com/ocibuilder/ocibuilder/pkg"
 	"io"
-	"os"
 	"os/exec"
 
 	"github.com/creack/pty"
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -39,57 +37,39 @@ type Buildah struct {
 var executor = exec.Command
 
 // Build performs a buildah build and returns an array of readclosers
-func (b Buildah) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
-	log := b.Logger
+func (buildah Buildah) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	buildOpts, err := pkg.ParseBuildSpec(spec.Build)
-
 	if err != nil {
-		log.WithError(err).Errorln("failed to parse build spec...")
-		return nil, err
+		return nil, errors.Wrapf(err, "failed to parse the build specification")
 	}
-
 	var buildResponses []io.ReadCloser
 	for _, opt := range buildOpts {
-		imageName := fmt.Sprintf("%s:%s", opt.Name, opt.Tag)
-		opt.BuildContext = common.ValidateContext(opt.BuildContext)
-
-		fullPath := opt.BuildContext.LocalContext.ContextPath + "/" + opt.Dockerfile
-		if opt.BuildContext.LocalContext.ContextPath == "" {
-			fullPath = "." + fullPath
-		}
-
-		buildCommand := createBuildCommand(opt, b.StorageDriver)
-		log.WithField("command", buildCommand).Debug("build command to be executed")
-
+		buildCommand := createBuildCommand(opt, buildah.StorageDriver)
+		buildah.Logger.WithField("command", buildCommand).Debug("build command to be executed")
 		cmd := executor("buildah", buildCommand...)
 		out, err := pty.Start(cmd)
 		if err != nil {
-			log.WithError(err).Errorln("failed to execute buildah bud...")
-			return nil, err
+			return nil, errors.Wrapf(err, "failed to execute buildah build")
 		}
+
 		buildResponses = append(buildResponses, out)
 
 		if err := cmd.Wait(); err != nil {
-			log.WithError(err).Errorln("error waiting for cmd execution")
-			return nil, err
+			return nil, errors.Wrapf(err, "error waiting for cmd execution")
 		}
-
-		log.WithField("filepath", fullPath).Debugln("attempting to cleanup dockerfile")
-		if err := os.Remove(fullPath); err != nil {
-			log.WithError(err).Errorln("failed to remove dockerfile")
-		}
-
 		if opt.Purge {
+			imageName := fmt.Sprintf("%s:%s", opt.Name, opt.Tag)
 			purgeCommand := createPurgeCommand(imageName)
-			log.WithFields(logrus.Fields{"command": purgeCommand, "image": imageName}).Debug("purge command to be executed")
-
+			buildah.Logger.WithFields(logrus.Fields{
+				"command": purgeCommand,
+				"image":   imageName,
+			}).Debug("purge command to be executed")
 			cmd = executor("buildah", purgeCommand...)
 			out, err = pty.Start(cmd)
 			if err != nil {
-				log.WithError(err).Errorln("failed to execute purge")
-				return nil, err
+				return nil, errors.Wrapf(err, "failed to execute purge")
 			}
-			log.WithField("response", out).Infoln("images purged")
+			buildah.Logger.WithField("response", out).Infoln("images purged")
 		}
 	}
 	return buildResponses, nil
@@ -118,8 +98,8 @@ func createBuildCommand(args v1alpha1.ImageBuildArgs, storageDriver string) []st
 }
 
 // Login performs a buildah login on all registries defined in spec.yaml or login.yaml
-func (b Buildah) Login(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
-	log := b.Logger
+func (buildah Buildah) Login(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
+	log := buildah.Logger
 
 	if err := pkg.ValidateLogin(spec); err != nil {
 		return nil, err
@@ -178,10 +158,10 @@ func createLoginCommand(args v1alpha1.LoginSpec) ([]string, error) {
 // Pull performs a buildah pull of a passed in image name. Pull will login to all
 // registries specified in the 'login' spec and attempt to pull the image
 // uses buildah login to login to directories specified
-func (b Buildah) Pull(spec v1alpha1.OCIBuilderSpec, imageName string) ([]io.ReadCloser, error) {
-	log := b.Logger
+func (buildah Buildah) Pull(spec v1alpha1.OCIBuilderSpec, imageName string) ([]io.ReadCloser, error) {
+	log := buildah.Logger
 
-	if _, err := b.Login(spec); err != nil {
+	if _, err := buildah.Login(spec); err != nil {
 		log.WithError(err).Errorln("error attempting to login")
 		return nil, err
 	}
@@ -231,10 +211,10 @@ func createPullCommand(imageName string, registry string) ([]string, error) {
 
 // Push performs a buildah push of a spec image to a chosen registry
 // uses buildah login to login to directories specified
-func (b Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
-	log := b.Logger
+func (buildah Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
+	log := buildah.Logger
 
-	if _, err := b.Login(spec); err != nil {
+	if _, err := buildah.Login(spec); err != nil {
 		log.WithError(err).Errorln("error attempting to login")
 		return nil, err
 	}
