@@ -21,110 +21,89 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"github.com/ocibuilder/ocibuilder/pkg"
 	"io"
 	"io/ioutil"
 	"os"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
-	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/pkg"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
-// Docker is a struct which consists of an instance of logger, docker client and context path
+// Docker contains configuration required to perform docker operations
 type Docker struct {
+	// Logger to log stuff
 	Logger *logrus.Logger
+	// Client is the Docker API client
 	Client client.APIClient
 }
 
 // Build is used to execute docker build and optionally purge the image after the build
-func (d Docker) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
-	log := d.Logger
-	cli := d.Client
-	buildOpts, err := pkg.ParseBuildSpec(spec.Build)
-
-	if err != nil {
-		log.WithError(err).Errorln("error in parsing build spec...")
-		return nil, err
-	}
-
+func (d *Docker) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	var buildResponses []io.ReadCloser
+	buildOpts, err := pkg.ParseBuildSpec(spec.Build)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to parse the build specification")
+	}
 	for _, opt := range buildOpts {
-
-		ctx, err := common.ReadContext(opt.BuildContext)
+		buildCtx, err := os.Open(opt.BuildContextPath)
 		if err != nil {
-			log.WithError(err).Errorln("error reading image build context")
-			continue
+			return nil, err
 		}
-
 		imageName := fmt.Sprintf("%s:%s", opt.Name, opt.Tag)
-
 		dockerOpt := types.ImageBuildOptions{
 			Dockerfile: opt.Dockerfile,
 			Tags:       []string{imageName},
-			Context:    ctx,
+			Context:    buildCtx,
 		}
-		buildResponse, err := cli.ImageBuild(context.Background(), ctx, dockerOpt)
+		buildResponse, err := d.Client.ImageBuild(context.Background(), buildCtx, dockerOpt)
 		if err != nil {
-			log.WithError(err).Errorln("error building image...")
-			continue
+			return nil, errors.Wrapf(err, "failed to build the image for step %s", opt.Name)
 		}
-
-		if err = os.Remove(opt.BuildContext.LocalContext.ContextPath + "/" + opt.Dockerfile); err != nil {
-			log.WithError(err).Errorln("error removing generated dockerfile")
+		if err = os.Remove(opt.BuildContextPath + "/" + opt.Dockerfile); err != nil {
+			d.Logger.WithError(err).WithField("step", opt.Name).Errorln("error removing generated dockerfile")
 		}
 		buildResponses = append(buildResponses, buildResponse.Body)
-
 		if opt.Purge {
-			res, err := cli.ImageRemove(context.Background(), imageName, types.ImageRemoveOptions{})
+			res, err := d.Client.ImageRemove(context.Background(), imageName, types.ImageRemoveOptions{})
 			if err != nil {
-				log.WithError(err).Errorln("unable to purge image after build")
-				return nil, err
+				return nil, errors.Wrapf(err, "failed to purge the image for step %s", opt.Name)
 			}
-			log.WithFields(logrus.Fields{"response": res}).Infoln("images purged")
+			d.Logger.WithField("response", res).Infoln("images purged")
 		}
-
 	}
-
 	return buildResponses, nil
 }
 
 // Login is used to login to the docker registry/registries
 // TODO: review this functionality, login user docker client for go doesn't stick or is inconsistent
-func (d Docker) Login(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
-	log := d.Logger
-	cli := d.Client
-
+func (d *Docker) Login(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	var loginResponses []io.ReadCloser
 	for _, loginSpec := range spec.Login {
-		log.WithFields(logrus.Fields{"registry": loginSpec.Registry}).Infoln("attempting to login to registry")
+		d.Logger.WithField("registry", loginSpec.Registry).Infoln("attempting to login to registry...")
 		username, err := pkg.ValidateLoginUsername(loginSpec)
 		if err != nil {
 			return nil, err
 		}
-
 		password, err := pkg.ValidateLoginPassword(loginSpec)
 		if err != nil {
 			return nil, err
 		}
-
 		if loginSpec.Registry == "" {
 			return nil, errors.New("no registry has been specified for login")
 		}
-
 		authCfg := types.AuthConfig{
 			Username:      username,
 			Password:      password,
 			ServerAddress: loginSpec.Registry,
 		}
-		authBody, err := cli.RegistryLogin(context.Background(), authCfg)
+		authBody, err := d.Client.RegistryLogin(context.Background(), authCfg)
 		if err != nil {
-			log.WithError(err).Errorln("failed to login to registry...")
-			return nil, err
+			return nil, errors.Wrapf(err, "failed to log into registry %s", loginSpec.Registry)
 		}
 		loginResponses = append(loginResponses, ioutil.NopCloser(bytes.NewBufferString(authBody.Status)))
 	}
@@ -132,74 +111,55 @@ func (d Docker) Login(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 }
 
 // Pull is used to authenticate with the docker registry and pull an image from the docker registry
-func (d Docker) Pull(spec v1alpha1.OCIBuilderSpec, imageName string) ([]io.ReadCloser, error) {
-	log := d.Logger
-	cli := d.Client
-
+func (d *Docker) Pull(spec v1alpha1.OCIBuilderSpec, imageName string) ([]io.ReadCloser, error) {
 	var pullResponses []io.ReadCloser
 	for _, loginSpec := range spec.Login {
 		registry := loginSpec.Registry
 		if registry != "" {
 			registry = registry + "/"
 		}
-
 		authStr, err := encodeAuth(loginSpec)
 		if err != nil {
 			return nil, err
 		}
-
-		pullResponse, err := cli.ImagePull(context.Background(), registry+imageName, types.ImagePullOptions{
+		pullResponse, err := d.Client.ImagePull(context.Background(), registry+imageName, types.ImagePullOptions{
 			RegistryAuth: authStr,
 		})
-
 		if err != nil {
-			log.WithError(err).Errorln("failed to pull image")
-			return nil, err
+			return nil, errors.Wrapf(err, "image pull failed for %s", imageName)
 		}
 		pullResponses = append(pullResponses, pullResponse)
-		log.Infoln("docker pull has been executed successfully")
+		d.Logger.WithField("image", imageName).Infoln("docker pull has been executed successfully")
 	}
 	return pullResponses, nil
 }
 
 // Push is used to push an image to a docker registry with authentication
 func (d Docker) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
-	log := d.Logger
-	cli := d.Client
-
 	var pushResponses []io.ReadCloser
 	for _, pushSpec := range spec.Push {
 		if err := pkg.ValidatePushSpec(pushSpec); err != nil {
 			return nil, err
 		}
-
 		pushImageName := fmt.Sprintf("%s/%s:%s", pushSpec.Registry, pushSpec.Image, pushSpec.Tag)
-		log.WithField("name:", pushImageName).Infoln("pushing image")
-
+		d.Logger.WithField("name", pushImageName).Infoln("pushing image")
 		authString, err := getPushAuthRegistryString(pushSpec.Registry, spec)
 		if err != nil {
-			log.WithError(err).Errorln("unable to find login spec")
+			return nil, errors.Wrapf(err, "failed to get the login credentials for the registry %s", pushSpec.Registry)
 		}
-
-		pushResponse, err := cli.ImagePush(context.Background(), pushImageName, types.ImagePushOptions{
+		pushResponse, err := d.Client.ImagePush(context.Background(), pushImageName, types.ImagePushOptions{
 			RegistryAuth: authString,
 		})
 		if err != nil {
-			log.WithError(err).Errorln("failed to push image")
-			return nil, err
+			return nil, errors.Wrapf(err, "failed to push the image %s", pushImageName)
 		}
-
 		if pushSpec.Purge {
-			res, err := cli.ImageRemove(context.Background(), pushImageName, types.ImageRemoveOptions{})
-			if err != nil {
-				log.WithError(err).Errorln("unable to purge image after push")
-				return nil, err
+			if _, err := d.Client.ImageRemove(context.Background(), pushImageName, types.ImageRemoveOptions{}); err != nil {
+				return nil, errors.Wrapf(err, "failed to purge the image %s after push", pushImageName)
 			}
-			log.WithFields(logrus.Fields{"response": res}).Infoln("images purged")
+			d.Logger.WithField("image", pushImageName).Infoln("image purged")
 		}
-
 		pushResponses = append(pushResponses, pushResponse)
-		log.Infoln("docker push has been executed successfully")
 	}
 	return pushResponses, nil
 }
@@ -218,7 +178,7 @@ func getPushAuthRegistryString(registry string, spec v1alpha1.OCIBuilderSpec) (s
 			return authStr, nil
 		}
 	}
-	return "", errors.New("no auth credentials matching registry: " + registry + " found")
+	return "", errors.Errorf("no auth credentials matching registry %s found", registry)
 }
 
 // encodeAuth is used to generate a base64 encoded auth string to be used in push auth
@@ -227,22 +187,18 @@ func encodeAuth(spec v1alpha1.LoginSpec) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
 	pass, err := pkg.ValidateLoginPassword(spec)
 	if err != nil {
 		return "", err
 	}
-
 	authConfig := types.AuthConfig{
 		Username: user,
 		Password: pass,
 	}
-
 	encodedJSON, err := json.Marshal(authConfig)
 	if err != nil {
 		return "", err
 	}
-
 	authStr := base64.URLEncoding.EncodeToString(encodedJSON)
 	return authStr, nil
 }

@@ -20,9 +20,9 @@ import (
 	"io"
 	"os"
 
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/docker/pkg/term"
+	"github.com/ocibuilder/ocibuilder/common"
 )
 
 var log = common.GetLogger(false)
