@@ -13,6 +13,7 @@ The **ocibuilder** offers a command line tool called the **ocictl** to build, pu
 * Parameterize build configuration at runtime with environment variable support.
 * Supports [distroless](https://github.com/GoogleContainerTools/distroless) to produce lean images.
 * Supports [ansible roles](https://docs.ansible.com/) as build stage.
+* Supports build contexts like Local Filesystem, Git, S3, Google Cloud Storage, Azure Storage Blob, Aliyun OSS
 * All basic features like registry login, pulling and pushing images from/to multiple registries.
 
 ## Architecture
