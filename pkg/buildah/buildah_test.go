@@ -22,7 +22,6 @@ import (
 	"testing"
 
 	"github.com/ocibuilder/ocibuilder/common"
-	"github.com/ocibuilder/ocibuilder/common/context"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/fake"
 	"github.com/stretchr/testify/assert"
@@ -115,13 +114,10 @@ func TestCreatePushCommand(t *testing.T) {
 }
 
 var buildArgs = v1alpha1.ImageBuildArgs{
-	Name:       "image-name",
-	Tag:        "1.0.0",
-	Dockerfile: "path/to/Dockerfile",
-	BuildContext: v1alpha1.BuildContext{
-		LocalContext: &context.LocalContext{
-			ContextPath: ".",
-		}},
+	Name:             "image-name",
+	Tag:              "1.0.0",
+	Dockerfile:       "path/to/Dockerfile",
+	BuildContextPath: ".",
 }
 
 // enabling the mocking of exec commands as in https://npf.io/2015/06/testing-exec-command/
