@@ -94,7 +94,6 @@ func readIndividualSpecs(spec *v1alpha1.OCIBuilderSpec, path string) error {
 			common.Logger.WithError(err).Errorln("failed to unmarshal push.yaml")
 			return err
 		}
-
 		spec.Push = pushSpec
 	}
 	return nil
@@ -103,12 +102,10 @@ func readIndividualSpecs(spec *v1alpha1.OCIBuilderSpec, path string) error {
 // applyOverlay applys a ytt overalay to the specification
 func applyOverlay(yamlTemplate []byte, overlayPath string) ([]byte, error) {
 	file, err := os.Open(overlayPath)
-
 	if err != nil {
 		common.Logger.WithError(err).Errorln("unable to read overlay file...")
 		return nil, err
 	}
-
 	yttOverlay := YttOverlay{
 		spec: yamlTemplate,
 		overlay: OverlayFile{
@@ -116,13 +113,11 @@ func applyOverlay(yamlTemplate []byte, overlayPath string) ([]byte, error) {
 			file: file,
 		},
 	}
-
 	overlayedSpec, err := yttOverlay.Apply()
 	if err != nil {
 		common.Logger.WithError(err).Errorln("unable to apply overlay to spec...")
 		return nil, err
 	}
-
 	return overlayedSpec, nil
 }
 
@@ -131,7 +126,6 @@ func applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error {
 	if err != nil {
 		return err
 	}
-
 	for _, param := range spec.Params {
 		if param.Value != "" {
 			tmp, err := sjson.SetBytes(specJson, param.Dest, param.Value)
@@ -145,7 +139,6 @@ func applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error {
 			if val == "" {
 				common.Logger.Warn("env variable ", param.ValueFromEnvVariable, " is empty")
 			}
-
 			tmp, err := sjson.SetBytes(specJson, param.Dest, val)
 			if err != nil {
 				return err
@@ -153,7 +146,6 @@ func applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error {
 			specJson = tmp
 		}
 	}
-
 	if err := json.Unmarshal(specJson, spec); err != nil {
 		return err
 	}
