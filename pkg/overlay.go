@@ -49,7 +49,6 @@ func (y YttOverlay) Apply() ([]byte, error) {
 	if y.spec == nil {
 		return nil, errors.New("spec file is not defined, overlays is currently only supported for spec.yaml files")
 	}
-
 	annotatedOverlay := addYttAnnotations(y.overlay.file)
 	if annotatedOverlay == nil {
 		overlay, err := ioutil.ReadFile(y.overlay.path)
@@ -58,7 +57,6 @@ func (y YttOverlay) Apply() ([]byte, error) {
 		}
 		annotatedOverlay = overlay
 	}
-
 	filesToProcess := []*files.File{
 		files.MustNewFileFromSource(files.NewBytesSource("spec.yaml", y.spec)),
 		files.MustNewFileFromSource(files.NewBytesSource(y.overlay.path, annotatedOverlay)),
@@ -75,12 +73,10 @@ func (y YttOverlay) Apply() ([]byte, error) {
 
 	ui := cmdcore.NewPlainUI(false)
 	opts := cmdtpl.NewOptions()
-
 	out := opts.RunWithFiles(cmdtpl.TemplateInput{Files: filesToProcess}, ui)
 	if out.Err != nil {
 		return nil, out.Err
 	}
-
 	return out.Files[0].Bytes(), nil
 }
 
@@ -104,12 +100,10 @@ func addYttAnnotations(overlay io.ReadCloser) []byte {
 		if idx == 0 && strings.TrimSpace(scanner.Text()) == yttOverlayIdentifier {
 			return nil
 		}
-
 		if strings.TrimSpace(scanner.Text()) == "- metadata:" {
 			addTempToAnnotate()
 			tempSegment = nil
 		}
-
 		if strings.Contains(scanner.Text(), "overlay:") {
 			annotation := retrieveAnnotation(scanner.Text())
 
@@ -117,7 +111,6 @@ func addYttAnnotations(overlay io.ReadCloser) []byte {
 			addTempToAnnotate()
 			tempSegment = nil
 		}
-
 		tempSegment = append(tempSegment, scanner.Text())
 		idx++
 	}

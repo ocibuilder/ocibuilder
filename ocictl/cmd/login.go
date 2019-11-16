@@ -18,12 +18,12 @@ package cmd
 
 import (
 	"errors"
-	"github.com/ocibuilder/ocibuilder/pkg"
 	"io"
 
 	"github.com/docker/docker/client"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/ocictl/pkg/utils"
+	"github.com/ocibuilder/ocibuilder/pkg"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/buildah"
 	"github.com/ocibuilder/ocibuilder/pkg/docker"
@@ -67,58 +67,51 @@ func (l *loginCmd) run(args []string) error {
 	}
 
 	switch v1alpha1.Framework(l.builder) {
-
 	case v1alpha1.DockerFramework:
-		{
-			cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-			if err != nil {
-				log.WithError(err).Errorln("failed to fetch docker client")
-				return err
-			}
-
-			d := docker.Docker{
-				Client: cli,
-				Logger: common.GetLogger(l.debug),
-			}
-
-			out, err := d.Login(ociBuilderSpec)
-			if err != nil {
-				log.WithError(err).Errorln("failed to login to registry")
-				return err
-			}
-
-			for _, readCloser := range out {
-				if err := utils.Output(readCloser); err != nil {
-					return err
-				}
-			}
-			log.Infoln("docker login completed")
+		cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+		if err != nil {
+			log.WithError(err).Errorln("failed to fetch docker client")
+			return err
 		}
+
+		d := docker.Docker{
+			Client: cli,
+			Logger: common.GetLogger(l.debug),
+		}
+
+		out, err := d.Login(ociBuilderSpec)
+		if err != nil {
+			log.WithError(err).Errorln("failed to login to registry")
+			return err
+		}
+
+		for _, readCloser := range out {
+			if err := utils.Output(readCloser); err != nil {
+				return err
+			}
+		}
+		log.Infoln("docker login completed")
 
 	case v1alpha1.BuildahFramework:
-		{
-			b := buildah.Buildah{
-				Logger: common.GetLogger(l.debug),
-			}
+		b := buildah.Buildah{
+			Logger: common.GetLogger(l.debug),
+		}
 
-			out, err := b.Login(ociBuilderSpec)
-			if err != nil {
-				log.WithError(err).Errorln("failed to login to registry")
+		out, err := b.Login(ociBuilderSpec)
+		if err != nil {
+			log.WithError(err).Errorln("failed to login to registry")
+			return err
+		}
+
+		for _, readCloser := range out {
+			if err := utils.Output(readCloser); err != nil {
 				return err
 			}
-
-			for _, readCloser := range out {
-				if err := utils.Output(readCloser); err != nil {
-					return err
-				}
-			}
-			log.Infoln("buildah login completed")
 		}
+		log.Infoln("buildah login completed")
 
 	default:
-		{
-			return errors.New("invalid builder specified, try --builder=docker or --builder=buildah")
-		}
+		return errors.New("invalid builder specified, try --builder=docker or --builder=buildah")
 	}
 	return nil
 }

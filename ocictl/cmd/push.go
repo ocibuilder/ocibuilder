@@ -74,57 +74,49 @@ func (p *pushCmd) run(args []string) error {
 	}
 
 	switch v1alpha1.Framework(p.builder) {
-
 	case v1alpha1.DockerFramework:
-		{
-			cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-			if err != nil {
-				log.WithError(err).Errorln("failed to fetch docker client")
-				return err
-			}
-			d := docker.Docker{
-				Client: cli,
-				Logger: common.GetLogger(p.debug),
-			}
-			res, err := d.Push(ociBuilderSpec)
-			if err != nil {
-				return err
-			}
-
-			for idx, imageResponse := range res {
-				log.WithField("step: ", idx).Infoln("running push step")
-				err := utils.OutputJson(imageResponse)
-				if err != nil {
-					return err
-				}
-			}
-			log.Infoln("docker push complete")
+		cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+		if err != nil {
+			log.WithError(err).Errorln("failed to fetch docker client")
+			return err
 		}
+		d := docker.Docker{
+			Client: cli,
+			Logger: common.GetLogger(p.debug),
+		}
+		res, err := d.Push(ociBuilderSpec)
+		if err != nil {
+			return err
+		}
+
+		for idx, imageResponse := range res {
+			log.WithField("step: ", idx).Infoln("running push step")
+			err := utils.OutputJson(imageResponse)
+			if err != nil {
+				return err
+			}
+		}
+		log.Infoln("docker push complete")
 
 	case v1alpha1.BuildahFramework:
-		{
-			b := buildah.Buildah{
-				Logger: common.GetLogger(p.debug),
-			}
-			res, err := b.Push(ociBuilderSpec)
-			if err != nil {
+		b := buildah.Buildah{
+			Logger: common.GetLogger(p.debug),
+		}
+		res, err := b.Push(ociBuilderSpec)
+		if err != nil {
+			return err
+		}
+
+		for idx, imageResponse := range res {
+			log.WithField("step: ", idx).Infoln("running push step")
+			if err := utils.Output(imageResponse); err != nil {
 				return err
 			}
-
-			for idx, imageResponse := range res {
-				log.WithField("step: ", idx).Infoln("running push step")
-				if err := utils.Output(imageResponse); err != nil {
-					return err
-				}
-			}
-			log.Infoln("buildah push complete")
 		}
+		log.Infoln("buildah push complete")
 
 	default:
-		{
-			return errors.New("invalid builder specified, try --builder=docker or --builder=buildah")
-		}
-
+		return errors.New("invalid builder specified, try --builder=docker or --builder=buildah")
 	}
 	return nil
 }

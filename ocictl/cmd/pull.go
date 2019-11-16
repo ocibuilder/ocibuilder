@@ -74,58 +74,50 @@ func (p *pullCmd) run(args []string) error {
 	}
 
 	switch v1alpha1.Framework(p.builder) {
-
 	case v1alpha1.DockerFramework:
-		{
-			cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-			if err != nil {
-				log.WithError(err).Errorln("failed to fetch docker client")
-				return err
-			}
-
-			d := docker.Docker{
-				Client: cli,
-				Logger: common.GetLogger(p.debug),
-			}
-			res, err := d.Pull(ociBuilderSpec, p.name)
-			if err != nil {
-				return err
-			}
-
-			for idx, imageResponse := range res {
-				log.WithField("step: ", idx).Infoln("running pull step")
-				err := utils.OutputJson(imageResponse)
-				if err != nil {
-					return err
-				}
-			}
-			log.Infoln("docker pull completed")
+		cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+		if err != nil {
+			log.WithError(err).Errorln("failed to fetch docker client")
+			return err
 		}
+
+		d := docker.Docker{
+			Client: cli,
+			Logger: common.GetLogger(p.debug),
+		}
+		res, err := d.Pull(ociBuilderSpec, p.name)
+		if err != nil {
+			return err
+		}
+
+		for idx, imageResponse := range res {
+			log.WithField("step: ", idx).Infoln("running pull step")
+			err := utils.OutputJson(imageResponse)
+			if err != nil {
+				return err
+			}
+		}
+		log.Infoln("docker pull completed")
 
 	case v1alpha1.BuildahFramework:
-		{
-			b := buildah.Buildah{
-				Logger: common.GetLogger(p.debug),
-			}
-			res, err := b.Pull(ociBuilderSpec, p.name)
-			if err != nil {
+		b := buildah.Buildah{
+			Logger: common.GetLogger(p.debug),
+		}
+		res, err := b.Pull(ociBuilderSpec, p.name)
+		if err != nil {
+			return err
+		}
+
+		for idx, imageResponse := range res {
+			log.WithField("step: ", idx).Infoln("running pull step")
+			if err := utils.Output(imageResponse); err != nil {
 				return err
 			}
-
-			for idx, imageResponse := range res {
-				log.WithField("step: ", idx).Infoln("running pull step")
-				if err := utils.Output(imageResponse); err != nil {
-					return err
-				}
-			}
-			log.Infoln("buildah pull completed")
 		}
+		log.Infoln("buildah pull completed")
 
 	default:
-		{
-			return errors.New("invalid builder specified, try --builder=docker or --builder=buildah")
-		}
+		return errors.New("invalid builder specified, try --builder=docker or --builder=buildah")
 	}
-
 	return nil
 }
