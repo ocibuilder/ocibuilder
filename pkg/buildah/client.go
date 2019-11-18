@@ -26,7 +26,7 @@ func (cli Client) ImageBuild(options v1alpha1.OCIBuildOptions) (types.ImageBuild
 	cmd := common.Builder("buildah").Command("bud").Flags(buildFlags...).Args(options.ContextPath).Build()
 	cli.Logger.WithField("cmd", cmd).Debugln("executing build with command")
 
-	out, err := cmd.Exec()
+	out, err := execute(cmd)
 	if err != nil {
 		cli.Logger.WithError(err).Errorln("error building image...")
 		return types.ImageBuildResponse{}, err
@@ -46,7 +46,7 @@ func (cli Client) ImagePull(options v1alpha1.OCIPullOptions) (io.ReadCloser, err
 	cmd := common.Builder("buildah").Command("pull").Flags(pullFlags...).Args(options.Ref).Build()
 	cli.Logger.WithField("cmd", cmd).Debugln("executing pull with command")
 
-	out, err := cmd.Exec()
+	out, err := execute(cmd)
 	if err != nil {
 		cli.Logger.WithError(err).Errorln("error building image...")
 		return nil, err
@@ -64,7 +64,7 @@ func (cli Client) ImagePush(options v1alpha1.OCIPushOptions) (io.ReadCloser, err
 	cmd := common.Builder("buildah").Command("push").Flags(pushFlags...).Args(options.Ref).Build()
 	cli.Logger.WithField("cmd", cmd).Debugln("executing push with command")
 
-	out, err := cmd.Exec()
+	out, err := execute(cmd)
 	if err != nil {
 		cli.Logger.WithError(err).Errorln("error building image...")
 		return nil, err
@@ -77,7 +77,7 @@ func (cli Client) ImageRemove(options v1alpha1.OCIRemoveOptions) ([]types.ImageD
 	cmd := common.Builder("buildah").Command("rmi").Args(options.Image).Build()
 	cli.Logger.WithField("cmd", cmd).Debugln("executing remove with command")
 
-	_, err := cmd.Exec()
+	_, err := execute(cmd)
 	if err != nil {
 		cli.Logger.WithError(err).Errorln("error building image...")
 		return nil, err
@@ -99,7 +99,7 @@ func (cli Client) RegistryLogin(options v1alpha1.OCILoginOptions) (registry.Auth
 	cmd := common.Builder("buildah").Command("login").Flags(loginFlags...).Args(options.ServerAddress).Build()
 	cli.Logger.WithField("cmd", cmd).Debugln("executing login with command")
 
-	_, err := cmd.Exec()
+	_, err := execute(cmd)
 	if err != nil {
 		cli.Logger.WithError(err).Errorln("error building image...")
 		return registry.AuthenticateOKBody{}, err
@@ -112,4 +112,9 @@ func (cli Client) RegistryLogin(options v1alpha1.OCILoginOptions) (registry.Auth
 
 func (cli Client) GenerateAuthRegistryString(auth types.AuthConfig) string {
 	return fmt.Sprintf("%s:%s", auth.Username, auth.Password)
+}
+
+// Execute executes the buildah command. This function is mocked in buildah client tests.
+var execute = func(cmd common.Command) (io.ReadCloser, error) {
+	return cmd.Exec()
 }
