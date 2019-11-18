@@ -5,11 +5,10 @@ import (
 	"io"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/docker/docker/api/types"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_ImageBuild(t *testing.T) {
