@@ -45,7 +45,7 @@ To learn more about the ocibuilder and how to get started take a look at our [qu
 
 View our complete [documentation](https://ocibuilder.github.io/docs/).
 
-The ocibuilder.yaml specification file documentation with all fields available with examples can be found [here](https://ocibuilder.github.io/docs/specification/specification/).
+The ocibuilder.yaml specification file with all fields available and examples is documented [here](https://ocibuilder.github.io/docs/specification/specification/).
 
 ## Roadmap
 Take a look at our roadmap and features in developement [here](https://github.com/ocibuilder/ocibuilder/blob/master/ROADMAP.md)
