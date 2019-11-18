@@ -23,7 +23,7 @@ func (cli Client) ImageBuild(options v1alpha1.OCIBuildOptions) (types.ImageBuild
 		{"s", options.StorageDriver, true},
 	}
 
-	cmd := common.Builder("buildah").Command("build").Flags(buildFlags...).Args(options.ContextPath).Build()
+	cmd := common.Builder("buildah").Command("bud").Flags(buildFlags...).Args(options.ContextPath).Build()
 	cli.Logger.WithField("cmd", cmd).Debugln("executing build with command")
 
 	out, err := cmd.Exec()

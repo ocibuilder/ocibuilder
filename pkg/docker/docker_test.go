@@ -17,16 +17,11 @@ limitations under the License.
 package docker
 
 import (
-	"io"
 	"testing"
 
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/registry"
-	"github.com/docker/docker/client"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/dummy"
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/net/context"
 )
 
 var docker = Docker{
@@ -57,30 +52,4 @@ func TestDocker_Push(t *testing.T) {
 func TestDocker_Pull(t *testing.T) {
 	_, err := docker.Pull(dummy.Spec, "testImage")
 	assert.Equal(t, nil, err)
-}
-
-func (t testClient) ImageBuild(ctx context.Context, context io.Reader, options types.ImageBuildOptions) (types.ImageBuildResponse, error) {
-	return types.ImageBuildResponse{
-		Body: nil,
-		OSType: "",
-	}, nil
-}
-
-func (t testClient) ImagePull(ctx context.Context, ref string, options types.ImagePullOptions) (io.ReadCloser, error) {
-	return nil, nil
-}
-
-func (t testClient) ImagePush(ctx context.Context, ref string, options types.ImagePushOptions) (io.ReadCloser, error) {
-	return nil, nil
-}
-
-func (t testClient) RegistryLogin(ctx context.Context, auth types.AuthConfig) (registry.AuthenticateOKBody, error) {
-	return registry.AuthenticateOKBody{
-		IdentityToken: "",
-		Status:        "",
-	}, nil
-}
-
-type testClient struct {
-	client.APIClient
 }

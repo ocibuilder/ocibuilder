@@ -4,6 +4,8 @@ import (
 	"os"
 	"os/exec"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var builder = Builder("buildah")
@@ -12,10 +14,12 @@ func TestExec(t *testing.T) {
 	executor = fakeExecCommand
 	defer func() { executor = exec.Command }()
 
-	builder.Command("build").Flags(Flag{
-		flag:  "f",
-		value: "./Dockerfile",
+	_, err := builder.Command("build").Flags(Flag{
+		Name:  "f",
+		Value: "./Dockerfile",
+		Short: true,
 	}).Args(".").Build().Exec()
+	assert.Equal(t, nil, err)
 }
 
 // enabling the mocking of exec commands as in https://npf.io/2015/06/testing-exec-command/

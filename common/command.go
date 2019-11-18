@@ -68,7 +68,6 @@ func (c *Command) Exec() (io.ReadCloser, error) {
 	command := c.constructCommand()
 	cmd := executor(c.name, command...)
 	stdout, _ := cmd.StdoutPipe()
-
 	if err := cmd.Start(); err != nil {
 		return nil, err
 	}
