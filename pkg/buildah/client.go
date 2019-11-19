@@ -18,9 +18,9 @@ type Client struct {
 func (cli Client) ImageBuild(options v1alpha1.OCIBuildOptions) (types.ImageBuildResponse, error) {
 
 	buildFlags := []common.Flag{
+		{"storage-driver", options.StorageDriver, false},
 		{"f", options.Dockerfile, true},
 		{"t", options.Tags[0], true},
-		{"storage-driver", options.StorageDriver, false},
 	}
 
 	cmd := common.Builder("buildah").Command("bud").Flags(buildFlags...).Args(options.ContextPath).Build()
