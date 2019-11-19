@@ -62,6 +62,13 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 			return
 		}
 		res <- buildResponse
+		if buildResponse.Exec != nil {
+			log.Debugln("executing wait on build response")
+			if err := buildResponse.Exec.Wait(); err != nil {
+				errChan <- err
+				return
+			}
+		}
 
 		if opt.Purge {
 			if err := b.Purge(imageName); err != nil {

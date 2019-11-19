@@ -35,7 +35,7 @@ func (cli Client) ImageBuild(options v1alpha1.OCIBuildOptions) (v1alpha1.OCIBuil
 		ImageBuildResponse: types.ImageBuildResponse{
 			Body: out,
 		},
-		Exec: cmd,
+		Exec: &cmd,
 	}, nil
 }
 
@@ -56,7 +56,7 @@ func (cli Client) ImagePull(options v1alpha1.OCIPullOptions) (v1alpha1.OCIPullRe
 	}
 	return v1alpha1.OCIPullResponse{
 		Body: out,
-		Exec: cmd,
+		Exec: &cmd,
 	}, nil
 }
 
@@ -77,7 +77,7 @@ func (cli Client) ImagePush(options v1alpha1.OCIPushOptions) (v1alpha1.OCIPushRe
 	}
 	return v1alpha1.OCIPushResponse{
 		Body: out,
-		Exec: cmd,
+		Exec: &cmd,
 	}, nil
 }
 
@@ -97,7 +97,7 @@ func (cli Client) ImageRemove(options v1alpha1.OCIRemoveOptions) (v1alpha1.OCIRe
 				Deleted: options.Image,
 			},
 		},
-		Exec: cmd,
+		Exec: &cmd,
 	}, nil
 }
 
@@ -121,7 +121,7 @@ func (cli Client) RegistryLogin(options v1alpha1.OCILoginOptions) (v1alpha1.OCIL
 		AuthenticateOKBody: registry.AuthenticateOKBody{
 			Status: "login completed",
 		},
-		Exec: cmd,
+		Exec: &cmd,
 	}, nil
 }
 

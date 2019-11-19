@@ -98,6 +98,8 @@ func (b *buildCmd) run(args []string) error {
 				APIClient: apiClient,
 				Logger:    logger,
 			}
+
+			ociBuilderSpec.Daemon = true
 		}
 
 	case v1alpha1.BuildahFramework:
@@ -105,6 +107,8 @@ func (b *buildCmd) run(args []string) error {
 			cli = buildah.Client{
 				Logger: logger,
 			}
+
+			ociBuilderSpec.Daemon = false
 		}
 
 	default:
