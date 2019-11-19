@@ -8,11 +8,12 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/command"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_ImageBuild(t *testing.T) {
-	execute = func(cmd common.Command) (io.ReadCloser, error) {
+	execute = func(cmd command.Command) (io.ReadCloser, error) {
 		assert.Equal(t, expectedBuildCommand, cmd)
 		return nil, nil
 	}
@@ -21,7 +22,7 @@ func TestClient_ImageBuild(t *testing.T) {
 }
 
 func TestClient_ImagePull(t *testing.T) {
-	execute = func(cmd common.Command) (io.ReadCloser, error) {
+	execute = func(cmd command.Command) (io.ReadCloser, error) {
 		assert.Equal(t, expectedPullCommand, cmd)
 		return nil, nil
 	}
@@ -31,7 +32,7 @@ func TestClient_ImagePull(t *testing.T) {
 }
 
 func TestClient_ImagePush(t *testing.T) {
-	execute = func(cmd common.Command) (io.ReadCloser, error) {
+	execute = func(cmd command.Command) (io.ReadCloser, error) {
 		assert.Equal(t, expectedPushCommand, cmd)
 		return nil, nil
 	}
@@ -41,7 +42,7 @@ func TestClient_ImagePush(t *testing.T) {
 }
 
 func TestClient_ImageRemove(t *testing.T) {
-	execute = func(cmd common.Command) (io.ReadCloser, error) {
+	execute = func(cmd command.Command) (io.ReadCloser, error) {
 		assert.Equal(t, expectedRemoveCommand, cmd)
 		return nil, nil
 	}
@@ -51,7 +52,7 @@ func TestClient_ImageRemove(t *testing.T) {
 }
 
 func TestClient_RegistryLogin(t *testing.T) {
-	execute = func(cmd common.Command) (io.ReadCloser, error) {
+	execute = func(cmd command.Command) (io.ReadCloser, error) {
 		assert.Equal(t, expectedLoginCommand, cmd)
 		return nil, nil
 	}
@@ -79,10 +80,10 @@ var ociBuildOptions = v1alpha1.OCIBuildOptions{
 	},
 }
 
-var expectedBuildCommand = common.Builder("buildah").Command("bud").Flags([]common.Flag{
-	{"f", "./Dockerfile", true},
-	{"t", "image-name:v0.1.0", true},
-	{"storage-driver", "vfs", false},
+var expectedBuildCommand = command.Builder("buildah").Command("bud").Flags([]command.Flag{
+	{"f", "./Dockerfile", true, true},
+	{"t", "image-name:v0.1.0", true, true},
+	{"storage-driver", "vfs", false, true},
 }...).Args(".").Build()
 
 var ociPullOptions = v1alpha1.OCIPullOptions{
@@ -93,8 +94,8 @@ var ociPullOptions = v1alpha1.OCIPullOptions{
 	},
 }
 
-var expectedPullCommand = common.Builder("buildah").Command("pull").Flags([]common.Flag{
-	{"creds", "this-is-my-auth", false},
+var expectedPullCommand = command.Builder("buildah").Command("pull").Flags([]command.Flag{
+	{"creds", "this-is-my-auth", false, true},
 }...).Args("image-name").Build()
 
 var ociPushOptions = v1alpha1.OCIPushOptions{
@@ -105,8 +106,8 @@ var ociPushOptions = v1alpha1.OCIPushOptions{
 	},
 }
 
-var expectedPushCommand = common.Builder("buildah").Command("push").Flags([]common.Flag{
-	{"creds", "this-is-my-auth", false},
+var expectedPushCommand = command.Builder("buildah").Command("push").Flags([]command.Flag{
+	{"creds", "this-is-my-auth", false, true},
 }...).Args("image-name").Build()
 
 var ociRemoveOptions = v1alpha1.OCIRemoveOptions{
@@ -115,16 +116,16 @@ var ociRemoveOptions = v1alpha1.OCIRemoveOptions{
 	ImageRemoveOptions: types.ImageRemoveOptions{},
 }
 
-var expectedRemoveCommand = common.Builder("buildah").Command("rmi").Args("image-name").Build()
+var expectedRemoveCommand = command.Builder("buildah").Command("rmi").Args("image-name").Build()
 
 var ociLoginOptions = v1alpha1.OCILoginOptions{
 	Ctx:        context.Background(),
 	AuthConfig: authConfig,
 }
 
-var expectedLoginCommand = common.Builder("buildah").Command("login").Flags([]common.Flag{
-	{"u", "user", true},
-	{"p", "pass", true},
+var expectedLoginCommand = command.Builder("buildah").Command("login").Flags([]command.Flag{
+	{"u", "user", true, true},
+	{"p", "pass", true, true},
 }...).Args("arts-test-registry").Build()
 
 var authConfig = types.AuthConfig{

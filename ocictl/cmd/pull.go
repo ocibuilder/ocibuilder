@@ -119,7 +119,7 @@ func (p *pullCmd) run(args []string) error {
 		Client: cli,
 	}
 
-	res := make(chan v1alpha1.OCIResponse)
+	res := make(chan v1alpha1.OCIPullResponse)
 	errChan := make(chan error)
 	go builder.Pull(ociBuilderSpec, p.name, res, errChan)
 
@@ -132,7 +132,7 @@ func (p *pullCmd) run(args []string) error {
 
 	case pullResponse := <-res:
 		{
-			if pullResponse.Metadata.Daemon {
+			if builderType == "docker" {
 				if err := utils.OutputJson(pullResponse.Body); err != nil {
 					return err
 				}

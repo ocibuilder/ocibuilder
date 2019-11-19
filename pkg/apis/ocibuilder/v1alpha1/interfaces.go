@@ -4,7 +4,6 @@ import (
 	"io"
 
 	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/registry"
 )
 
 // Builder provides an interface for both Buildah and Docker build tools
@@ -28,10 +27,10 @@ type ContextReader interface {
 }
 
 type BuilderClient interface {
-	ImageBuild(options OCIBuildOptions) (types.ImageBuildResponse, error)
-	ImagePull(options OCIPullOptions) (io.ReadCloser, error)
-	ImagePush(options OCIPushOptions) (io.ReadCloser, error)
-	ImageRemove(options OCIRemoveOptions) ([]types.ImageDeleteResponseItem, error)
-	RegistryLogin(options OCILoginOptions) (registry.AuthenticateOKBody, error)
+	ImageBuild(options OCIBuildOptions) (OCIBuildResponse, error)
+	ImagePull(options OCIPullOptions) (OCIPullResponse, error)
+	ImagePush(options OCIPushOptions) (OCIPushResponse, error)
+	ImageRemove(options OCIRemoveOptions) (OCIRemoveResponse, error)
+	RegistryLogin(options OCILoginOptions) (OCILoginResponse, error)
 	GenerateAuthRegistryString(auth types.AuthConfig) string
 }

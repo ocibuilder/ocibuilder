@@ -21,6 +21,8 @@ import (
 	"io"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/registry"
+	"github.com/ocibuilder/ocibuilder/pkg/command"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -390,9 +392,10 @@ type OCIBuildOptions struct {
 	StorageDriver string
 }
 
-type OCILoginOptions struct {
-	types.AuthConfig
-	Ctx ctx.Context
+type OCIBuildResponse struct {
+	types.ImageBuildResponse
+	// Exec is part of the response for Buildah command executions
+	Exec command.Command
 }
 
 type OCIPullOptions struct {
@@ -401,10 +404,22 @@ type OCIPullOptions struct {
 	Ctx ctx.Context
 }
 
+type OCIPullResponse struct {
+	Body io.ReadCloser
+	// Exec is part of the response for Buildah command executions
+	Exec command.Command
+}
+
 type OCIPushOptions struct {
 	types.ImagePushOptions
 	Ref string
 	Ctx ctx.Context
+}
+
+type OCIPushResponse struct {
+	Body io.ReadCloser
+	// Exec is part of the response for Buildah command executions
+	Exec command.Command
 }
 
 type OCIRemoveOptions struct {
@@ -413,7 +428,19 @@ type OCIRemoveOptions struct {
 	Ctx   ctx.Context
 }
 
-type OCIResponse struct {
-	Body     io.ReadCloser
-	Metadata ImageMetadata
+type OCIRemoveResponse struct {
+	Response []types.ImageDeleteResponseItem
+	// Exec is part of the response for Buildah command executions
+	Exec command.Command
+}
+
+type OCILoginOptions struct {
+	types.AuthConfig
+	Ctx ctx.Context
+}
+
+type OCILoginResponse struct {
+	registry.AuthenticateOKBody
+	// Exec is part of the response for Buildah command executions
+	Exec command.Command
 }

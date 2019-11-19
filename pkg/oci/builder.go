@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/docker/docker/api/types/registry"
-
 	"github.com/docker/docker/api/types"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
@@ -20,7 +18,7 @@ type Builder struct {
 	Metadata []v1alpha1.ImageMetadata
 }
 
-func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIResponse, errChan chan<- error) {
+func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBuildResponse, errChan chan<- error) {
 	log := b.Logger
 	cli := b.Client
 
@@ -63,12 +61,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIRes
 			errChan <- err
 			return
 		}
-		res <- v1alpha1.OCIResponse{
-			Body: buildResponse.Body,
-			Metadata: v1alpha1.ImageMetadata{
-				BuildFile: fmt.Sprintf("%s/%s", path, opt.Dockerfile),
-			},
-		}
+		res <- buildResponse
 
 		if opt.Purge {
 			if err := b.Purge(imageName); err != nil {
@@ -86,7 +79,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIRes
 	log.Infoln("build complete")
 }
 
-func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIResponse, errChan chan<- error) {
+func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPushResponse, errChan chan<- error) {
 	log := b.Logger
 	cli := b.Client
 
@@ -97,7 +90,7 @@ func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIResp
 		}
 
 		pushFullImageName := fmt.Sprintf("%s/%s:%s", pushSpec.Registry, pushSpec.Image, pushSpec.Tag)
-		log.WithField("name:", pushFullImageName).Infoln("pushing image")
+		log.WithField("name", pushFullImageName).Infoln("pushing image with name")
 
 		authString, err := b.generateAuthRegistryString(pushSpec.Registry, spec)
 		if err != nil {
@@ -120,11 +113,7 @@ func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIResp
 			errChan <- err
 			return
 		}
-
-		res <- v1alpha1.OCIResponse{
-			Body: pushResponse,
-			Metadata: v1alpha1.ImageMetadata{},
-		}
+		res <- pushResponse
 
 		if pushSpec.Purge {
 			if err := b.Purge(pushFullImageName); err != nil {
@@ -140,7 +129,7 @@ func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIResp
 	log.Infoln("push complete")
 }
 
-func (b *Builder) Pull(spec v1alpha1.OCIBuilderSpec, imageName string, res chan<- v1alpha1.OCIResponse, errChan chan<- error) {
+func (b *Builder) Pull(spec v1alpha1.OCIBuilderSpec, imageName string, res chan<- v1alpha1.OCIPullResponse, errChan chan<- error) {
 	log := b.Logger
 	cli := b.Client
 
@@ -171,11 +160,7 @@ func (b *Builder) Pull(spec v1alpha1.OCIBuilderSpec, imageName string, res chan<
 			errChan <- err
 			return
 		}
-
-		res <- v1alpha1.OCIResponse{
-			Body: pullResponse,
-			Metadata: v1alpha1.ImageMetadata{},
-		}
+		res <- pullResponse
 
 		log.WithField("response", idx).Debugln("response has finished executing")
 	}
@@ -184,7 +169,7 @@ func (b *Builder) Pull(spec v1alpha1.OCIBuilderSpec, imageName string, res chan<
 	log.Infoln("pull complete")
 }
 
-func (b *Builder) Login(spec v1alpha1.OCIBuilderSpec, res chan<- registry.AuthenticateOKBody, errChan chan<- error) {
+func (b *Builder) Login(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCILoginResponse, errChan chan<- error) {
 	log := b.Logger
 	cli := b.Client
 

@@ -119,7 +119,7 @@ func (b *buildCmd) run(args []string) error {
 		Client: cli,
 	}
 
-	res := make(chan v1alpha1.OCIResponse)
+	res := make(chan v1alpha1.OCIBuildResponse)
 	errChan := make(chan error)
 	go builder.Build(ociBuilderSpec, res, errChan)
 

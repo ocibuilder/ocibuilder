@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/docker/docker/api/types/registry"
 	"github.com/ocibuilder/ocibuilder/pkg/oci"
 
 	"github.com/docker/docker/client"
@@ -113,7 +112,7 @@ func (l *loginCmd) run(args []string) error {
 		Client: cli,
 	}
 
-	res := make(chan registry.AuthenticateOKBody)
+	res := make(chan v1alpha1.OCILoginResponse)
 	errChan := make(chan error)
 	go builder.Login(ociBuilderSpec, res, errChan)
 

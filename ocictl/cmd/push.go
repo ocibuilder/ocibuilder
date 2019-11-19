@@ -118,7 +118,7 @@ func (p *pushCmd) run(args []string) error {
 		Client: cli,
 	}
 
-	res := make(chan v1alpha1.OCIResponse)
+	res := make(chan v1alpha1.OCIPushResponse)
 	errChan := make(chan error)
 	go builder.Push(ociBuilderSpec, res, errChan)
 
@@ -131,7 +131,7 @@ func (p *pushCmd) run(args []string) error {
 
 	case pushResponse := <-res:
 		{
-			if pushResponse.Metadata.Daemon {
+			if builderType == "docker" {
 				if err := utils.OutputJson(pushResponse.Body); err != nil {
 					return err
 				}
