@@ -148,5 +148,6 @@ func (b *buildCmd) run(args []string) error {
 		}
 
 	}
+	logger.Infoln("execution complete")
 	return nil
 }
