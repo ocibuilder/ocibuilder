@@ -94,6 +94,7 @@ func (c Command) constructCommand() []string {
 		if flag.Short {
 			commandVector = append(commandVector, fmt.Sprintf("-%s", flag.Name), flag.Value)
 		} else {
+			fmt.Println("ADDING COMMAND:::", fmt.Sprintf("--%s", flag.Name))
 			commandVector = append(commandVector, fmt.Sprintf("--%s", flag.Name), flag.Value)
 		}
 	}
@@ -101,6 +102,7 @@ func (c Command) constructCommand() []string {
 	for _, arg := range c.args {
 		commandVector = append(commandVector, arg)
 	}
+	fmt.Println("COMMAND VECTOR:::", commandVector)
 
 	return commandVector
 }
