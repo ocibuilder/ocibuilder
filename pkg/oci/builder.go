@@ -61,7 +61,9 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 			errChan <- err
 			return
 		}
+		log.Debugln("sending step build response")
 		res <- buildResponse
+		log.Debugln("finished sending step build response")
 		if buildResponse.Exec != nil {
 			log.Debugln("executing wait on build response")
 			if err := buildResponse.Exec.Wait(); err != nil {
@@ -83,7 +85,6 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 	close(errChan)
 	log.Debugln("running build file cleanup")
 	b.Clean()
-	log.Infoln("build complete")
 }
 
 func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPushResponse, errChan chan<- error) {
@@ -133,7 +134,6 @@ func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPush
 	}
 	close(res)
 	close(errChan)
-	log.Infoln("push complete")
 }
 
 func (b *Builder) Pull(spec v1alpha1.OCIBuilderSpec, imageName string, res chan<- v1alpha1.OCIPullResponse, errChan chan<- error) {
@@ -173,7 +173,6 @@ func (b *Builder) Pull(spec v1alpha1.OCIBuilderSpec, imageName string, res chan<
 	}
 	close(res)
 	close(errChan)
-	log.Infoln("pull complete")
 }
 
 func (b *Builder) Login(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCILoginResponse, errChan chan<- error) {
