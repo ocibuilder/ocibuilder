@@ -53,16 +53,11 @@ func OutputJson(ouput io.ReadCloser) error {
 // Output outputs a readcloser to stdout in a stream without formatting.
 func Output(stdout io.ReadCloser, stderr io.ReadCloser) error {
 	if _, err := io.Copy(os.Stdout, stderr); err != nil {
-
+		log.WithError(err).Errorln("error copying output to stdout")
+		return err
 	}
 
 	if _, err := io.Copy(os.Stdout, stdout); err != nil {
-		// TODO: this needs to be replaced with a permanent fix, this error is thrown
-		// when reaching the end of the reader
-		if err.Error() == "read /dev/ptmx: input/output error" {
-			log.Infoln("finished reading output")
-			return nil
-		}
 		log.WithError(err).Errorln("error copying output to stdout")
 		return err
 	}
