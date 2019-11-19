@@ -84,10 +84,12 @@ func (c *Command) Exec() (io.ReadCloser, error) {
 		return nil, err
 	}
 	c.execCmd = cmd
+	fmt.Println("EXEC CMD in EXEC:::", c.execCmd)
 	return stdout, nil
 }
 
 func (c Command) Wait() error {
+	fmt.Println("EXEC CMD in WAIT:::", c.execCmd)
 	if err := c.execCmd.Wait(); err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {
 			fmt.Printf("Exit code is %d\n", exitError.ExitCode())
