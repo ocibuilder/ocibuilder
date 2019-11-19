@@ -136,7 +136,7 @@ func (p *pushCmd) run(args []string) error {
 					return err
 				}
 			} else {
-				if err := utils.Output(pushResponse.Body); err != nil {
+				if err := utils.Output(pushResponse.Body, pushResponse.Stderr); err != nil {
 					return err
 				}
 			}

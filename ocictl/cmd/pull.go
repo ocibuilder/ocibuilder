@@ -137,7 +137,7 @@ func (p *pullCmd) run(args []string) error {
 					return err
 				}
 			} else {
-				if err := utils.Output(pullResponse.Body); err != nil {
+				if err := utils.Output(pullResponse.Body, pullResponse.Stderr); err != nil {
 					return err
 				}
 			}
