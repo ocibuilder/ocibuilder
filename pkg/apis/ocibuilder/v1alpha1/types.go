@@ -395,7 +395,8 @@ type OCIBuildOptions struct {
 type OCIBuildResponse struct {
 	types.ImageBuildResponse
 	// Exec is part of the response for Buildah command executions
-	Exec *command.Command
+	Exec   *command.Command
+	Stderr io.ReadCloser
 }
 
 type OCIPullOptions struct {
@@ -407,7 +408,8 @@ type OCIPullOptions struct {
 type OCIPullResponse struct {
 	Body io.ReadCloser
 	// Exec is part of the response for Buildah command executions
-	Exec *command.Command
+	Exec   *command.Command
+	Stderr io.ReadCloser
 }
 
 type OCIPushOptions struct {
@@ -419,7 +421,8 @@ type OCIPushOptions struct {
 type OCIPushResponse struct {
 	Body io.ReadCloser
 	// Exec is part of the response for Buildah command executions
-	Exec *command.Command
+	Exec   *command.Command
+	Stderr io.ReadCloser
 }
 
 type OCIRemoveOptions struct {
@@ -431,7 +434,8 @@ type OCIRemoveOptions struct {
 type OCIRemoveResponse struct {
 	Response []types.ImageDeleteResponseItem
 	// Exec is part of the response for Buildah command executions
-	Exec *command.Command
+	Exec   *command.Command
+	Stderr io.ReadCloser
 }
 
 type OCILoginOptions struct {
@@ -442,5 +446,6 @@ type OCILoginOptions struct {
 type OCILoginResponse struct {
 	registry.AuthenticateOKBody
 	// Exec is part of the response for Buildah command executions
-	Exec *command.Command
+	Exec   *command.Command
+	Stderr io.ReadCloser
 }

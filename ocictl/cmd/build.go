@@ -141,7 +141,7 @@ func (b *buildCmd) run(args []string) error {
 					return err
 				}
 			} else {
-				if err := utils.Output(buildResponse.Body); err != nil {
+				if err := utils.Output(buildResponse.Body, buildResponse.Stderr); err != nil {
 					return err
 				}
 			}

@@ -26,16 +26,17 @@ func (cli Client) ImageBuild(options v1alpha1.OCIBuildOptions) (v1alpha1.OCIBuil
 	cmd := command.Builder("buildah").Command("bud").Flags(buildFlags...).Args(options.ContextPath).Build()
 	cli.Logger.WithField("cmd", cmd).Debugln("executing build with command")
 
-	out, err := execute(&cmd)
+	stdout, stderr, err := execute(&cmd)
 	if err != nil {
 		cli.Logger.WithError(err).Errorln("error building image...")
 		return v1alpha1.OCIBuildResponse{}, err
 	}
 	return v1alpha1.OCIBuildResponse{
 		ImageBuildResponse: types.ImageBuildResponse{
-			Body: out,
+			Body: stdout,
 		},
-		Exec: &cmd,
+		Exec:   &cmd,
+		Stderr: stderr,
 	}, nil
 }
 
@@ -49,14 +50,15 @@ func (cli Client) ImagePull(options v1alpha1.OCIPullOptions) (v1alpha1.OCIPullRe
 	cmd := command.Builder("buildah").Command("pull").Flags(pullFlags...).Args(options.Ref).Build()
 	cli.Logger.WithField("cmd", cmd).Debugln("executing pull with command")
 
-	out, err := execute(&cmd)
+	stdout, stderr, err := execute(&cmd)
 	if err != nil {
 		cli.Logger.WithError(err).Errorln("error building image...")
 		return v1alpha1.OCIPullResponse{}, err
 	}
 	return v1alpha1.OCIPullResponse{
-		Body: out,
-		Exec: &cmd,
+		Body:   stdout,
+		Exec:   &cmd,
+		Stderr: stderr,
 	}, nil
 }
 
@@ -70,14 +72,15 @@ func (cli Client) ImagePush(options v1alpha1.OCIPushOptions) (v1alpha1.OCIPushRe
 	cmd := command.Builder("buildah").Command("push").Flags(pushFlags...).Args(options.Ref).Build()
 	cli.Logger.WithField("cmd", cmd).Debugln("executing push with command")
 
-	out, err := execute(&cmd)
+	stdout, stderr, err := execute(&cmd)
 	if err != nil {
 		cli.Logger.WithError(err).Errorln("error building image...")
 		return v1alpha1.OCIPushResponse{}, err
 	}
 	return v1alpha1.OCIPushResponse{
-		Body: out,
-		Exec: &cmd,
+		Body:   stdout,
+		Exec:   &cmd,
+		Stderr: stderr,
 	}, nil
 }
 
@@ -86,7 +89,7 @@ func (cli Client) ImageRemove(options v1alpha1.OCIRemoveOptions) (v1alpha1.OCIRe
 	cmd := command.Builder("buildah").Command("rmi").Args(options.Image).Build()
 	cli.Logger.WithField("cmd", cmd).Debugln("executing remove with command")
 
-	_, err := execute(&cmd)
+	_, _, err := execute(&cmd)
 	if err != nil {
 		cli.Logger.WithError(err).Errorln("error building image...")
 		return v1alpha1.OCIRemoveResponse{}, err
@@ -111,7 +114,7 @@ func (cli Client) RegistryLogin(options v1alpha1.OCILoginOptions) (v1alpha1.OCIL
 	cmd := command.Builder("buildah").Command("login").Flags(loginFlags...).Args(options.ServerAddress).Build()
 	cli.Logger.WithField("cmd", cmd).Debugln("executing login with command")
 
-	_, err := execute(&cmd)
+	_, _, err := execute(&cmd)
 	if err != nil {
 		cli.Logger.WithError(err).Errorln("error building image...")
 		return v1alpha1.OCILoginResponse{}, err
@@ -130,6 +133,6 @@ func (cli Client) GenerateAuthRegistryString(auth types.AuthConfig) string {
 }
 
 // Execute executes the buildah command. This function is mocked in buildah client tests.
-var execute = func(cmd *command.Command) (io.ReadCloser, error) {
+var execute = func(cmd *command.Command) (stdout io.ReadCloser, stderr io.ReadCloser, err error) {
 	return cmd.Exec()
 }

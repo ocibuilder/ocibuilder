@@ -76,20 +76,19 @@ func Builder(name string) *CommandBuilder {
 	return cmdBuilder
 }
 
-func (c *Command) Exec() (io.ReadCloser, error) {
+func (c *Command) Exec() (stdout io.ReadCloser, stderr io.ReadCloser, err error) {
 	command := c.constructCommand()
 	cmd := executor(c.name, command...)
-	stdout, _ := cmd.StdoutPipe()
+	stdout, _ = cmd.StdoutPipe()
+	stderr, _ = cmd.StderrPipe()
 	if err := cmd.Start(); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	c.execCmd = cmd
-	fmt.Println("EXEC CMD in EXEC:::", c.execCmd)
-	return stdout, nil
+	return stdout, stderr, nil
 }
 
 func (c Command) Wait() error {
-	fmt.Println("EXEC CMD in WAIT:::", c.execCmd)
 	if err := c.execCmd.Wait(); err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {
 			fmt.Printf("Exit code is %d\n", exitError.ExitCode())
