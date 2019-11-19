@@ -132,7 +132,7 @@ func (b *buildCmd) run(args []string) error {
 
 	case buildResponse := <-res:
 		{
-			if buildResponse.Metadata.Daemon {
+			if builderType == "docker" {
 				if err := utils.OutputJson(buildResponse.Body); err != nil {
 					return err
 				}

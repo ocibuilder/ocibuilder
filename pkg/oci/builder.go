@@ -67,7 +67,6 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIRes
 			Body: buildResponse.Body,
 			Metadata: v1alpha1.ImageMetadata{
 				BuildFile: fmt.Sprintf("%s/%s", path, opt.Dockerfile),
-				Daemon:    spec.Daemon,
 			},
 		}
 
@@ -124,9 +123,7 @@ func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIResp
 
 		res <- v1alpha1.OCIResponse{
 			Body: pushResponse,
-			Metadata: v1alpha1.ImageMetadata{
-				Daemon: spec.Daemon,
-			},
+			Metadata: v1alpha1.ImageMetadata{},
 		}
 
 		if pushSpec.Purge {
@@ -177,9 +174,7 @@ func (b *Builder) Pull(spec v1alpha1.OCIBuilderSpec, imageName string, res chan<
 
 		res <- v1alpha1.OCIResponse{
 			Body: pullResponse,
-			Metadata: v1alpha1.ImageMetadata{
-				Daemon: spec.Daemon,
-			},
+			Metadata: v1alpha1.ImageMetadata{},
 		}
 
 		log.WithField("response", idx).Debugln("response has finished executing")
