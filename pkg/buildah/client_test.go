@@ -13,8 +13,8 @@ import (
 )
 
 func TestClient_ImageBuild(t *testing.T) {
-	execute = func(cmd command.Command) (io.ReadCloser, error) {
-		assert.Equal(t, expectedBuildCommand, cmd)
+	execute = func(cmd *command.Command) (io.ReadCloser, error) {
+		assert.Equal(t, &expectedBuildCommand, cmd)
 		return nil, nil
 	}
 	_, err := cli.ImageBuild(ociBuildOptions)
@@ -22,8 +22,8 @@ func TestClient_ImageBuild(t *testing.T) {
 }
 
 func TestClient_ImagePull(t *testing.T) {
-	execute = func(cmd command.Command) (io.ReadCloser, error) {
-		assert.Equal(t, expectedPullCommand, cmd)
+	execute = func(cmd *command.Command) (io.ReadCloser, error) {
+		assert.Equal(t, &expectedPullCommand, cmd)
 		return nil, nil
 	}
 
@@ -32,7 +32,7 @@ func TestClient_ImagePull(t *testing.T) {
 }
 
 func TestClient_ImagePush(t *testing.T) {
-	execute = func(cmd command.Command) (io.ReadCloser, error) {
+	execute = func(cmd *command.Command) (io.ReadCloser, error) {
 		assert.Equal(t, expectedPushCommand, cmd)
 		return nil, nil
 	}
@@ -42,7 +42,7 @@ func TestClient_ImagePush(t *testing.T) {
 }
 
 func TestClient_ImageRemove(t *testing.T) {
-	execute = func(cmd command.Command) (io.ReadCloser, error) {
+	execute = func(cmd *command.Command) (io.ReadCloser, error) {
 		assert.Equal(t, expectedRemoveCommand, cmd)
 		return nil, nil
 	}
@@ -52,7 +52,7 @@ func TestClient_ImageRemove(t *testing.T) {
 }
 
 func TestClient_RegistryLogin(t *testing.T) {
-	execute = func(cmd command.Command) (io.ReadCloser, error) {
+	execute = func(cmd *command.Command) (io.ReadCloser, error) {
 		assert.Equal(t, expectedLoginCommand, cmd)
 		return nil, nil
 	}
