@@ -82,7 +82,7 @@ var ociBuildOptions = v1alpha1.OCIBuildOptions{
 var expectedBuildCommand = common.Builder("buildah").Command("bud").Flags([]common.Flag{
 	{"f", "./Dockerfile", true},
 	{"t", "image-name:v0.1.0", true},
-	{"s", "vfs", true},
+	{"storage-driver", "vfs", false},
 }...).Args(".").Build()
 
 var ociPullOptions = v1alpha1.OCIPullOptions{

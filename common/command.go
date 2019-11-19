@@ -90,6 +90,7 @@ func (c Command) constructCommand() []string {
 	var commandVector = []string{c.command}
 
 	for _, flag := range c.flags {
+		fmt.Println("FLAG:::", flag)
 		if flag.Short {
 			commandVector = append(commandVector, fmt.Sprintf("-%s", flag.Name), flag.Value)
 		} else {
