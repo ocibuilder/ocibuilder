@@ -28,7 +28,10 @@ type CommandBuilder struct {
 type Flag struct {
 	Name  string
 	Value string
+	// Short determines whether the flag used is a short variation or not
 	Short bool
+	// OmitEmpty omits the flag if the value is empty
+	OmitEmpty bool
 }
 
 func (builder *CommandBuilder) Build() Command {
@@ -46,7 +49,16 @@ func (builder *CommandBuilder) Command(command string) *CommandBuilder {
 }
 
 func (builder *CommandBuilder) Flags(flags ...Flag) *CommandBuilder {
-	builder.flags = flags
+	var builderFlags []Flag
+	for _, f := range flags {
+		if !f.OmitEmpty {
+			builderFlags = append(builderFlags, f)
+		} else if f.Value != "" {
+			builderFlags = append(builderFlags, f)
+		}
+	}
+
+	builder.flags = builderFlags
 	return builder
 }
 
@@ -90,11 +102,9 @@ func (c Command) constructCommand() []string {
 	var commandVector = []string{c.command}
 
 	for _, flag := range c.flags {
-		fmt.Println("FLAG:::", flag)
 		if flag.Short {
 			commandVector = append(commandVector, fmt.Sprintf("-%s", flag.Name), flag.Value)
 		} else {
-			fmt.Println("ADDING COMMAND:::", fmt.Sprintf("--%s", flag.Name))
 			commandVector = append(commandVector, fmt.Sprintf("--%s", flag.Name), flag.Value)
 		}
 	}
@@ -102,7 +112,6 @@ func (c Command) constructCommand() []string {
 	for _, arg := range c.args {
 		commandVector = append(commandVector, arg)
 	}
-	fmt.Println("COMMAND VECTOR:::", commandVector)
 
 	return commandVector
 }

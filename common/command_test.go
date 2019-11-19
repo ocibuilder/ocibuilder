@@ -16,12 +16,34 @@ func TestCommand_constructCommand(t *testing.T) {
 	assert.Equal(t, []string{"build", "-f", "./Dockerfile", "--storage-driver", "vfs", ".", "one", "two"}, constructedCmd)
 }
 
-func TestExec(t *testing.T) {
+func TestCommand_Exec(t *testing.T) {
 	executor = fakeExecCommand
 	defer func() { executor = exec.Command }()
 
 	_, err := cmd.Exec()
 	assert.Equal(t, nil, err)
+}
+
+func TestCommandBuilder_Flags(t *testing.T) {
+
+	flags := []Flag{
+		{"f", "Dockerfile", true, true},
+		{"storage-driver", "", false, true},
+		{"t", "image:tag", true, true},
+	}
+
+	builder := Builder("test").Flags(flags...)
+	assert.Equal(t, Command{
+		name:    "test",
+		command: "",
+		flags:   expectedFlags,
+		args:    []string{},
+	}, builder.Build())
+}
+
+var expectedFlags = []Flag{
+	{"f", "Dockerfile", true, true},
+	{"t", "image:tag", true, true},
 }
 
 var cmd = builder.Command("build").Flags([]Flag{

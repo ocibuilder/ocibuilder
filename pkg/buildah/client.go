@@ -18,9 +18,9 @@ type Client struct {
 func (cli Client) ImageBuild(options v1alpha1.OCIBuildOptions) (types.ImageBuildResponse, error) {
 
 	buildFlags := []common.Flag{
-		{"storage-driver", options.StorageDriver, false},
-		{"f", options.Dockerfile, true},
-		{"t", options.Tags[0], true},
+		{"f", options.Dockerfile, true, true},
+		{"storage-driver", options.StorageDriver, false, true},
+		{"t", options.Tags[0], true, true},
 	}
 
 	cmd := common.Builder("buildah").Command("bud").Flags(buildFlags...).Args(options.ContextPath).Build()
@@ -40,7 +40,7 @@ func (cli Client) ImagePull(options v1alpha1.OCIPullOptions) (io.ReadCloser, err
 
 	pullFlags := []common.Flag{
 		// Buildah registry auth in format username[:password]
-		{"creds", options.RegistryAuth, false},
+		{"creds", options.RegistryAuth, false, true},
 	}
 
 	cmd := common.Builder("buildah").Command("pull").Flags(pullFlags...).Args(options.Ref).Build()
@@ -58,7 +58,7 @@ func (cli Client) ImagePush(options v1alpha1.OCIPushOptions) (io.ReadCloser, err
 
 	pushFlags := []common.Flag{
 		// Buildah registry auth in format username[:password]
-		{"creds", options.RegistryAuth, false},
+		{"creds", options.RegistryAuth, false, true},
 	}
 
 	cmd := common.Builder("buildah").Command("push").Flags(pushFlags...).Args(options.Ref).Build()
@@ -92,8 +92,8 @@ func (cli Client) ImageRemove(options v1alpha1.OCIRemoveOptions) ([]types.ImageD
 func (cli Client) RegistryLogin(options v1alpha1.OCILoginOptions) (registry.AuthenticateOKBody, error) {
 
 	loginFlags := []common.Flag{
-		{"u", options.Username, true},
-		{"p", options.Password, true},
+		{"u", options.Username, true, true},
+		{"p", options.Password, true, true},
 	}
 
 	cmd := common.Builder("buildah").Command("login").Flags(loginFlags...).Args(options.ServerAddress).Build()
