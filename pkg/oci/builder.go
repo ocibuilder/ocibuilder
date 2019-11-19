@@ -18,7 +18,7 @@ type Builder struct {
 	Metadata []v1alpha1.ImageMetadata
 }
 
-func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBuildResponse, errChan chan<- error) {
+func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBuildResponse, errChan chan<- error, finished chan bool) {
 	log := b.Logger
 	cli := b.Client
 
@@ -85,6 +85,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 	close(errChan)
 	log.Debugln("running build file cleanup")
 	b.Clean()
+	<-finished
 }
 
 func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPushResponse, errChan chan<- error) {

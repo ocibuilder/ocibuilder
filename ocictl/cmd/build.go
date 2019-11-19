@@ -125,7 +125,9 @@ func (b *buildCmd) run(args []string) error {
 
 	res := make(chan v1alpha1.OCIBuildResponse)
 	errChan := make(chan error)
-	go builder.Build(ociBuilderSpec, res, errChan)
+	finished := make(chan bool)
+
+	go builder.Build(ociBuilderSpec, res, errChan, finished)
 
 	select {
 
