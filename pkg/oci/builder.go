@@ -61,16 +61,15 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 			errChan <- err
 			return
 		}
-		log.Debugln("sending step build response")
+
 		res <- buildResponse
-		log.Debugln("finished sending step build response")
-		if buildResponse.Exec != nil {
-			log.Debugln("executing wait on build response")
-			if err := buildResponse.Exec.Wait(); err != nil {
-				errChan <- err
-				return
-			}
-		}
+		//if buildResponse.Exec != nil {
+		//	log.Debugln("executing wait on build response")
+		//	if err := buildResponse.Exec.Wait(); err != nil {
+		//		errChan <- err
+		//		return
+		//	}
+		//}
 
 		if opt.Purge {
 			if err := b.Purge(imageName); err != nil {
@@ -240,6 +239,7 @@ func (b *Builder) Purge(imageName string) error {
 
 func (b Builder) Clean() {
 	log := b.Logger
+	log.WithField("metadata", b.Metadata).Debugln("attempting to cleanup files listed in metadata")
 	for _, m := range b.Metadata {
 		if m.BuildFile != "" {
 			log.WithField("filepath", m.BuildFile).Debugln("attempting to cleanup dockerfile")

@@ -143,7 +143,6 @@ func (b *buildCmd) run(args []string) error {
 		case buildResponse := <-res:
 			{
 				logger.Infoln("executing build step")
-				logger.Infoln("outputting result")
 				if builderType == "docker" {
 					if err := utils.OutputJson(buildResponse.Body); err != nil {
 						return err

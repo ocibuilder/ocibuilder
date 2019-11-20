@@ -129,6 +129,7 @@ func (l *loginCmd) run(args []string) error {
 
 		case loginResponse := <-res:
 			{
+				logger.Infoln("executing login step")
 				//TODO: make this output nicer
 				fmt.Println(loginResponse)
 			}

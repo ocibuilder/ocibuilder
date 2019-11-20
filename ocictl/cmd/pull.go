@@ -139,7 +139,6 @@ func (p *pullCmd) run(args []string) error {
 		case pullResponse := <-res:
 			{
 				logger.Infoln("executing pull step")
-				logger.Infoln("outputting result")
 				if builderType == "docker" {
 					if err := utils.OutputJson(pullResponse.Body); err != nil {
 						return err

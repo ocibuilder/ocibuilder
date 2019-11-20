@@ -139,7 +139,6 @@ func (p *pushCmd) run(args []string) error {
 		case pushResponse := <-res:
 			{
 				logger.Infoln("executing push step")
-				logger.Infoln("outputting result")
 				if builderType == "docker" {
 					if err := utils.OutputJson(pushResponse.Body); err != nil {
 						return err
