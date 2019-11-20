@@ -68,6 +68,10 @@ func (t testClient) ImagePush(ctx context.Context, ref string, options types.Ima
 	return nil, nil
 }
 
+func (t testClient) ImageRemove(ctx context.Context, image string, options types.ImageRemoveOptions) ([]types.ImageDeleteResponseItem, error) {
+	return nil, nil
+}
+
 func (t testClient) RegistryLogin(ctx context.Context, auth types.AuthConfig) (registry.AuthenticateOKBody, error) {
 	return registry.AuthenticateOKBody{
 		IdentityToken: "",

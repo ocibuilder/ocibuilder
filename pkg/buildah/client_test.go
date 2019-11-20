@@ -13,18 +13,18 @@ import (
 )
 
 func TestClient_ImageBuild(t *testing.T) {
-	execute = func(cmd *command.Command) (io.ReadCloser, error) {
+	execute = func(cmd *command.Command) (io.ReadCloser, io.ReadCloser, error) {
 		assert.Equal(t, &expectedBuildCommand, cmd)
-		return nil, nil
+		return nil, nil, nil
 	}
 	_, err := cli.ImageBuild(ociBuildOptions)
 	assert.Equal(t, nil, err)
 }
 
 func TestClient_ImagePull(t *testing.T) {
-	execute = func(cmd *command.Command) (io.ReadCloser, error) {
+	execute = func(cmd *command.Command) (io.ReadCloser, io.ReadCloser, error) {
 		assert.Equal(t, &expectedPullCommand, cmd)
-		return nil, nil
+		return nil, nil, nil
 	}
 
 	_, err := cli.ImagePull(ociPullOptions)
@@ -32,9 +32,9 @@ func TestClient_ImagePull(t *testing.T) {
 }
 
 func TestClient_ImagePush(t *testing.T) {
-	execute = func(cmd *command.Command) (io.ReadCloser, error) {
-		assert.Equal(t, expectedPushCommand, cmd)
-		return nil, nil
+	execute = func(cmd *command.Command) (io.ReadCloser, io.ReadCloser, error) {
+		assert.Equal(t, &expectedPushCommand, cmd)
+		return nil, nil, nil
 	}
 
 	_, err := cli.ImagePush(ociPushOptions)
@@ -42,9 +42,9 @@ func TestClient_ImagePush(t *testing.T) {
 }
 
 func TestClient_ImageRemove(t *testing.T) {
-	execute = func(cmd *command.Command) (io.ReadCloser, error) {
-		assert.Equal(t, expectedRemoveCommand, cmd)
-		return nil, nil
+	execute = func(cmd *command.Command) (io.ReadCloser, io.ReadCloser, error) {
+		assert.Equal(t, &expectedRemoveCommand, cmd)
+		return nil, nil, nil
 	}
 
 	_, err := cli.ImageRemove(ociRemoveOptions)
@@ -52,9 +52,9 @@ func TestClient_ImageRemove(t *testing.T) {
 }
 
 func TestClient_RegistryLogin(t *testing.T) {
-	execute = func(cmd *command.Command) (io.ReadCloser, error) {
-		assert.Equal(t, expectedLoginCommand, cmd)
-		return nil, nil
+	execute = func(cmd *command.Command) (io.ReadCloser, io.ReadCloser, error) {
+		assert.Equal(t, &expectedLoginCommand, cmd)
+		return nil, nil, nil
 	}
 
 	_, err := cli.RegistryLogin(ociLoginOptions)
@@ -82,8 +82,8 @@ var ociBuildOptions = v1alpha1.OCIBuildOptions{
 
 var expectedBuildCommand = command.Builder("buildah").Command("bud").Flags([]command.Flag{
 	{"f", "./Dockerfile", true, true},
-	{"t", "image-name:v0.1.0", true, true},
 	{"storage-driver", "vfs", false, true},
+	{"t", "image-name:v0.1.0", true, true},
 }...).Args(".").Build()
 
 var ociPullOptions = v1alpha1.OCIPullOptions{
