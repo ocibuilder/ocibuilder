@@ -26,8 +26,6 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 		Logger: log,
 	}
 
-	defer b.Clean()
-
 	buildOpts, err := common.ParseBuildSpec(spec.Build)
 	if err != nil {
 		log.WithError(err).Errorln("error in parsing build spec")
@@ -84,6 +82,8 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 		}
 		log.WithField("step", idx).Debugln("build step has finished excuting")
 	}
+	defer b.Clean()
+
 	log.Debugln("running build file cleanup")
 	finished <- true
 }
@@ -151,11 +151,12 @@ func (b *Builder) Pull(spec v1alpha1.OCIBuilderSpec, imageName string, res chan<
 	for idx, loginSpec := range spec.Login {
 		registry := loginSpec.Registry
 		log.WithField("registry", registry).Debugln("attempting to pull from logged in registry")
+		authString, err := b.generateAuthRegistryString(registry, spec)
+
 		if registry != "" {
 			registry = registry + "/"
 		}
 
-		authString, err := b.generateAuthRegistryString(registry, spec)
 		if err != nil {
 			errChan <- err
 			return
