@@ -164,10 +164,6 @@ func (b *buildCmd) run(args []string) error {
 				return nil
 			}
 
-		default:
-			{
-				break
-			}
 		}
 	}
 

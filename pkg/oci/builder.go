@@ -26,6 +26,8 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 		Logger: log,
 	}
 
+	defer b.Clean()
+
 	buildOpts, err := common.ParseBuildSpec(spec.Build)
 	if err != nil {
 		log.WithError(err).Errorln("error in parsing build spec")
@@ -33,6 +35,8 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 	}
 
 	for idx, opt := range buildOpts {
+		b.Metadata = append(b.Metadata, v1alpha1.ImageMetadata{BuildFile: opt.Dockerfile})
+
 		log.WithField("step: ", idx).Debugln("running build step")
 		ctx, path, err := reader.ReadContext(opt.Context)
 		if err != nil {
@@ -63,13 +67,13 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 		}
 
 		res <- buildResponse
-		//if buildResponse.Exec != nil {
-		//	log.Debugln("executing wait on build response")
-		//	if err := buildResponse.Exec.Wait(); err != nil {
-		//		errChan <- err
-		//		return
-		//	}
-		//}
+		if buildResponse.Exec != nil {
+			log.Debugln("executing wait on build response")
+			if err := buildResponse.Exec.Wait(); err != nil {
+				errChan <- err
+				return
+			}
+		}
 
 		if opt.Purge {
 			if err := b.Purge(imageName); err != nil {
@@ -81,7 +85,6 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 		log.WithField("step", idx).Debugln("build step has finished excuting")
 	}
 	log.Debugln("running build file cleanup")
-	b.Clean()
 	finished <- true
 }
 
@@ -119,7 +122,15 @@ func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPush
 			errChan <- err
 			return
 		}
+
 		res <- pushResponse
+		if pushResponse.Exec != nil {
+			log.Debugln("executing wait on push response")
+			if err := pushResponse.Exec.Wait(); err != nil {
+				errChan <- err
+				return
+			}
+		}
 
 		if pushSpec.Purge {
 			if err := b.Purge(pushFullImageName); err != nil {
@@ -164,7 +175,15 @@ func (b *Builder) Pull(spec v1alpha1.OCIBuilderSpec, imageName string, res chan<
 			errChan <- err
 			return
 		}
+
 		res <- pullResponse
+		if pullResponse.Exec != nil {
+			log.Debugln("executing wait on pull response")
+			if err := pullResponse.Exec.Wait(); err != nil {
+				errChan <- err
+				return
+			}
+		}
 
 		log.WithField("step", idx).Debugln("finished pull attempt from registry")
 	}

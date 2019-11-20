@@ -160,10 +160,6 @@ func (p *pushCmd) run(args []string) error {
 				return nil
 			}
 
-		default:
-			{
-				break
-			}
 		}
 	}
 
