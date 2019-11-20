@@ -145,5 +145,4 @@ func (l *loginCmd) run(args []string) error {
 		}
 	}
 
-	return nil
 }

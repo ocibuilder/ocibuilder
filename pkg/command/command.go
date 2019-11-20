@@ -110,9 +110,5 @@ func (c Command) constructCommand() []string {
 		}
 	}
 
-	for _, arg := range c.args {
-		commandVector = append(commandVector, arg)
-	}
-
-	return commandVector
+	return append(commandVector, c.args...)
 }
