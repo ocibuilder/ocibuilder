@@ -46,16 +46,8 @@ func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepath
 	if filepath != "" {
 		dir = filepath
 	}
-	log.WithField("filepath", dir+"/ocibuilder.yaml").Debugln("looking for ocibuilder.yaml")
+	log.WithField("filepath", dir+"/ocibuilder.yaml").Debugln("looking for spec.yaml")
 	file, err := ioutil.ReadFile(dir + "/ocibuilder.yaml")
-	if overlayPath != "" {
-		file, err = applyOverlay(file, overlayPath)
-		if err != nil {
-			log.WithError(err).WithField("path", overlayPath).Errorln("failed to apply overlay to spec at path")
-			return err
-		}
-	}
-
 	if err != nil {
 		log.Infoln("spec file not found, looking for individual specifications...")
 		if err := r.readIndividualSpecs(spec, dir); err != nil {
@@ -78,7 +70,7 @@ func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepath
 		log.WithField("overlayPath", overlayPath).Debugln("overlay path not empty - looking for overlay file")
 		file, err = applyOverlay(file, overlayPath)
 		if err != nil {
-			log.WithError(err).Errorln("failed to apply overlay to spec")
+			log.WithError(err).WithField("path", overlayPath).Errorln("failed to apply overlay to spec at path")
 			return err
 		}
 	}
@@ -100,7 +92,7 @@ func (r Reader) readIndividualSpecs(spec *v1alpha1.OCIBuilderSpec, path string) 
 	var buildSpec *v1alpha1.BuildSpec
 	var pushSpec []v1alpha1.PushSpec
 
-	r.Logger.Debugln("attempting to read individual specs as ocibuilder.yaml as not found")
+	r.Logger.Debugln("attempting to read individual specs as spec.yaml as not found")
 	if file, err := ioutil.ReadFile(path + "/login.yaml"); err == nil {
 		if err := yaml.Unmarshal(file, &loginSpec); err != nil {
 			log.WithError(err).Errorln("failed to unmarshal login.yaml")
@@ -157,7 +149,7 @@ func (r Reader) applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error
 		return err
 	}
 
-	log.WithField("number", len(spec.Params)).Debugln("found custom params in ocibuilder.yaml")
+	log.WithField("number", len(spec.Params)).Debugln("found custom params in spec.yaml")
 	for _, param := range spec.Params {
 		if param.Value != "" {
 			log.WithFields(logrus.Fields{
@@ -206,21 +198,17 @@ func (r Reader) applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error
 }
 
 // ReadContext reads the user supplied context for the image build
-func (r Reader) ReadContext(ctx v1alpha1.ImageContext) (context io.ReadCloser, path string, error error) {
-	log := r.Logger
+func (r Reader) ReadContext(ctx v1alpha1.ImageContext) (out io.ReadCloser, path string, err error) {
 
 	if ctx.GitContext != nil {
-		log.WithField("context", ctx.GitContext).Debugln("using Git as context")
 		return nil, "", errors.New("git context is not supported in this version of the ocibuilder")
 	}
 
 	if ctx.S3Context != nil {
-		log.WithField("context", ctx.S3Context).Debugln("using S3 as context")
 		return nil, "", errors.New("s3 context is not supported in this version of the ocibuilder")
 	}
 
 	if ctx.LocalContext != nil {
-		log.WithField("context", ctx.LocalContext.ContextPath).Debugln("using local path as context")
 		return ctx.LocalContext.Read()
 	}
 

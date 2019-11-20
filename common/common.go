@@ -41,3 +41,8 @@ const (
 const (
 	LabelVersion = "version"
 )
+
+// Default image registry
+const (
+	DefaultImageRegistry = "docker.io"
+)

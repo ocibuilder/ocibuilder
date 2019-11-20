@@ -20,7 +20,7 @@ func TestCommand_Exec(t *testing.T) {
 	executor = fakeExecCommand
 	defer func() { executor = exec.Command }()
 
-	_, err := cmd.Exec()
+	_, _, err := cmd.Exec()
 	assert.Equal(t, nil, err)
 }
 

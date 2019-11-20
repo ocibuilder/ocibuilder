@@ -94,7 +94,7 @@ func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPush
 
 	for idx, pushSpec := range spec.Push {
 		log.WithField("step: ", idx).Debugln("running push step")
-		if err := common.ValidatePushSpec(pushSpec); err != nil {
+		if err := common.ValidatePushSpec(&pushSpec); err != nil {
 			errChan <- err
 		}
 
