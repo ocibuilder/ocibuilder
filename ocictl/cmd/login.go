@@ -114,21 +114,34 @@ func (l *loginCmd) run(args []string) error {
 
 	res := make(chan v1alpha1.OCILoginResponse)
 	errChan := make(chan error)
-	go builder.Login(ociBuilderSpec, res, errChan)
+	finished := make(chan bool)
 
-	select {
+	go builder.Login(ociBuilderSpec, res, errChan, finished)
 
-	case err := <-errChan:
-		{
-			return err
+	for {
+		select {
+
+		case err := <-errChan:
+			{
+				logger.WithError(err).Errorln("error received from error channel whilst logging in")
+				return err
+			}
+
+		case loginResponse := <-res:
+			{
+				//TODO: make this output nicer
+				fmt.Println(loginResponse)
+			}
+
+		case <-finished:
+			{
+				logger.Infoln("all login steps complete successfully")
+				close(res)
+				close(errChan)
+				close(finished)
+				return nil
+			}
 		}
-
-	case loginResponse := <-res:
-		{
-			//TODO: make this output nicer
-			fmt.Println(loginResponse)
-		}
-
 	}
 	return nil
 }

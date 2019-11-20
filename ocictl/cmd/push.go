@@ -20,9 +20,10 @@ import (
 	"errors"
 	"io"
 
+	"github.com/ocibuilder/ocibuilder/ocictl/pkg/utils"
+
 	"github.com/docker/docker/client"
 	"github.com/ocibuilder/ocibuilder/common"
-	"github.com/ocibuilder/ocibuilder/ocictl/pkg/utils"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/buildah"
 	"github.com/ocibuilder/ocibuilder/pkg/docker"
@@ -120,28 +121,52 @@ func (p *pushCmd) run(args []string) error {
 
 	res := make(chan v1alpha1.OCIPushResponse)
 	errChan := make(chan error)
-	go builder.Push(ociBuilderSpec, res, errChan)
+	finished := make(chan bool)
 
-	select {
+	go builder.Push(ociBuilderSpec, res, errChan, finished)
 
-	case err := <-errChan:
-		{
-			return err
-		}
+	for {
+		select {
 
-	case pushResponse := <-res:
-		{
-			if builderType == "docker" {
-				if err := utils.OutputJson(pushResponse.Body); err != nil {
-					return err
-				}
-			} else {
-				if err := utils.Output(pushResponse.Body, pushResponse.Stderr); err != nil {
+		case err := <-errChan:
+			{
+				if err != nil {
+					logger.WithError(err).Errorln("error received from error channel whilst pushing")
 					return err
 				}
 			}
-		}
 
+		case pushResponse := <-res:
+			{
+				logger.Infoln("executing push step")
+				logger.Infoln("outputting result")
+				if builderType == "docker" {
+					if err := utils.OutputJson(pushResponse.Body); err != nil {
+						return err
+					}
+				} else {
+					if err := utils.Output(pushResponse.Body, pushResponse.Stderr); err != nil {
+						return err
+					}
+				}
+				logger.Infoln("push step complete")
+			}
+
+		case <-finished:
+			{
+				logger.Infoln("all push steps complete successfully")
+				close(res)
+				close(errChan)
+				close(finished)
+				return nil
+			}
+
+		default:
+			{
+				break
+			}
+		}
 	}
+
 	return nil
 }

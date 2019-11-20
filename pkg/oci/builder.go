@@ -18,7 +18,7 @@ type Builder struct {
 	Metadata []v1alpha1.ImageMetadata
 }
 
-func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBuildResponse, errChan chan<- error, finished chan bool) {
+func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBuildResponse, errChan chan<- error, finished chan<- bool) {
 	log := b.Logger
 	cli := b.Client
 
@@ -33,7 +33,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 	}
 
 	for idx, opt := range buildOpts {
-		log.WithField("step: ", idx).Infoln("running build step")
+		log.WithField("step: ", idx).Debugln("running build step")
 		ctx, path, err := reader.ReadContext(opt.Context)
 		if err != nil {
 			log.WithError(err).Errorln("error reading image build context")
@@ -79,21 +79,19 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 				return
 			}
 		}
-		log.WithField("response", idx).Debugln("response has finished executing")
+		log.WithField("step", idx).Debugln("build step has finished excuting")
 	}
-	close(res)
-	close(errChan)
 	log.Debugln("running build file cleanup")
 	b.Clean()
-	<-finished
+	finished <- true
 }
 
-func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPushResponse, errChan chan<- error) {
+func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPushResponse, errChan chan<- error, finished chan<- bool) {
 	log := b.Logger
 	cli := b.Client
 
 	for idx, pushSpec := range spec.Push {
-		log.WithField("step: ", idx).Infoln("running push step")
+		log.WithField("step: ", idx).Debugln("running push step")
 		if err := common.ValidatePushSpec(pushSpec); err != nil {
 			errChan <- err
 		}
@@ -118,7 +116,7 @@ func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPush
 
 		pushResponse, err := cli.ImagePush(pushOptions)
 		if err != nil {
-			log.WithError(err).Errorln("failed to push image")
+			log.WithError(err).Debugln("failed to push image")
 			errChan <- err
 			return
 		}
@@ -131,19 +129,18 @@ func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPush
 				return
 			}
 		}
-		log.WithField("response", idx).Debugln("response has finished executing")
+		log.WithField("step", idx).Debugln("push step has finished executing")
 	}
-	close(res)
-	close(errChan)
+	finished <- true
 }
 
-func (b *Builder) Pull(spec v1alpha1.OCIBuilderSpec, imageName string, res chan<- v1alpha1.OCIPullResponse, errChan chan<- error) {
+func (b *Builder) Pull(spec v1alpha1.OCIBuilderSpec, imageName string, res chan<- v1alpha1.OCIPullResponse, errChan chan<- error, finished chan<- bool) {
 	log := b.Logger
 	cli := b.Client
 
-	log.Infoln("attempting to pull from logged in registries")
 	for idx, loginSpec := range spec.Login {
 		registry := loginSpec.Registry
+		log.WithField("registry", registry).Debugln("attempting to pull from logged in registry")
 		if registry != "" {
 			registry = registry + "/"
 		}
@@ -170,13 +167,12 @@ func (b *Builder) Pull(spec v1alpha1.OCIBuilderSpec, imageName string, res chan<
 		}
 		res <- pullResponse
 
-		log.WithField("response", idx).Debugln("response has finished executing")
+		log.WithField("step", idx).Debugln("finished pull attempt from registry")
 	}
-	close(res)
-	close(errChan)
+	finished <- true
 }
 
-func (b *Builder) Login(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCILoginResponse, errChan chan<- error) {
+func (b *Builder) Login(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCILoginResponse, errChan chan<- error, finished chan<- bool) {
 	log := b.Logger
 	cli := b.Client
 
@@ -185,8 +181,8 @@ func (b *Builder) Login(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCILog
 		return
 	}
 
-	for _, loginSpec := range spec.Login {
-		log.WithFields(logrus.Fields{"registry": loginSpec.Registry}).Infoln("attempting to login to registry")
+	for idx, loginSpec := range spec.Login {
+		log.WithField("registry", loginSpec.Registry).Debugln("attempting to login to registry")
 		username, err := common.ValidateLoginUsername(loginSpec)
 		if err != nil {
 			errChan <- err
@@ -215,10 +211,9 @@ func (b *Builder) Login(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCILog
 		}
 
 		res <- loginResponse
+		log.WithField("step", idx).Debugln("login step has finished executing")
 	}
-	close(res)
-	close(errChan)
-	log.Infoln("login complete")
+	finished <- true
 }
 
 func (b *Builder) Purge(imageName string) error {

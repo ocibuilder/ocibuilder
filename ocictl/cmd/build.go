@@ -129,27 +129,48 @@ func (b *buildCmd) run(args []string) error {
 
 	go builder.Build(ociBuilderSpec, res, errChan, finished)
 
-	select {
+	for {
+		select {
 
-	case err := <-errChan:
-		{
-			return err
-		}
-
-	case buildResponse := <-res:
-		{
-			if builderType == "docker" {
-				if err := utils.OutputJson(buildResponse.Body); err != nil {
-					return err
-				}
-			} else {
-				if err := utils.Output(buildResponse.Body, buildResponse.Stderr); err != nil {
+		case err := <-errChan:
+			{
+				if err != nil {
+					logger.WithError(err).Errorln("error received from error channel whilst building")
 					return err
 				}
 			}
-		}
 
+		case buildResponse := <-res:
+			{
+				logger.Infoln("executing build step")
+				logger.Infoln("outputting result")
+				if builderType == "docker" {
+					if err := utils.OutputJson(buildResponse.Body); err != nil {
+						return err
+					}
+				} else {
+					if err := utils.Output(buildResponse.Body, buildResponse.Stderr); err != nil {
+						return err
+					}
+				}
+				logger.Infoln("build step complete")
+			}
+
+		case <-finished:
+			{
+				logger.Infoln("all build steps complete successfully")
+				close(res)
+				close(errChan)
+				close(finished)
+				return nil
+			}
+
+		default:
+			{
+				break
+			}
+		}
 	}
-	logger.Infoln("execution complete")
+
 	return nil
 }

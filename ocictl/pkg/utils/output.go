@@ -52,14 +52,14 @@ func OutputJson(ouput io.ReadCloser) error {
 
 // Output outputs a readcloser to stdout in a stream without formatting.
 func Output(stdout io.ReadCloser, stderr io.ReadCloser) error {
-	//if _, err := io.Copy(os.Stdout, stderr); err != nil {
-	//	log.WithError(err).Errorln("error copying output to stdout")
-	//	return err
-	//}
-	//
-	//if _, err := io.Copy(os.Stdout, stdout); err != nil {
-	//	log.WithError(err).Errorln("error copying output to stdout")
-	//	return err
-	//}
+	if _, err := io.Copy(os.Stdout, stderr); err != nil {
+		log.WithError(err).Errorln("error copying output to stdout")
+		return err
+	}
+
+	if _, err := io.Copy(os.Stdout, stdout); err != nil {
+		log.WithError(err).Errorln("error copying output to stdout")
+		return err
+	}
 	return nil
 }

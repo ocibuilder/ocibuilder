@@ -121,28 +121,52 @@ func (p *pullCmd) run(args []string) error {
 
 	res := make(chan v1alpha1.OCIPullResponse)
 	errChan := make(chan error)
-	go builder.Pull(ociBuilderSpec, p.name, res, errChan)
+	finished := make(chan bool)
 
-	select {
+	go builder.Pull(ociBuilderSpec, p.name, res, errChan, finished)
 
-	case err := <-errChan:
-		{
-			return err
-		}
+	for {
+		select {
 
-	case pullResponse := <-res:
-		{
-			if builderType == "docker" {
-				if err := utils.OutputJson(pullResponse.Body); err != nil {
-					return err
-				}
-			} else {
-				if err := utils.Output(pullResponse.Body, pullResponse.Stderr); err != nil {
+		case err := <-errChan:
+			{
+				if err != nil {
+					logger.WithError(err).Errorln("error received from error channel whilst pulling")
 					return err
 				}
 			}
-		}
 
+		case pullResponse := <-res:
+			{
+				logger.Infoln("executing pull step")
+				logger.Infoln("outputting result")
+				if builderType == "docker" {
+					if err := utils.OutputJson(pullResponse.Body); err != nil {
+						return err
+					}
+				} else {
+					if err := utils.Output(pullResponse.Body, pullResponse.Stderr); err != nil {
+						return err
+					}
+				}
+				logger.Infoln("pull step complete")
+			}
+
+		case <-finished:
+			{
+				logger.Infoln("all pull steps complete successfully")
+				close(res)
+				close(errChan)
+				close(finished)
+				return nil
+			}
+
+		default:
+			{
+				break
+			}
+		}
 	}
+
 	return nil
 }
