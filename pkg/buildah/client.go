@@ -44,7 +44,7 @@ func (cli Client) ImagePull(options v1alpha1.OCIPullOptions) (v1alpha1.OCIPullRe
 
 	pullFlags := []command.Flag{
 		// Buildah registry auth in format username[:password]
-		{"creds", options.RegistryAuth, false, true},
+		{Name: "creds", Value: options.RegistryAuth, Short: false, OmitEmpty: true},
 	}
 
 	cmd := command.Builder("buildah").Command("pull").Flags(pullFlags...).Args(options.Ref).Build()
@@ -66,7 +66,7 @@ func (cli Client) ImagePush(options v1alpha1.OCIPushOptions) (v1alpha1.OCIPushRe
 
 	pushFlags := []command.Flag{
 		// Buildah registry auth in format username[:password]
-		{"creds", options.RegistryAuth, false, true},
+		{Name: "creds", Value: options.RegistryAuth, Short: false, OmitEmpty: true},
 	}
 
 	cmd := command.Builder("buildah").Command("push").Flags(pushFlags...).Args(options.Ref).Build()
@@ -107,8 +107,8 @@ func (cli Client) ImageRemove(options v1alpha1.OCIRemoveOptions) (v1alpha1.OCIRe
 func (cli Client) RegistryLogin(options v1alpha1.OCILoginOptions) (v1alpha1.OCILoginResponse, error) {
 
 	loginFlags := []command.Flag{
-		{"u", options.Username, true, true},
-		{"p", options.Password, true, true},
+		{Name: "u", Value: options.Username, Short: true, OmitEmpty: true},
+		{Name: "p", Value: options.Password, Short: true, OmitEmpty: true},
 	}
 
 	cmd := command.Builder("buildah").Command("login").Flags(loginFlags...).Args(options.ServerAddress).Build()

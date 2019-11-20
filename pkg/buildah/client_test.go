@@ -81,9 +81,9 @@ var ociBuildOptions = v1alpha1.OCIBuildOptions{
 }
 
 var expectedBuildCommand = command.Builder("buildah").Command("bud").Flags([]command.Flag{
-	{"f", "./Dockerfile", true, true},
-	{"storage-driver", "vfs", false, true},
-	{"t", "image-name:v0.1.0", true, true},
+	{Name: "f", Value: "./Dockerfile", Short: true, OmitEmpty: true},
+	{Name: "storage-driver", Value: "vfs", Short: false, OmitEmpty: true},
+	{Name: "t", Value: "image-name:v0.1.0", Short: true, OmitEmpty: true},
 }...).Args(".").Build()
 
 var ociPullOptions = v1alpha1.OCIPullOptions{
@@ -95,7 +95,7 @@ var ociPullOptions = v1alpha1.OCIPullOptions{
 }
 
 var expectedPullCommand = command.Builder("buildah").Command("pull").Flags([]command.Flag{
-	{"creds", "this-is-my-auth", false, true},
+	{Name: "creds", Value: "this-is-my-auth", Short: false, OmitEmpty: true},
 }...).Args("image-name").Build()
 
 var ociPushOptions = v1alpha1.OCIPushOptions{
@@ -107,7 +107,7 @@ var ociPushOptions = v1alpha1.OCIPushOptions{
 }
 
 var expectedPushCommand = command.Builder("buildah").Command("push").Flags([]command.Flag{
-	{"creds", "this-is-my-auth", false, true},
+	{Name: "creds", Value: "this-is-my-auth", Short: false, OmitEmpty: true},
 }...).Args("image-name").Build()
 
 var ociRemoveOptions = v1alpha1.OCIRemoveOptions{
@@ -124,8 +124,8 @@ var ociLoginOptions = v1alpha1.OCILoginOptions{
 }
 
 var expectedLoginCommand = command.Builder("buildah").Command("login").Flags([]command.Flag{
-	{"u", "user", true, true},
-	{"p", "pass", true, true},
+	{Name: "u", Value: "user", Short: true, OmitEmpty: true},
+	{Name: "p", Value: "pass", Short: true, OmitEmpty: true},
 }...).Args("arts-test-registry").Build()
 
 var authConfig = types.AuthConfig{
