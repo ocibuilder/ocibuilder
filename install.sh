@@ -6,6 +6,8 @@
 # It attempts to identify the current platform and an error will be thrown if
 # the platform is not supported.
 #
+# Environment variables:
+# - INSTALL_DIRECTORY (optional): defaults to $GOPATH/bin
 #
 # You can install using this script:
 # $ curl https://raw.githubusercontent.com/ocibuilder/ocibuilder/master/install.sh | sh
@@ -13,6 +15,26 @@
 set -e
 
 RELEASES_URL="https://github.com/ocibuilder/ocibuilder/releases"
+LATEST_VERSION=$(curl --silent "$RELEASES_URL/latest" | sed 's#.*tag/\(.*\)\".*#\1#')
+
+downloadTar() {
+    url="$DOWNLOAD_URL"
+
+    echo "Fetching $url.."
+    if test -x "$(command -v curl)"; then
+        wget -c $url -O - | tar -xz
+    elif test -x "$(command -v wget)"; then
+        curl $url | tar -xz
+    else
+        echo "Neither curl nor wget was available to perform http requests."
+        exit 1
+    fi
+    if [ "$code" != 200 ]; then
+        echo "Request failed with code $code"
+        exit 1
+    fi
+
+}
 
 findGoBinDirectory() {
     EFFECTIVE_GOPATH=$(go env GOPATH)
@@ -52,3 +74,15 @@ if [ -z "$INSTALL_DIRECTORY" ]; then
     findGoBinDirectory INSTALL_DIRECTORY
 fi
 echo "Will install into $INSTALL_DIRECTORY"
+
+if [ $OS = "darwin" ]; then
+    DOWNLOAD_URL="$RELEASES_URL/download/$LATEST_VERSION/ocictl-darwin-amd64.tar.gz"
+fi
+
+if [ $OS = "linux" ]; then
+    DOWNLOAD_URL="$RELEASES_URL/download/$LATEST_VERSION/ocictl-linux-amd64.tar.gz"
+fi
+echo "Will download from $DOWNLOAD_URL"
+
+downloadTar
+

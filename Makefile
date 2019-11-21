@@ -1,6 +1,7 @@
 PACKAGE=github.com/ocibuilder/ocibuilder/provenance
 CURRENT_DIR=$(shell pwd)
 DIST_DIR=${CURRENT_DIR}/dist
+OCICTL_DIR=${DIST_DIR}/ocictl
 
 VERSION                = $(shell cat ${CURRENT_DIR}/VERSION)
 BUILD_DATE             = $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
@@ -20,7 +21,7 @@ ocibuilder-linux:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 make ocibuilder
 
 ocictl:
-	packr build -v -ldflags '${LDFLAGS}' -o ${DIST_DIR}/ocictl ${CURRENT_DIR}/ocictl/main.go
+	packr build -v -ldflags '${LDFLAGS}' -o ${OCICTL_DIR}/ocictl ${CURRENT_DIR}/ocictl/main.go
 
 ocictl-linux:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 make ocictl
@@ -30,11 +31,11 @@ ocictl-mac:
 
 ocictl-package-build:
 	make ocictl-linux
-	tar -czvf dist/ocictl-linux-${VERSION}.tar.gz ./dist/ocictl
-	rm ${CURRENT_DIR}/dist/ocictl
+	cp README.md ./dist/ocictl
+	cd dist; tar -czvf ocictl-linux-amd64.tar.gz ./ocictl
 	make ocictl-mac
-	tar -czvf dist/ocictl-mac-${VERSION}.tar.gz ./dist/ocictl
-	rm ${CURRENT_DIR}/dist/ocictl
+	cd dist; tar -czvf ocictl-mac-amd64.tar.gz ./ocictl
+	cd dist; rm -rf ./ocictl
 
 test:
 	go test $(shell go list ./... | grep -v /vendor/ | grep -v /testing/) -race -short -v -coverprofile=coverage.text
