@@ -18,7 +18,8 @@ package cmd
 
 import (
 	"io"
-	"io/ioutil"
+
+	"github.com/ocibuilder/ocibuilder/pkg/init"
 
 	"github.com/gobuffalo/packr"
 	"github.com/ocibuilder/ocibuilder/common"
@@ -26,9 +27,10 @@ import (
 )
 
 type initCmd struct {
-	out   io.Writer
-	dry   bool
-	debug bool
+	out        io.Writer
+	dry        bool
+	debug      bool
+	fromDocker string
 }
 
 func newInitCmd(out io.Writer) *cobra.Command {
@@ -42,30 +44,26 @@ func newInitCmd(out io.Writer) *cobra.Command {
 	}
 	f := cmd.Flags()
 	f.BoolVar(&ic.dry, "dry", false, "Run a dry spec generation which is outputted to the terminal")
+	f.StringVarP(&ic.fromDocker, "from-docker", "-f", "", "Generate an ocibuilder build spec from a Dockerfile. Expects a path to a Dockerfile")
 	f.BoolVarP(&ic.debug, "debug", "d", false, "Turn on debug logging")
 
 	return cmd
 }
 
 func (i *initCmd) run(args []string) error {
-	log := common.GetLogger(i.debug)
-	box := packr.NewBox("../../templates/spec")
-
-	template, err := box.Find("simple_spec_template.yaml")
-	if err != nil {
-		log.WithError(err).Errorln("error reading in template from docs")
-		return err
+	initializer := init.Initializer{
+		Box:    packr.NewBox("../../templates/spec"),
+		Dry:    i.dry,
+		Logger: common.GetLogger(i.debug),
 	}
 
-	if i.dry {
-		if _, err := i.out.Write(template); err != nil {
-			log.WithError(err).Errorln("error writing template to stdout")
+	if i.fromDocker != "" {
+		if err := initializer.FromDocker(i.fromDocker); err != nil {
 			return err
 		}
 	}
 
-	if err := ioutil.WriteFile("ocibuilder.yaml", template, 0777); err != nil {
-		log.WithError(err).Errorln("error generating ocibuilder.yaml template file")
+	if err := initializer.Basic(); err != nil {
 		return err
 	}
 
