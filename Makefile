@@ -32,6 +32,7 @@ ocictl-mac:
 ocictl-package-build:
 	make ocictl-linux
 	cp README.md ./dist/ocictl
+	cp LICENSE ./dist/ocictl
 	cd dist; tar -czvf ocictl-linux-amd64.tar.gz ./ocictl
 	make ocictl-mac
 	cd dist; tar -czvf ocictl-mac-amd64.tar.gz ./ocictl

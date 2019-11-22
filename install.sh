@@ -16,24 +16,21 @@ set -e
 
 RELEASES_URL="https://github.com/ocibuilder/ocibuilder/releases"
 LATEST_VERSION=$(curl --silent "$RELEASES_URL/latest" | sed 's#.*tag/\(.*\)\".*#\1#')
+DOWNLOAD_BIN="ocictl/ocictl"
 
 downloadTar() {
     url="$DOWNLOAD_URL"
 
     echo "Fetching $url.."
     if test -x "$(command -v curl)"; then
-        wget -c $url -O - | tar -xz
+        curl -0L $url | tar -xz
     elif test -x "$(command -v wget)"; then
-        curl $url | tar -xz
+        wget -c $url -O - | tar -xz
     else
         echo "Neither curl nor wget was available to perform http requests."
         exit 1
     fi
-    if [ "$code" != 200 ]; then
-        echo "Request failed with code $code"
-        exit 1
-    fi
-
+    echo "Finished downloading tar"
 }
 
 findGoBinDirectory() {
@@ -82,7 +79,12 @@ fi
 if [ $OS = "linux" ]; then
     DOWNLOAD_URL="$RELEASES_URL/download/$LATEST_VERSION/ocictl-linux-amd64.tar.gz"
 fi
-echo "Will download from $DOWNLOAD_URL"
+echo "Downloading from $DOWNLOAD_URL"
 
 downloadTar
 
+echo "Setting executable permissions."
+chmod +x "$DOWNLOAD_BIN"
+
+echo "Moving executable to $INSTALL_DIRECTORY/$INSTALL_NAME"
+mv "$DOWNLOAD_BIN" "$INSTALL_DIRECTORY"
