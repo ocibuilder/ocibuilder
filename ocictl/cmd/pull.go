@@ -60,64 +60,96 @@ func newPullCmd(out io.Writer) *cobra.Command {
 	}
 	f := cmd.Flags()
 	f.StringVarP(&pc.name, "name", "i", "", "Specify the name of the image you want to pull")
-	f.StringVarP(&pc.path, "path", "p", "", "Path to your spec.yaml. By default will look in the current working directory")
+	f.StringVarP(&pc.path, "path", "p", "", "Path to your ocibuilder.yaml. By default will look in the current working directory")
 	f.StringVarP(&pc.builder, "builder", "b", "docker", "Choose either docker and buildah as the targetted image puller. By default the builder is docker.")
 	f.BoolVarP(&pc.debug, "debug", "d", false, "Turn on debug logging")
 	return cmd
 }
 
 func (p *pullCmd) run(args []string) error {
-	ociBuilderSpec := v1alpha1.OCIBuilderSpec{}
-	if err := pkg.Read(&ociBuilderSpec, "", p.path); err != nil {
+	ociBuilderSpec := v1alpha1.OCIBuilderSpec{
+		Daemon: true,
+	}
+	logger := common.GetLogger(p.debug)
+
+	reader := pkg.Reader{
+		Logger: logger,
+	}
+	if err := reader.Read(&ociBuilderSpec, "", p.path); err != nil {
 		log.WithError(err).Errorln("failed to read spec")
 		return err
 	}
 
-	switch v1alpha1.Framework(p.builder) {
+	// Prioritise builder passed in as argument, default builder is docker
+	builder := p.builder
+	if !ociBuilderSpec.Daemon {
+		builder = "buildah"
+	}
+
+	switch v1alpha1.Framework(builder) {
+
 	case v1alpha1.DockerFramework:
-		cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-		if err != nil {
-			log.WithError(err).Errorln("failed to fetch docker client")
-			return err
-		}
+		{
+			cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+			if err != nil {
+				log.WithError(err).Errorln("failed to fetch docker client")
+				return err
+			}
 
-		d := docker.Docker{
-			Client: cli,
-			Logger: common.GetLogger(p.debug),
-		}
-		res, err := d.Pull(ociBuilderSpec, p.name)
-		if err != nil {
-			return err
-		}
+			d := docker.Docker{
+				Client: cli,
+				Logger: logger,
+			}
+			log := d.Logger
 
-		for idx, imageResponse := range res {
-			log.WithField("step: ", idx).Infoln("running pull step")
-			err := utils.OutputJson(imageResponse)
+			res, err := d.Pull(ociBuilderSpec, p.name)
 			if err != nil {
 				return err
 			}
+
+			log.WithField("responses", len(res)).Debugln("received responses and running pull")
+			for idx, imageResponse := range res {
+				log.WithField("step: ", idx).Infoln("running pull step")
+
+				if err := utils.OutputJson(imageResponse); err != nil {
+					return err
+				}
+				log.WithField("response", idx).Debugln("response has finished executing")
+			}
+			log.Infoln("docker pull completed")
 		}
-		log.Infoln("docker pull completed")
 
 	case v1alpha1.BuildahFramework:
-		b := buildah.Buildah{
-			Logger: common.GetLogger(p.debug),
-		}
-		res, err := b.Pull(ociBuilderSpec, p.name)
-		if err != nil {
-			return err
-		}
+		{
+			b := buildah.Buildah{
+				Logger: logger,
+			}
+			log := b.Logger
 
-		for idx, imageResponse := range res {
-			log.WithField("step: ", idx).Infoln("running pull step")
-			if err := utils.Output(imageResponse); err != nil {
+			res, err := b.Pull(ociBuilderSpec, p.name)
+			if err != nil {
 				return err
 			}
+
+			log.WithField("responses", len(res)).Debugln("received responses and running pull")
+			for idx, imageResponse := range res {
+				log.WithField("step: ", idx).Infoln("running pull step")
+				if err := utils.Output(imageResponse); err != nil {
+					return err
+				}
+				if err := b.Wait(idx); err != nil {
+					return err
+				}
+				log.WithField("response", idx).Debugln("response has finished executing")
+			}
+			log.Infoln("buildah pull complete")
 		}
-		log.Infoln("buildah pull completed")
 
 	default:
-		return errors.New("invalid builder specified, try --builder=docker or --builder=buildah")
+		{
+			return errors.New("invalid builder specified, try --builder=docker or --builder=buildah")
+		}
 	}
+
 	return nil
 }

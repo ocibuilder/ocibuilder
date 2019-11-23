@@ -23,16 +23,17 @@ import (
 	"strings"
 
 	"github.com/ghodss/yaml"
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/tidwall/sjson"
 )
 
 // Read is responsible for reading in the specification files, either
-// combined in spec.yaml or separated in login.yaml, build.yaml and push.yaml.
+// combined in ocibuilder.yaml or separated in login.yaml, build.yaml and push.yaml.
 // The passed in OCIBuilderSpec reference is populated
 // If a filepath is not specified the current working directory is used
-func Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepaths ...string) error {
+func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepaths ...string) error {
 	dir, err := os.Getwd()
 	if err != nil {
 		return err
@@ -41,58 +42,64 @@ func Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepaths ...string
 	if filepath != "" {
 		dir = filepath
 	}
-	file, err := ioutil.ReadFile(dir + "/spec.yaml")
+
+	r.Logger.WithField("filepath", dir+"/ocibuilder.yaml").Debugln("looking for spec.yaml")
+	file, err := ioutil.ReadFile(dir + "/ocibuilder.yaml")
 	if err != nil {
-		common.Logger.Infoln("spec file not found, looking for individual specifications...")
-		if err := readIndividualSpecs(spec, dir); err != nil {
-			return err
+		r.Logger.Infoln("spec file not found, looking for individual specifications...")
+		if err := r.readIndividualSpecs(spec, dir); err != nil {
+			return errors.Wrap(err, "failed to read individual specs")
 		}
 	}
+
+	if err = yaml.Unmarshal(file, spec); err != nil {
+		return errors.Wrap(err, "failed to unmarshal spec at directory")
+	}
+
+	if err := Validate(spec); err != nil {
+		return errors.Wrap(err, "failed to validate spec at directory")
+	}
+
 	if overlayPath != "" {
+		r.Logger.WithField("overlayPath", overlayPath).Debugln("overlay path not empty - looking for overlay file")
 		file, err = applyOverlay(file, overlayPath)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "failed to apply overlay to spec at path")
 		}
 	}
-	if err = yaml.Unmarshal(file, spec); err != nil {
-		return err
-	}
-	if err := Validate(spec); err != nil {
-		return err
-	}
+
 	if spec.Params != nil {
-		if err = applyParams(file, spec); err != nil {
-			return err
+		if err = r.applyParams(file, spec); err != nil {
+			return errors.Wrap(err, "failed to apply params to spec")
 		}
 	}
+
 	return nil
 }
 
 // readIndividualSpecs reads the individual specifications if a global
-// spec.yaml is not found
-func readIndividualSpecs(spec *v1alpha1.OCIBuilderSpec, path string) error {
+// ocibuilder.yaml is not found
+func (r Reader) readIndividualSpecs(spec *v1alpha1.OCIBuilderSpec, path string) error {
 	var loginSpec []v1alpha1.LoginSpec
 	var buildSpec *v1alpha1.BuildSpec
 	var pushSpec []v1alpha1.PushSpec
 
+	r.Logger.Debugln("attempting to read individual specs as spec.yaml as not found")
 	if file, err := ioutil.ReadFile(path + "/login.yaml"); err == nil {
 		if err := yaml.Unmarshal(file, &loginSpec); err != nil {
-			common.Logger.WithError(err).Errorln("failed to unmarshal login.yaml")
-			return err
+			return errors.Wrap(err, "failed to unmarshal login.yaml")
 		}
 		spec.Login = loginSpec
 	}
 	if file, err := ioutil.ReadFile(path + "/build.yaml"); err == nil {
 		if err := yaml.Unmarshal(file, &buildSpec); err != nil {
-			common.Logger.WithError(err).Errorln("failed to unmarshal build.yaml")
-			return err
+			return errors.Wrap(err, "failed to unmarshal build.yaml")
 		}
 		spec.Build = buildSpec
 	}
 	if file, err := ioutil.ReadFile(path + "/push.yaml"); err == nil {
 		if err := yaml.Unmarshal(file, &pushSpec); err != nil {
-			common.Logger.WithError(err).Errorln("failed to unmarshal push.yaml")
-			return err
+			return errors.Wrap(err, "failed to unmarshal push.yaml")
 		}
 		spec.Push = pushSpec
 	}
@@ -103,9 +110,9 @@ func readIndividualSpecs(spec *v1alpha1.OCIBuilderSpec, path string) error {
 func applyOverlay(yamlTemplate []byte, overlayPath string) ([]byte, error) {
 	file, err := os.Open(overlayPath)
 	if err != nil {
-		common.Logger.WithError(err).Errorln("unable to read overlay file...")
-		return nil, err
+		return nil, errors.Wrap(err, "unable to read overlay file")
 	}
+
 	yttOverlay := YttOverlay{
 		spec: yamlTemplate,
 		overlay: OverlayFile{
@@ -113,40 +120,65 @@ func applyOverlay(yamlTemplate []byte, overlayPath string) ([]byte, error) {
 			file: file,
 		},
 	}
+
 	overlayedSpec, err := yttOverlay.Apply()
 	if err != nil {
-		common.Logger.WithError(err).Errorln("unable to apply overlay to spec...")
-		return nil, err
+		return nil, errors.Wrap(err, "unable to apply overlay to spec")
 	}
+
 	return overlayedSpec, nil
 }
 
-func applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error {
-	specJson, err := yaml.YAMLToJSON(yamlObj)
+func (r Reader) applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error {
+	log := r.Logger
+	specJSON, err := yaml.YAMLToJSON(yamlObj)
 	if err != nil {
 		return err
 	}
+
+	log.WithField("number", len(spec.Params)).Debugln("found custom params in spec.yaml")
 	for _, param := range spec.Params {
 		if param.Value != "" {
-			tmp, err := sjson.SetBytes(specJson, param.Dest, param.Value)
+			log.WithFields(logrus.Fields{
+				"value": param.Value,
+				"dest":  param.Dest,
+			}).Debugln("setting param value at destination")
+
+			if err := ValidateParams(specJSON, param.Dest); err != nil {
+				log.WithError(err).WithField("dest", param.Dest).Errorln("Error validating params, check that your param dest is valid")
+				return err
+			}
+
+			tmp, err := sjson.SetBytes(specJSON, param.Dest, param.Value)
 			if err != nil {
 				return err
 			}
-			specJson = tmp
+			specJSON = tmp
 		}
 		if param.ValueFromEnvVariable != "" {
+			log.WithFields(logrus.Fields{
+				"value": param.Value,
+				"dest":  param.Dest,
+			}).Debugln("setting param value at destination")
+
 			val := os.Getenv(param.ValueFromEnvVariable)
 			if val == "" {
-				common.Logger.Warn("env variable ", param.ValueFromEnvVariable, " is empty")
+				log.Warn("env variable ", param.ValueFromEnvVariable, " is empty")
 			}
-			tmp, err := sjson.SetBytes(specJson, param.Dest, val)
+
+			if err := ValidateParams(specJSON, param.Dest); err != nil {
+				log.WithError(err).WithField("dest", param.Dest).Errorln("Error validating params, check that your param dest is valid")
+				return err
+			}
+			tmp, err := sjson.SetBytes(specJSON, param.Dest, val)
 			if err != nil {
 				return err
 			}
-			specJson = tmp
+			specJSON = tmp
 		}
 	}
-	if err := json.Unmarshal(specJson, spec); err != nil {
+
+	if err := json.Unmarshal(specJSON, spec); err != nil {
 		return err
 	}
 	return nil

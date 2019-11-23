@@ -47,6 +47,11 @@ var BuildSpec = &v1alpha1.BuildSpec{
 					},
 				},
 			},
+			BuildContext: &v1alpha1.BuildContext{
+				LocalContext: &v1alpha1.LocalContext{
+					ContextPath: ".",
+				},
+			},
 		},
 	},
 }

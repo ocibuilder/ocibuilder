@@ -56,7 +56,7 @@ func Output(output io.ReadCloser) error {
 		// TODO: this needs to be replaced with a permanent fix, this error is thrown
 		// when reaching the end of the reader
 		if err.Error() == "read /dev/ptmx: input/output error" {
-			log.Infoln("finished reading input")
+			log.Infoln("finished reading output")
 			return nil
 		}
 		log.WithError(err).Errorln("error copying output to stdout")

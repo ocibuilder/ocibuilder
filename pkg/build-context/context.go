@@ -30,13 +30,13 @@ type BuildContextReader interface {
 
 // GetBuildContextReader returns a build context based on the store
 func GetBuildContextReader(buildContext *v1alpha1.BuildContext, k8sConfigPath string) (BuildContextReader, error) {
+	var k8sClient kubernetes.Interface
 	kubeConfig, err := common.GetClientConfig(k8sConfigPath)
-	if err != nil {
-		return nil, err
-	}
-	k8sClient, err := kubernetes.NewForConfig(kubeConfig)
-	if err != nil {
-		return nil, err
+	if err == nil {
+		k8sClient, err = kubernetes.NewForConfig(kubeConfig)
+		if err != nil {
+			return nil, err
+		}
 	}
 	if buildContext.AliyunOSSContext != nil {
 		return NewAliyunOSSBuildContextReader(buildContext.AliyunOSSContext, k8sClient), nil

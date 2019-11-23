@@ -47,7 +47,7 @@ type OverlayFile struct {
 // Apply applies the overlay on a YttOverlay struct
 func (y YttOverlay) Apply() ([]byte, error) {
 	if y.spec == nil {
-		return nil, errors.New("spec file is not defined, overlays is currently only supported for spec.yaml files")
+		return nil, errors.New("spec file is not defined, overlays is currently only supported for ocibuilder.yaml files")
 	}
 	annotatedOverlay := addYttAnnotations(y.overlay.file)
 	if annotatedOverlay == nil {
@@ -58,7 +58,7 @@ func (y YttOverlay) Apply() ([]byte, error) {
 		annotatedOverlay = overlay
 	}
 	filesToProcess := []*files.File{
-		files.MustNewFileFromSource(files.NewBytesSource("spec.yaml", y.spec)),
+		files.MustNewFileFromSource(files.NewBytesSource("ocibuilder.yaml", y.spec)),
 		files.MustNewFileFromSource(files.NewBytesSource(y.overlay.path, annotatedOverlay)),
 	}
 

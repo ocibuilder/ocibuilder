@@ -19,8 +19,10 @@ package pkg
 import (
 	"os"
 
+	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/pkg/errors"
+	"github.com/tidwall/gjson"
 )
 
 // Validate validates a ocibuilder spec.
@@ -37,7 +39,7 @@ func Validate(spec *v1alpha1.OCIBuilderSpec) error {
 	return nil
 }
 
-// ValidateBuildTempalteStep validates build template step
+// ValidateBuildTemplateStep validates build template step
 func ValidateBuildTemplateStep(step v1alpha1.BuildTemplateStep) error {
 	if step.Ansible == nil && step.Docker == nil {
 		return errors.New("at least one step type should be defined")
@@ -99,15 +101,22 @@ func ValidatePush(spec v1alpha1.OCIBuilderSpec) error {
 }
 
 // ValidatePushSpec validates the lower level push specification
-func ValidatePushSpec(spec v1alpha1.PushSpec) error {
+func ValidatePushSpec(spec *v1alpha1.PushSpec) error {
 	if spec.Registry == "" {
-		return errors.New("push registry must be specified for push")
+		spec.Registry = common.DefaultImageRegistry
 	}
 	if spec.Image == "" {
 		return errors.New("image name must be specified for push")
 	}
 	if spec.Tag == "" {
 		return errors.New("tag must be specified for push")
+	}
+	return nil
+}
+
+func ValidateParams(specJSON []byte, src string) error {
+	if res := gjson.GetBytes(specJSON, src); res.Str == "" {
+		return errors.New("path to dest is invalid in a set param")
 	}
 	return nil
 }

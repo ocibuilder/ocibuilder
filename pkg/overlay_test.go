@@ -17,20 +17,21 @@ limitations under the License.
 package pkg
 
 import (
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestYttOverlay_Apply(t *testing.T) {
-	file, err := os.Open("../testing/overlay_overlay_test.yaml")
+	file, err := os.Open("../testing/dummy/overlay_overlay_test.yaml")
 	assert.Equal(t, nil, err)
 
 	yttOverlay := YttOverlay{
 		spec: yamlTplData,
 		overlay: OverlayFile{
 			file: file,
-			path: "../testing/overlay_overlay_test.yaml",
+			path: "../testing/dummy/overlay_overlay_test.yaml",
 		},
 	}
 	overlayedSpec, err := yttOverlay.Apply()
@@ -39,14 +40,14 @@ func TestYttOverlay_Apply(t *testing.T) {
 }
 
 func TestYttOverlay_ApplyAnnotated(t *testing.T) {
-	file, err := os.Open("../testing/overlay_overlay_annotated_test.yaml")
+	file, err := os.Open("../testing/dummy/overlay_overlay_annotated_test.yaml")
 	assert.Equal(t, nil, err)
 
 	yttOverlay := YttOverlay{
 		spec: yamlTplData,
 		overlay: OverlayFile{
 			file: file,
-			path: "../testing/overlay_overlay_annotated_test.yaml",
+			path: "../testing/dummy/overlay_overlay_annotated_test.yaml",
 		},
 	}
 	overlayedSpec, err := yttOverlay.Apply()
@@ -56,7 +57,7 @@ func TestYttOverlay_ApplyAnnotated(t *testing.T) {
 }
 
 func TestAddYttAnnotations(t *testing.T) {
-	file, err := os.Open("../testing/overlay_overlay_test.yaml")
+	file, err := os.Open("../testing/dummy/overlay_overlay_test.yaml")
 	assert.Equal(t, nil, err)
 
 	annotatedOverlay := addYttAnnotations(file)

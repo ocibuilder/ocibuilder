@@ -18,12 +18,12 @@ package cmd
 
 import (
 	"errors"
+	"github.com/ocibuilder/ocibuilder/pkg"
 	"io"
 
 	"github.com/docker/docker/client"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/ocictl/pkg/utils"
-	"github.com/ocibuilder/ocibuilder/pkg"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/buildah"
 	"github.com/ocibuilder/ocibuilder/pkg/docker"
@@ -31,7 +31,7 @@ import (
 )
 
 const buildDesc = `
-This command runs an image build with the specification defined in your projects spec.yaml file.
+This command runs an image build with the specification defined in your projects ocibuilder.yaml file.
 It can run a build in both docker and buildah varieties.
 `
 
@@ -56,74 +56,112 @@ func newBuildCmd(out io.Writer) *cobra.Command {
 		},
 	}
 	f := cmd.Flags()
-	f.StringVarP(&bc.name, "name", "n", "", "Specify the name of your build or defined in spec.yaml")
-	f.StringVarP(&bc.path, "path", "p", "", "Path to your spec.yaml or build.yaml. By default will look in the current working directory")
+	f.StringVarP(&bc.name, "name", "n", "", "Specify the name of your build or defined in ocibuilder.yaml")
+	f.StringVarP(&bc.path, "path", "p", "", "Path to your ocibuilder.yaml or build.yaml. By default will look in the current working directory")
 	f.StringVarP(&bc.builder, "builder", "b", "docker", "Choose either docker and buildah as the targetted image builder. By default the builder is docker.")
 	f.BoolVarP(&bc.debug, "debug", "d", false, "Turn on debug logging")
 	f.StringVarP(&bc.overlay, "overlay", "o", "", "Path to your overlay.yaml file")
-	f.StringVarP(&bc.storageDriver, "storage-driver", "-s", "overlay", "Storage-driver for Buildah. vfs enables the use of buildah within an unprivileged container. By default the storage driver is overlay")
+	f.StringVarP(&bc.storageDriver, "storage-driver", "s", "overlay", "Storage-driver for Buildah. vfs enables the use of buildah within an unprivileged container. By default the storage driver is overlay")
 
 	return cmd
 }
 
 func (b *buildCmd) run(args []string) error {
-	ociBuilderSpec := v1alpha1.OCIBuilderSpec{}
-	if err := pkg.Read(&ociBuilderSpec, b.overlay, b.path); err != nil {
+	logger := common.GetLogger(b.debug)
+	ociBuilderSpec := v1alpha1.OCIBuilderSpec{
+		Daemon: true,
+	}
+
+	reader := pkg.Reader{
+		Logger: logger,
+	}
+
+	if err := reader.Read(&ociBuilderSpec, b.overlay, b.path); err != nil {
 		log.WithError(err).Errorln("failed to read spec")
 		return err
 	}
 
-	switch v1alpha1.Framework(b.builder) {
+	// Prioritise builder passed in as argument, default builder is docker
+	builder := b.builder
+	if !ociBuilderSpec.Daemon {
+		builder = "buildah"
+	}
+
+	switch v1alpha1.Framework(builder) {
+
 	case v1alpha1.DockerFramework:
-		cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-		if err != nil {
-			log.WithError(err).Errorln("failed to fetch docker client")
-			return err
-		}
-
-		d := docker.Docker{
-			Client: cli,
-			Logger: common.GetLogger(b.debug),
-		}
-		res, err := d.Build(ociBuilderSpec)
-		if err != nil {
-			return err
-		}
-
-		for idx, imageResponse := range res {
-			log.WithField("step: ", idx).Infoln("running build step")
-
-			if imageResponse == nil {
-				return errors.New("no response received from daemon - check if docker is installed and running")
+		{
+			cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+			if err != nil {
+				log.WithError(err).Errorln("failed to fetch docker client")
+				return err
 			}
 
-			err := utils.OutputJson(imageResponse)
+			d := docker.Docker{
+				Client: cli,
+				Logger: logger,
+			}
+			log := d.Logger
+
+			res, err := d.Build(ociBuilderSpec)
 			if err != nil {
 				return err
 			}
+
+			log.WithField("responses", len(res)).Debugln("received responses and running build")
+			for idx, imageResponse := range res {
+				log.WithField("step: ", idx).Infoln("running build step")
+
+				if imageResponse == nil {
+					return errors.New("no response received from daemon - check if docker is installed and running")
+				}
+
+				if err := utils.OutputJson(imageResponse); err != nil {
+					return err
+				}
+				log.WithField("response", idx).Debugln("response has finished executing")
+			}
+			log.Debugln("running build file cleanup")
+			d.Clean()
+			log.Infoln("docker build complete")
 		}
-		log.Infoln("docker build complete")
 
 	case v1alpha1.BuildahFramework:
-		b := buildah.Buildah{
-			Logger:        common.GetLogger(b.debug),
-			StorageDriver: b.storageDriver,
-		}
-		res, err := b.Build(ociBuilderSpec)
-		if err != nil {
-			log.WithError(err).Errorln("error executing build on ocibuilder spec")
-			return err
-		}
-		for idx, imageResponse := range res {
-			log.WithField("step: ", idx).Infoln("running build step")
-			if err := utils.Output(imageResponse); err != nil {
+		{
+			b := buildah.Buildah{
+				Logger:        logger,
+				StorageDriver: b.storageDriver,
+			}
+			log := b.Logger
+
+			res, err := b.Build(ociBuilderSpec)
+			if err != nil {
+				log.WithError(err).Errorln("error executing build on ocibuilder spec")
 				return err
 			}
+
+			log.WithField("responses", len(res)).Debugln("received responses and running build")
+			for idx, imageResponse := range res {
+				log.WithField("step: ", idx).Infoln("running build step")
+				if err := utils.Output(imageResponse); err != nil {
+					return err
+				}
+				if err := b.Wait(idx); err != nil {
+					return err
+				}
+				log.WithField("response", idx).Debugln("response has finished executing")
+			}
+			log.Debugln("running build file cleanup")
+			b.Clean()
+			log.Infoln("buildah build complete")
 		}
-		log.Infoln("buildah build complete")
 
 	default:
-		return errors.New("invalid builder specified, try --builder=docker or --builder=buildah")
+		{
+			return errors.New("invalid builder specified, try --builder=docker or --builder=buildah")
+		}
+
 	}
+
 	return nil
 }

@@ -21,9 +21,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// Daemon is the type of build framework
-type Daemon bool
-
 // NodePhase is the label for the condition of a node.
 type NodePhase string
 
@@ -88,6 +85,10 @@ type OCIBuilderSpec struct {
 	// +optional
 	// +listType=map
 	Push []PushSpec `json:"push,omitempty" protobuf:"bytes,4,name=push"`
+	// Type of the build framework.
+	// Defaults to docker
+	// +optional
+	Daemon bool `json:"daemon,omitempty" protobuf:"bytes,5,opt,name=daemon"`
 }
 
 // OCIBuilderStatus holds the status of a OCIBuilder resource
@@ -180,33 +181,29 @@ type AnsibleGalaxy struct {
 type BuildStep struct {
 	// Metadata about the build step.
 	*Metadata `json:"metadata,inline" protobuf:"bytes,1,name=metadata"`
-	// Type of the build framework.
-	// Defaults to docker
-	// +optional
-	Daemon Daemon `json:"daemon,omitempty" protobuf:"bytes,2,opt,name=daemon"`
 	// Stages of the build
 	// +listType=map
 	Stages []Stage `json:"stages" protobuf:"bytes,3,opt,name=purge"`
 	// Git url to fetch the project from.
 	// +optional
-	Git string `json:"git,omitempty" protobuf:"bytes,4,opt,name=git"`
+	Git string `json:"git,omitempty" protobuf:"bytes,3,opt,name=git"`
 	// Tag the tag of the build
 	// +optional
-	Tag string `json:"tag,omitempty" protobuf:"bytes,5,opt,name=tag"`
+	Tag string `json:"tag,omitempty" protobuf:"bytes,4,opt,name=tag"`
 	// Distroless if set to true generates a distroless image
-	Distroless bool `json:"distroless,omitempty" protobuf:"bytes,6,opt,name=distroless"`
+	Distroless bool `json:"distroless,omitempty" protobuf:"bytes,5,opt,name=distroless"`
 	// Cache for build
 	// Set to false by default
 	// +optional
-	Cache bool `json:"cache,omitempty" protobuf:"bytes,7,opt,name=cache"`
+	Cache bool `json:"cache,omitempty" protobuf:"bytes,6,opt,name=cache"`
 	// Purge the build
 	// defaults to false
 	// +optional
-	Purge bool `json:"purge,omitempty" protobuf:"bytes,8,opt,name=purge"`
+	Purge bool `json:"purge,omitempty" protobuf:"bytes,7,opt,name=purge"`
 	// BuildContext used for image build
 	// default looks at the current working directory
 	// +optional
-	BuildContext *BuildContext `json:"context,omitempty" protobuf:"bytes,9,opt,name=context"`
+	BuildContext *BuildContext `json:"context,omitempty" protobuf:"bytes,8,opt,name=context"`
 }
 
 // Stage represents a stage within the build
@@ -333,9 +330,6 @@ type ImageBuildArgs struct {
 	// Dockerfile is the path to the generated Dockerfile
 	// +optional
 	Dockerfile string `json:"dockerfile,omitempty" protobuf:"bytes,3,opt,name=dockerfile"`
-	// Ansible step outlines the ansible steps in the build *optional
-	// +optional
-	Ansible AnsibleStep `json:"ansible,omitempty" protobuf:"bytes,4,opt,name=ansible"`
 	// Purge the image after it has been pushed
 	// defaults to false
 	// +optional
@@ -496,4 +490,10 @@ type Command struct {
 	// Value is the contents of the command (e.g `ubuntu:xenial`)
 	// +listType=map
 	Value []string `json:"value" protobuf:"bytes,7,opt,name=value"`
+}
+
+// Represents build image metadata
+type ImageMetadata struct {
+	// BuildFile is the path to the buildfile
+	BuildFile string
 }

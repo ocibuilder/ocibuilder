@@ -3,6 +3,7 @@ ocibuilder.iml
 dist/
 vendor/
 */.DS_Store
+*.swp
 
 # Binaries for programs and plugins
 *.exe

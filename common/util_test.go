@@ -62,6 +62,6 @@ func TestReadCredentials(t *testing.T) {
 		}
 		sensor, err := fakeClient.CoreV1().Secrets(secretObj.Namespace).Create(secretObj)
 		convey.So(err, convey.ShouldBeNil)
-		convey.So(sensor.Data["accessKey"], convey.ShouldEqual, "access")
+		convey.So(string(sensor.Data["accessKey"]), convey.ShouldEqual, "access")
 	})
 }

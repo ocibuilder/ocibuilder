@@ -83,6 +83,9 @@ func ReadCredentials(client kubernetes.Interface, creds *v1alpha1.Credentials) (
 		return value, nil
 	}
 	if creds.KubeSecret != nil {
+		if client == nil {
+			return "", errors.New("kubernetes client is not initialized")
+		}
 		secret, err := client.CoreV1().Secrets(creds.KubeSecret.Namespace).Get(creds.KubeSecret.Secret.Name, metav1.GetOptions{})
 		if err != nil {
 			return "", err
