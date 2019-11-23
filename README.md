@@ -8,7 +8,9 @@
 
 The **ocibuilder** offers a command line tool called the **ocictl** to build, push and pull [OCI](https://www.opencontainers.org/) compliant images through declarative specifications, allowing you to pick between [Buildah](https://github.com/containers/buildah) or [Docker](https://docs.docker.com/) as the container build tool.
 
-![logo](https://github.com/ocibuilder/docs/blob/master/assets/oci-gopher.png)
+<p align="center">
+  <img src="https://github.com/ocibuilder/docs/blob/master/assets/oci-gopher.png?raw=true" alt="Logo"/>
+</p>
 
 ## Features
 
