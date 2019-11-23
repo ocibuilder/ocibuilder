@@ -1,5 +1,6 @@
 # ocibuilder - Build [Open Container Initiative (OCI)](https://www.opencontainers.org/) compliant images the declarative way
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/ocibuilder/ocibuilder)](https://goreportcard.com/report/github.com/ocibuilder/ocibuilder)
 [![CircleCI](https://circleci.com/gh/ocibuilder/ocibuilder.svg?style=shield)](https://circleci.com/gh/ocibuilder/ocibuilder)
 [![Docs](https://img.shields.io/badge/docs-ocibuilder-56b5f5)](https://ocibuilder.github.io/docs/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
