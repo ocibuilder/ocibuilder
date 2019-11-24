@@ -5,7 +5,7 @@ build:
         - docker:
             inline:
               - ADD . /src
-              - RUN cd /src && go build -o goapp
+              - RUN cd /src &amp;&amp; go build -o goapp
     - name: template-2
       cmd:
         - docker:

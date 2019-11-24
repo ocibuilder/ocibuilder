@@ -24,5 +24,5 @@ type ContextReader interface {
 
 // SpecGenerator provides an interface for spec generation for ocibuilder.yaml specification files
 type SpecGenerator interface {
-	Generate() (interface{}, error)
+	Generate() ([]byte, error)
 }

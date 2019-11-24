@@ -3,7 +3,7 @@ build:
 {{ range .Templates }}{{ . }}{{ end }}
   steps:
     - metadata:
-      name: {{ .ImageName }}
+        name: {{ .ImageName }}
         labels:
           createdBy: spec-gen
       tag: {{ .Tag }}

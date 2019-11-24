@@ -2,20 +2,24 @@ package generate
 
 import (
 	"errors"
-	"fmt"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/moby/buildkit/frontend/dockerfile/parser"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/sirupsen/logrus"
 )
 
 type DockerGenerator struct {
-	Filepath string
+	Filepath  string
+	ImageName string
+	Tag       string
+	Logger    *logrus.Logger
 }
 
-func (d DockerGenerator) Generate() (interface{}, error) {
+func (d DockerGenerator) Generate() ([]byte, error) {
 	file, err := os.Open(d.Filepath)
 	if err != nil {
 		return nil, err
@@ -49,7 +53,7 @@ func (d DockerGenerator) Generate() (interface{}, error) {
 			templateName = "build-template-" + strconv.Itoa(templateIdx)
 
 			fromCmd, _ := parseFromCmd(templateName, cmd)
-			stage, err := Generate("stage_tmpl", fromCmd)
+			stage, err := generate("stage_tmpl", fromCmd)
 			if err != nil {
 				return nil, err
 			}
@@ -64,7 +68,7 @@ func (d DockerGenerator) Generate() (interface{}, error) {
 	var templates []string
 	for templateName, templateCmds := range tmpCmds {
 		buildTemplate := v1alpha1.BuildGenTemplate{Name: templateName, Cmds: templateCmds}
-		tmpl, err := Generate("build_template_tmpl", buildTemplate)
+		tmpl, err := generate("build_template_tmpl", buildTemplate)
 		if err != nil {
 			return nil, err
 		}
@@ -72,13 +76,16 @@ func (d DockerGenerator) Generate() (interface{}, error) {
 	}
 
 	ocibuilderTmpl := v1alpha1.GenerateTemplate{
+		ImageName: d.ImageName,
 		Stages:    stages,
+		Tag:       d.Tag,
 		Templates: templates,
 	}
-	byt, _ := Generate("ocibuilder_tmpl", ocibuilderTmpl)
-	fmt.Println(string(byt))
-
-	return nil, nil
+	spec, err := generate("ocibuilder_tmpl", ocibuilderTmpl)
+	if err != nil {
+		return nil, err
+	}
+	return removeWhitespace(spec), nil
 }
 
 func parseFromCmd(templateName string, cmd v1alpha1.Command) (v1alpha1.StageGenTemplate, error) {
@@ -105,4 +112,10 @@ func parseFromCmd(templateName string, cmd v1alpha1.Command) (v1alpha1.StageGenT
 	}
 
 	return stageTmp, nil
+}
+
+func removeWhitespace(spec []byte) []byte {
+	re := regexp.MustCompile("(?m)^\\s*$[\r\n]*")
+	specNoSpace := strings.Trim(re.ReplaceAllString(string(spec), ""), "\r\n")
+	return []byte(specNoSpace)
 }
