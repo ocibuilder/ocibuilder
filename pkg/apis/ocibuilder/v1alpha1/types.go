@@ -375,3 +375,22 @@ type ImageMetadata struct {
 	// BuildFile is the path to the buildfile
 	BuildFile string
 }
+
+type GenerateTemplate struct {
+	ImageName string
+	Tag       string
+	Stages    []string
+	Templates []string
+}
+
+type StageGenTemplate struct {
+	Base         string
+	BaseTag      string
+	StageName    string
+	TemplateName string
+}
+
+type BuildGenTemplate struct {
+	Name string
+	Cmds []string
+}
