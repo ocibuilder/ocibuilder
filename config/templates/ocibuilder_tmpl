@@ -1,14 +1,15 @@
 build:
   templates:
-    {{ range .Templates }}{{ . }}
-    {{ end }}
+{{ range .Templates }}{{ . }}{{ end }}
   steps:
     - metadata:
       name: {{ .ImageName }}
         labels:
           createdBy: spec-gen
-      stages:
-        {{ range .Stages }}{{ . }}
-        {{ end }}
       tag: {{ .Tag }}
       daemon: true
+      context:
+        localContext:
+          contextPath: .
+      stages:
+{{ range .Stages }}{{ . }}{{ end }}

@@ -1,6 +1,6 @@
-- metadata:
+        - metadata:
             name: {{ .StageName }}
-            base:
-              image: {{ .Base }}{{ if .BaseTag }}
-              tag: {{ .BaseTag }}{{end}}
-            template: {{ .TemplateName }}
+          base:
+            image: {{ .Base }}{{ if .BaseTag }}
+            tag: {{ .BaseTag }}{{end}}
+          template: {{ .TemplateName }}
