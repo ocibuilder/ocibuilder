@@ -3,16 +3,24 @@ package generate
 import (
 	"bytes"
 	"io/ioutil"
+	"os"
 	"text/template"
 
 	"github.com/gobuffalo/packr"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 )
 
-func GenerateSpecification(generator v1alpha1.SpecGenerator) error {
+func GenerateSpecification(generator v1alpha1.SpecGenerator, dry bool) error {
 	spec, err := generator.Generate()
 	if err != nil {
 		return err
+	}
+
+	if dry {
+		if _, err := os.Stdout.Write(spec); err != nil {
+			return err
+		}
+		return nil
 	}
 
 	if err := ioutil.WriteFile("ocibuilder.yaml", spec, 0644); err != nil {

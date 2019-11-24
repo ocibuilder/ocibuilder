@@ -14,13 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package init
+package initialize
 
 import (
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/gobuffalo/packr"
+	"github.com/ocibuilder/ocibuilder/pkg/generate"
 	"github.com/sirupsen/logrus"
 )
 
@@ -55,6 +57,22 @@ func (i Initializer) Basic() error {
 	return nil
 }
 
-func (i Initializer) FromDocker(path string) error {
+func (i Initializer) FromDocker(imageName string, path string) error {
+
+	tags := strings.Split(imageName, ":")
+	dg := generate.DockerGenerator{
+		ImageName: tags[0],
+		Filepath:  path,
+		Logger:    i.Logger,
+	}
+
+	if len(tags) > 1 {
+		dg.Tag = tags[1]
+	}
+
+	if err := generate.GenerateSpecification(dg, i.Dry); err != nil {
+		return err
+	}
+
 	return nil
 }
