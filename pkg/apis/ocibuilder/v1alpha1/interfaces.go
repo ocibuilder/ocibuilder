@@ -21,3 +21,8 @@ type Overlay interface {
 type ContextReader interface {
 	Read() (io.ReadCloser, error)
 }
+
+// SpecGenerator provides an interface for spec generation for ocibuilder.yaml specification files
+type SpecGenerator interface {
+	Generate() (interface{}, error)
+}
