@@ -43,7 +43,7 @@ lint:
 	golangci-lint run
 
 e2e:
-	go test testing/e2e
+	go test testing/e2e -ginkgo.v
 
 clean:
 	-rm -rf ${CURRENT_DIR}/dist
