@@ -154,7 +154,7 @@ func ParseAnsibleCommands(ansibleStep *v1alpha1.AnsibleStep) ([]byte, error) {
 	var buf bytes.Buffer
 	var dockerfile []byte
 
-	box := packr.NewBox("../templates/ansible")
+	box := packr.NewBox("../../templates/ansible")
 
 	if ansibleStep.Local != nil {
 		file, err := box.Find(v1alpha1.AnsiblePath)

@@ -31,7 +31,7 @@ func TestReadLogin(t *testing.T) {
 	reader := Reader{
 		Logger: common.GetLogger(true),
 	}
-	err := reader.Read(&spec, "", "../testing/dummy")
+	err := reader.Read(&spec, "", "../../testing/dummy")
 
 	assert.Equal(t, nil, err)
 	assert.Equal(t, spec.Login, loginSpec, "the login spec to match the expected")
@@ -42,7 +42,7 @@ func TestApplyParams(t *testing.T) {
 	reader := Reader{
 		Logger: common.GetLogger(true),
 	}
-	file, err := ioutil.ReadFile("../testing/dummy/spec_read_test.yaml")
+	file, err := ioutil.ReadFile("../../testing/dummy/spec_read_test.yaml")
 	assert.Equal(t, nil, err)
 
 	spec.Login = loginSpec
@@ -63,7 +63,7 @@ func TestApplyInvalidParams(t *testing.T) {
 	reader := Reader{
 		Logger: common.GetLogger(true),
 	}
-	file, err := ioutil.ReadFile("../testing/dummy/spec_read_test.yaml")
+	file, err := ioutil.ReadFile("../../testing/dummy/spec_read_test.yaml")
 	assert.Equal(t, nil, err)
 
 	spec.Login = loginSpec
@@ -78,7 +78,7 @@ func TestApplyParamsEnvVariable(t *testing.T) {
 	reader := Reader{
 		Logger: common.GetLogger(true),
 	}
-	file, err := ioutil.ReadFile("../testing/dummy/spec_read_test.yaml")
+	file, err := ioutil.ReadFile("../../testing/dummy/spec_read_test.yaml")
 	assert.Equal(t, nil, err)
 
 	spec.Login = loginSpec
@@ -106,7 +106,7 @@ func TestApplyInvalidParamsEnvVariable(t *testing.T) {
 	reader := Reader{
 		Logger: common.GetLogger(true),
 	}
-	file, err := ioutil.ReadFile("../testing/dummy/spec_read_test.yaml")
+	file, err := ioutil.ReadFile("../../testing/dummy/spec_read_test.yaml")
 	assert.Equal(t, nil, err)
 
 	spec.Login = loginSpec
