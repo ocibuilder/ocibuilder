@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package pkg
+package read
 
 import (
 	"encoding/json"
@@ -22,14 +22,20 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ocibuilder/ocibuilder/pkg/overlay"
-
 	"github.com/ghodss/yaml"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/overlay"
+	"github.com/ocibuilder/ocibuilder/pkg/validate"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/tidwall/sjson"
 )
+
+// Reader is the struct for the common reader library
+type Reader struct {
+	// Logger is the logrus logger pass to the reader
+	Logger *logrus.Logger
+}
 
 // Read is responsible for reading in the specification files, either
 // combined in ocibuilder.yaml or separated in login.yaml, build.yaml and push.yaml.
@@ -58,7 +64,7 @@ func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepath
 		return errors.Wrap(err, "failed to unmarshal spec at directory")
 	}
 
-	if err := Validate(spec); err != nil {
+	if err := validate.Validate(spec); err != nil {
 		return errors.Wrap(err, "failed to validate spec at directory")
 	}
 
@@ -116,10 +122,10 @@ func applyOverlay(yamlTemplate []byte, overlayPath string) ([]byte, error) {
 	}
 
 	yttOverlay := overlay.YttOverlay{
-		spec: yamlTemplate,
-		overlay: overlay.OverlayFile{
-			path: overlayPath,
-			file: file,
+		Spec: yamlTemplate,
+		Overlay: overlay.OverlayFile{
+			Path: overlayPath,
+			File: file,
 		},
 	}
 
@@ -146,7 +152,7 @@ func (r Reader) applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error
 				"dest":  param.Dest,
 			}).Debugln("setting param value at destination")
 
-			if err := ValidateParams(specJSON, param.Dest); err != nil {
+			if err := validate.ValidateParams(specJSON, param.Dest); err != nil {
 				log.WithError(err).WithField("dest", param.Dest).Errorln("Error validating params, check that your param dest is valid")
 				return err
 			}
@@ -168,7 +174,7 @@ func (r Reader) applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error
 				log.Warn("env variable ", param.ValueFromEnvVariable, " is empty")
 			}
 
-			if err := ValidateParams(specJSON, param.Dest); err != nil {
+			if err := validate.ValidateParams(specJSON, param.Dest); err != nil {
 				log.WithError(err).WithField("dest", param.Dest).Errorln("Error validating params, check that your param dest is valid")
 				return err
 			}

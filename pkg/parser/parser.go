@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package pkg
+package parser
 
 import (
 	"bytes"
@@ -30,7 +30,8 @@ import (
 	"github.com/moby/buildkit/frontend/dockerfile/parser"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	build_context "github.com/ocibuilder/ocibuilder/pkg/build-context"
+	"github.com/ocibuilder/ocibuilder/pkg/context"
+	"github.com/ocibuilder/ocibuilder/pkg/validate"
 )
 
 // ParseBuildSpec parses the build specification which is read in through spec.yml
@@ -42,7 +43,7 @@ func ParseBuildSpec(spec *v1alpha1.BuildSpec) ([]v1alpha1.ImageBuildArgs, error)
 		kubeConfig = ""
 	}
 	for _, step := range spec.Steps {
-		buildContext, err := build_context.GetBuildContextReader(step.BuildContext, kubeConfig)
+		buildContext, err := context.GetBuildContextReader(step.BuildContext, kubeConfig)
 		if err != nil {
 			return nil, err
 		}
@@ -125,7 +126,7 @@ func GenerateDockerfile(step v1alpha1.BuildStep, templates []v1alpha1.BuildTempl
 func parseCmdType(cmds []v1alpha1.BuildTemplateStep) ([]byte, error) {
 	var dockerfile []byte
 	for _, cmd := range cmds {
-		err := ValidateBuildTemplateStep(cmd)
+		err := validate.ValidateBuildTemplateStep(cmd)
 		if err != nil {
 			return nil, err
 		}

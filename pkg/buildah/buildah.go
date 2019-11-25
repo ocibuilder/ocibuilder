@@ -22,8 +22,11 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/ocibuilder/ocibuilder/pkg/validate"
+
+	"github.com/ocibuilder/ocibuilder/pkg/parser"
+
 	"github.com/creack/pty"
-	"github.com/ocibuilder/ocibuilder/pkg"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -42,7 +45,7 @@ var executor = exec.Command
 // Build performs a buildah build and returns an array of readclosers
 func (b *Buildah) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	log := b.Logger
-	buildOpts, err := pkg.ParseBuildSpec(spec.Build)
+	buildOpts, err := parser.ParseBuildSpec(spec.Build)
 
 	if err != nil {
 		log.WithError(err).Errorln("failed to parse build spec...")
@@ -116,7 +119,7 @@ func createBuildCommand(args v1alpha1.ImageBuildArgs, storageDriver string) []st
 func (b *Buildah) Login(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	log := b.Logger
 
-	if err := pkg.ValidateLogin(spec); err != nil {
+	if err := validate.ValidateLogin(spec); err != nil {
 		return nil, err
 	}
 
@@ -153,12 +156,12 @@ func createLoginCommand(args v1alpha1.LoginSpec) ([]string, error) {
 		return nil, errors.New("no registry has been specified for login")
 	}
 
-	username, err := pkg.ValidateLoginUsername(args)
+	username, err := validate.ValidateLoginUsername(args)
 	if err != nil {
 		return nil, err
 	}
 
-	password, err := pkg.ValidateLoginPassword(args)
+	password, err := validate.ValidateLoginPassword(args)
 	if err != nil {
 		return nil, err
 	}
@@ -216,14 +219,14 @@ func (b Buildah) createPullCommand(registry string, imageName string, spec v1alp
 func (b *Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	log := b.Logger
 
-	if err := pkg.ValidatePush(spec); err != nil {
+	if err := validate.ValidatePush(spec); err != nil {
 		return nil, err
 	}
 
 	var pushResponses []io.ReadCloser
 	for _, pushSpec := range spec.Push {
 
-		if err := pkg.ValidatePushSpec(&pushSpec); err != nil {
+		if err := validate.ValidatePushSpec(&pushSpec); err != nil {
 			return nil, err
 		}
 
@@ -280,17 +283,17 @@ func (b Buildah) createPushCommand(registry string, imageName string, spec v1alp
 }
 
 func getPushAuthRegistryString(registry string, spec v1alpha1.OCIBuilderSpec) (string, error) {
-	if err := pkg.ValidateLogin(spec); err != nil {
+	if err := validate.ValidateLogin(spec); err != nil {
 		return "", err
 	}
 	for _, spec := range spec.Login {
 		if spec.Registry == registry {
-			user, err := pkg.ValidateLoginUsername(spec)
+			user, err := validate.ValidateLoginUsername(spec)
 			if err != nil {
 				return "", err
 			}
 
-			pass, err := pkg.ValidateLoginPassword(spec)
+			pass, err := validate.ValidateLoginPassword(spec)
 			if err != nil {
 				return "", err
 			}

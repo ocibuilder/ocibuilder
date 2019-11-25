@@ -27,9 +27,12 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/ocibuilder/ocibuilder/pkg/validate"
+
+	"github.com/ocibuilder/ocibuilder/pkg/parser"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
-	"github.com/ocibuilder/ocibuilder/pkg"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/sirupsen/logrus"
 )
@@ -45,7 +48,7 @@ type Docker struct {
 func (d *Docker) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	log := d.Logger
 	cli := d.Client
-	buildOpts, err := pkg.ParseBuildSpec(spec.Build)
+	buildOpts, err := parser.ParseBuildSpec(spec.Build)
 
 	if err != nil {
 		log.WithError(err).Errorln("error in parsing build spec...")
@@ -103,12 +106,12 @@ func (d Docker) Login(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	var loginResponses []io.ReadCloser
 	for _, loginSpec := range spec.Login {
 		log.WithFields(logrus.Fields{"registry": loginSpec.Registry}).Infoln("attempting to login to registry")
-		username, err := pkg.ValidateLoginUsername(loginSpec)
+		username, err := validate.ValidateLoginUsername(loginSpec)
 		if err != nil {
 			return nil, err
 		}
 
-		password, err := pkg.ValidateLoginPassword(loginSpec)
+		password, err := validate.ValidateLoginPassword(loginSpec)
 		if err != nil {
 			return nil, err
 		}
@@ -170,7 +173,7 @@ func (d Docker) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 
 	var pushResponses []io.ReadCloser
 	for _, pushSpec := range spec.Push {
-		if err := pkg.ValidatePushSpec(&pushSpec); err != nil {
+		if err := validate.ValidatePushSpec(&pushSpec); err != nil {
 			return nil, err
 		}
 
@@ -207,7 +210,7 @@ func (d Docker) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 
 // getPushAuthRegistryString is used to match a push registry with a passed in login specification, returning an auth string
 func getPushAuthRegistryString(registry string, spec v1alpha1.OCIBuilderSpec) (string, error) {
-	if err := pkg.ValidateLogin(spec); err != nil {
+	if err := validate.ValidateLogin(spec); err != nil {
 		return "", err
 	}
 	for _, spec := range spec.Login {
@@ -224,12 +227,12 @@ func getPushAuthRegistryString(registry string, spec v1alpha1.OCIBuilderSpec) (s
 
 // encodeAuth is used to generate a base64 encoded auth string to be used in push auth
 func encodeAuth(spec v1alpha1.LoginSpec) (string, error) {
-	user, err := pkg.ValidateLoginUsername(spec)
+	user, err := validate.ValidateLoginUsername(spec)
 	if err != nil {
 		return "", err
 	}
 
-	pass, err := pkg.ValidateLoginPassword(spec)
+	pass, err := validate.ValidateLoginPassword(spec)
 	if err != nil {
 		return "", err
 	}
