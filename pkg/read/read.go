@@ -22,6 +22,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/ocibuilder/ocibuilder/pkg/overlay"
+
 	"github.com/ghodss/yaml"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/pkg/errors"
@@ -113,9 +115,9 @@ func applyOverlay(yamlTemplate []byte, overlayPath string) ([]byte, error) {
 		return nil, errors.Wrap(err, "unable to read overlay file")
 	}
 
-	yttOverlay := YttOverlay{
+	yttOverlay := overlay.YttOverlay{
 		spec: yamlTemplate,
-		overlay: OverlayFile{
+		overlay: overlay.OverlayFile{
 			path: overlayPath,
 			file: file,
 		},

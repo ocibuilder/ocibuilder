@@ -32,6 +32,10 @@ required = [
   name = "k8s.io/kube-openapi"
   branch = "master"
 
+[[override]]
+  name = "gopkg.in/fsnotify.v1"
+  source = "https://github.com/fsnotify/fsnotify.git"
+
 [[constraint]]
   name = "github.com/minio/minio-go"
   version = "6.0.0"
