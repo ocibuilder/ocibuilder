@@ -227,13 +227,6 @@ func schema_pkg_apis_ocibuilder_v1alpha1_BuildStep(ref common.ReferenceCallback)
 				Description: "BuildStep represents a step within the build",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"daemon": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Type of the build framework. Defaults to docker",
-							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
 					"stages": {
 						VendorExtensible: spec.VendorExtensible{
 							Extensions: spec.Extensions{
@@ -1123,6 +1116,13 @@ func schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderSpec(ref common.ReferenceCall
 									},
 								},
 							},
+						},
+					},
+					"daemon": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Type of the build framework. Defaults to docker",
+							Type:        []string{"boolean"},
+							Format:      "",
 						},
 					},
 				},
