@@ -18,7 +18,6 @@ package cmd
 
 import (
 	"errors"
-	"github.com/ocibuilder/ocibuilder/pkg"
 	"io"
 
 	"github.com/docker/docker/client"
@@ -27,6 +26,7 @@ import (
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/buildah"
 	"github.com/ocibuilder/ocibuilder/pkg/docker"
+	"github.com/ocibuilder/ocibuilder/pkg/read"
 	"github.com/spf13/cobra"
 )
 
@@ -65,7 +65,7 @@ func (l *loginCmd) run(args []string) error {
 	}
 	logger := common.GetLogger(l.debug)
 
-	reader := pkg.Reader{
+	reader := read.Reader{
 		Logger: logger,
 	}
 	if err := reader.Read(&ociBuilderSpec, "", l.path); err != nil {

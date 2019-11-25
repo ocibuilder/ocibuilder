@@ -28,10 +28,10 @@ func TestYttOverlay_Apply(t *testing.T) {
 	assert.Equal(t, nil, err)
 
 	yttOverlay := YttOverlay{
-		spec: yamlTplData,
-		overlay: OverlayFile{
-			file: file,
-			path: "../testing/dummy/overlay_overlay_test.yaml",
+		Spec: yamlTplData,
+		Overlay: OverlayFile{
+			File: file,
+			Path: "../testing/dummy/overlay_overlay_test.yaml",
 		},
 	}
 	overlayedSpec, err := yttOverlay.Apply()
@@ -44,10 +44,10 @@ func TestYttOverlay_ApplyAnnotated(t *testing.T) {
 	assert.Equal(t, nil, err)
 
 	yttOverlay := YttOverlay{
-		spec: yamlTplData,
-		overlay: OverlayFile{
-			file: file,
-			path: "../testing/dummy/overlay_overlay_annotated_test.yaml",
+		Spec: yamlTplData,
+		Overlay: OverlayFile{
+			File: file,
+			Path: "../testing/dummy/overlay_overlay_annotated_test.yaml",
 		},
 	}
 	overlayedSpec, err := yttOverlay.Apply()
