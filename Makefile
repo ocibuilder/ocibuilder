@@ -67,7 +67,7 @@ lint:
 
 .PHONY: e2e
 e2e:
-	go test ./testing/e2e
+	go test testing/e2e
 
 .PHONY: clean
 clean:
