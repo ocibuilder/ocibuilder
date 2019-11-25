@@ -192,7 +192,6 @@ func (d Docker) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 		}
 
 		pushImageName := fmt.Sprintf("%s/%s/%s:%s", pushSpec.Registry, pushSpec.User, pushSpec.Image, pushSpec.Tag)
-
 		err := cli.ImageTag(context.Background(), buildSpec[i].Name, pushImageName)
 		if err != nil {
 			log.WithError(err).Errorln("failed to tag image before pushing")

@@ -27,7 +27,6 @@ import (
 func BuildOcictl() string {
 	ocictlPath, err := gexec.Build("github.com/ocibuilder/ocibuilder/ocictl")
 	Expect(err).NotTo(HaveOccurred())
-
 	return ocictlPath
 }
 
