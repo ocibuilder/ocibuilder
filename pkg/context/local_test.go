@@ -17,8 +17,49 @@ limitations under the License.
 package context
 
 import (
+	"io/ioutil"
+	"os"
 	"testing"
+
+	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestLocalContext_Read(t *testing.T) {
+const TEST_SERVICE_PATH = "../../testing/e2e/resources/go-test-service"
+
+func TestLocalBuildContextReader_Read(t *testing.T) {
+
+	reader, err := GetBuildContextReader(buildContext, "")
+	assert.Equal(t, nil, err)
+
+	path, err := reader.Read()
+	assert.Equal(t, nil, err)
+	assert.Equal(t, TEST_SERVICE_PATH, path)
+
+	err = common.UntarFile(TEST_SERVICE_PATH+"/ocibuilder/context/context.tar.gz", TEST_SERVICE_PATH+"/unpacked")
+	assert.Equal(t, nil, err)
+
+	files, err := ioutil.ReadDir(TEST_SERVICE_PATH + "/unpacked/go-test-service")
+	assert.Equal(t, nil, err)
+
+	var actualFileNames []string
+	for _, file := range files {
+		actualFileNames = append(actualFileNames, file.Name())
+	}
+	assert.Equal(t, expectedFileNames, actualFileNames)
+
+	err = os.RemoveAll(TEST_SERVICE_PATH + "/ocibuilder")
+	assert.Equal(t, nil, err)
+
+	err = os.RemoveAll(TEST_SERVICE_PATH + "/unpacked")
+	assert.Equal(t, nil, err)
 }
+
+var buildContext = &v1alpha1.BuildContext{
+	LocalContext: &v1alpha1.LocalContext{
+		ContextPath: TEST_SERVICE_PATH,
+	},
+}
+
+var expectedFileNames = []string{"Dockerfile", "main.go", "ocibuilder.yaml"}

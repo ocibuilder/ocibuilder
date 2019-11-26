@@ -57,6 +57,7 @@ func (d *Docker) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 
 	var buildResponses []io.ReadCloser
 	for _, opt := range buildOpts {
+		log.WithField("path", opt.BuildContextPath).Debugln("building with build context at path")
 		buildContext, err := os.Open(opt.BuildContextPath)
 		if err != nil {
 			log.WithError(err).Errorln("error reading image build context")
