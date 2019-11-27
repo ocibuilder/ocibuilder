@@ -128,6 +128,7 @@ func ValidateContext(spec v1alpha1.ImageContext) v1alpha1.ImageContext {
 	return spec
 }
 
+// ValidateParams validates path to destination in param section of specs
 func ValidateParams(specJSON []byte, src string) error {
 	if res := gjson.GetBytes(specJSON, src); res.Str == "" {
 		return errors.New("path to dest is invalid in a set param")
