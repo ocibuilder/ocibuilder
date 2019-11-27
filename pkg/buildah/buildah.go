@@ -251,7 +251,6 @@ func (b *Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 		log.Infoln("buildah push has been executed")
 
 		if pushSpec.Purge {
-			// fullImageName := fmt.Sprintf("%s:%s", pushSpec.Registry, imageName)
 			purgeCommand := createPurgeCommand(imageName)
 			log.WithFields(logrus.Fields{"command": purgeCommand, "image": imageName}).Debug("purge command to be executed")
 
@@ -269,7 +268,6 @@ func (b *Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 
 func (b Buildah) createPushCommand(registry string, imageName string, spec v1alpha1.OCIBuilderSpec) ([]string, error) {
 	args := []string{"push", "--creds"}
-	// fullImageName := fmt.Sprintf("%s/%s/%s", registry, user, imageName)
 	b.Logger.WithField("command", append(args, imageName)).Debugln("push command with AUTH REVOKED")
 
 	authString, err := getPushAuthRegistryString(registry, spec)
