@@ -229,10 +229,10 @@ func (b *Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 			return nil, err
 		}
 
-		imageName := fmt.Sprintf("%s:%s", pushSpec.Image, pushSpec.Tag)
+		imageName := fmt.Sprintf("%s/%s/%s:%s", pushSpec.Registry, pushSpec.User, pushSpec.Image, pushSpec.Tag)
 		log.WithFields(logrus.Fields{"name": imageName, "registry": pushSpec.Registry}).Infoln("pushing image")
 
-		pushCommand, err := b.createPushCommand(pushSpec.Registry, imageName, spec)
+		pushCommand, err := b.createPushCommand(pushSpec.Registry, pushSpec.User, imageName, spec)
 
 		if err != nil {
 			log.WithError(err).Errorln("error attempting to create push command")
@@ -251,9 +251,9 @@ func (b *Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 		log.Infoln("buildah push has been executed")
 
 		if pushSpec.Purge {
-			fullImageName := fmt.Sprintf("%s:%s", pushSpec.Registry, imageName)
-			purgeCommand := createPurgeCommand(fullImageName)
-			log.WithFields(logrus.Fields{"command": purgeCommand, "image": fullImageName}).Debug("purge command to be executed")
+			// fullImageName := fmt.Sprintf("%s:%s", pushSpec.Registry, imageName)
+			purgeCommand := createPurgeCommand(imageName)
+			log.WithFields(logrus.Fields{"command": purgeCommand, "image": imageName}).Debug("purge command to be executed")
 
 			cmd = executor("buildah", purgeCommand...)
 			out, err = pty.Start(cmd)
@@ -267,10 +267,10 @@ func (b *Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	return pushResponses, nil
 }
 
-func (b Buildah) createPushCommand(registry string, imageName string, spec v1alpha1.OCIBuilderSpec) ([]string, error) {
+func (b Buildah) createPushCommand(registry string, user string, imageName string, spec v1alpha1.OCIBuilderSpec) ([]string, error) {
 	args := []string{"push", "--creds"}
-	fullImageName := fmt.Sprintf("%s/%s", registry, imageName)
-	b.Logger.WithField("command", append(args, fullImageName)).Debugln("push command with AUTH REVOKED")
+	// fullImageName := fmt.Sprintf("%s/%s/%s", registry, user, imageName)
+	b.Logger.WithField("command", append(args, imageName)).Debugln("push command with AUTH REVOKED")
 
 	authString, err := getPushAuthRegistryString(registry, spec)
 	if err != nil {
@@ -278,7 +278,7 @@ func (b Buildah) createPushCommand(registry string, imageName string, spec v1alp
 	}
 	args = append(args, authString)
 
-	return append(args, fullImageName), nil
+	return append(args, imageName), nil
 }
 
 func getPushAuthRegistryString(registry string, spec v1alpha1.OCIBuilderSpec) (string, error) {
