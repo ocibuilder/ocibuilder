@@ -46,10 +46,10 @@ func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepath
 	if filepath != "" {
 		dir = filepath
 	}
-	log.WithField("filepath", dir+"/ocibuilder.yaml").Debugln("looking for spec.yaml")
+	log.WithField("filepath", dir+"/ocibuilder.yaml").Debugln("looking for ocibuilder.yaml")
 	file, err := ioutil.ReadFile(dir + "/ocibuilder.yaml")
 	if err != nil {
-		log.Infoln("spec file not found, looking for individual specifications...")
+		log.Infoln("ocibuilder.yaml file not found, looking for individual specifications...")
 		if err := r.readIndividualSpecs(spec, dir); err != nil {
 			log.WithError(err).WithField("directory", dir).Errorln("failed to read individual specs")
 			return err
