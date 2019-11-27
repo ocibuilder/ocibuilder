@@ -232,7 +232,7 @@ func (b *Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 		imageName := fmt.Sprintf("%s/%s/%s:%s", pushSpec.Registry, pushSpec.User, pushSpec.Image, pushSpec.Tag)
 		log.WithFields(logrus.Fields{"name": imageName, "registry": pushSpec.Registry}).Infoln("pushing image")
 
-		pushCommand, err := b.createPushCommand(pushSpec.Registry, pushSpec.User, imageName, spec)
+		pushCommand, err := b.createPushCommand(pushSpec.Registry, imageName, spec)
 
 		if err != nil {
 			log.WithError(err).Errorln("error attempting to create push command")
@@ -267,7 +267,7 @@ func (b *Buildah) Push(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	return pushResponses, nil
 }
 
-func (b Buildah) createPushCommand(registry string, user string, imageName string, spec v1alpha1.OCIBuilderSpec) ([]string, error) {
+func (b Buildah) createPushCommand(registry string, imageName string, spec v1alpha1.OCIBuilderSpec) ([]string, error) {
 	args := []string{"push", "--creds"}
 	// fullImageName := fmt.Sprintf("%s/%s/%s", registry, user, imageName)
 	b.Logger.WithField("command", append(args, imageName)).Debugln("push command with AUTH REVOKED")
@@ -306,6 +306,7 @@ func createPurgeCommand(imageName string) []string {
 	return append([]string{"rmi"}, imageName)
 }
 
+// Clean is used to remove generated Dockerfile
 func (b Buildah) Clean() {
 	log := b.Logger
 	for _, m := range b.Metadata {
