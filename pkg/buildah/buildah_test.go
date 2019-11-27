@@ -110,11 +110,12 @@ func TestCreatePullCommand(t *testing.T) {
 }
 
 func TestCreatePushCommand(t *testing.T) {
-	expectedPushCommand := []string{"push", "--creds", "username:ThiSiSalOgInToK3N", "example-registry/example-image:1.0.0"}
+	expectedPushCommand := []string{"push", "--creds", "username:ThiSiSalOgInToK3N", "example-registry/example-user/example-image:1.0.0"}
 	b := Buildah{
 		Logger: common.GetLogger(true),
 	}
-	pushCommand, err := b.createPushCommand("example-registry", "example-image:1.0.0", dummy.Spec)
+	// pushCommand, err := b.createPushCommand("example-registry", "example-image:1.0.0", dummy.Spec)
+	pushCommand, err := b.createPushCommand("example-registry", "example-registry/example-user/example-image:1.0.0", dummy.Spec)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedPushCommand, pushCommand)
 }
