@@ -17,6 +17,13 @@ limitations under the License.
 package context
 
 import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+
+	"github.com/sirupsen/logrus"
+
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/pkg/errors"
@@ -57,4 +64,30 @@ func GetBuildContextReader(buildContext *v1alpha1.BuildContext, k8sConfigPath st
 		return NewS3BuildContextReader(buildContext.S3Context, k8sClient), nil
 	}
 	return nil, errors.New("unknown build context")
+}
+
+// InjectDockerfile embeds the generated ocibuilder dockerfile into your build context
+func InjectDockerfile(contextPath string, dockerfilePath string) error {
+	destination := fmt.Sprintf("%s%s", strings.Replace(contextPath, common.ContextFile, "", -1), "context/")
+	if err := common.UntarFile(contextPath, destination); err != nil {
+		logrus.WithError(err).Infoln("error untarring")
+		return err
+	}
+
+	if err := os.Remove(contextPath); err != nil {
+		logrus.WithError(err).Infoln("error removing tar")
+		return err
+	}
+
+	if err := os.Rename(dockerfilePath, fmt.Sprintf("%s%s", destination, filepath.Base(dockerfilePath))); err != nil {
+		logrus.WithError(err).Infoln("error moving dockerfile")
+		return err
+	}
+
+	if err := common.TarFile(destination, contextPath); err != nil {
+		logrus.WithError(err).Infoln("error tarring")
+		return err
+	}
+
+	return nil
 }

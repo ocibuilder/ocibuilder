@@ -78,7 +78,7 @@ func ParseBuildSpec(spec *v1alpha1.BuildSpec) ([]v1alpha1.ImageBuildArgs, error)
 
 // GenerateDockerfile takes in a build steps and generates a Dockerfile
 // returns path to generated dockerfile
-func GenerateDockerfile(step v1alpha1.BuildStep, templates []v1alpha1.BuildTemplate, contextPath string) (string, error) {
+func GenerateDockerfile(step v1alpha1.BuildStep, templates []v1alpha1.BuildTemplate, destination string) (string, error) {
 	var dockerfile []byte
 	for idx, stage := range step.Stages {
 		baseImage := parseBaseImage(stage.Base, stage.Name)
@@ -107,11 +107,7 @@ func GenerateDockerfile(step v1alpha1.BuildStep, templates []v1alpha1.BuildTempl
 		}
 	}
 
-	// if path not specified set to current working directory
-	if contextPath == "" {
-		contextPath = "."
-	}
-	file, err := ioutil.TempFile(contextPath, "Dockerfile")
+	file, err := ioutil.TempFile(destination, "Dockerfile")
 	if err != nil {
 		return "", err
 	}
