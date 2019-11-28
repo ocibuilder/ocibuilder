@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/sirupsen/logrus"
 
@@ -66,26 +65,32 @@ func GetBuildContextReader(buildContext *v1alpha1.BuildContext, k8sConfigPath st
 	return nil, errors.New("unknown build context")
 }
 
-// InjectDockerfile embeds the generated ocibuilder dockerfile into your build context
+// InjectDockerfile embeds the generated ocibuilder dockerfile into your build context tar
+// looking in /ocibuilder/context/context.tar.gz
 func InjectDockerfile(contextPath string, dockerfilePath string) error {
-	destination := fmt.Sprintf("%s%s", strings.Replace(contextPath, common.ContextFile, "", -1), "context/")
-	if err := common.UntarFile(contextPath, destination); err != nil {
+
+	contextDirectoryPath := fmt.Sprintf("%s%s", contextPath, common.ContextDirectory)
+	contextTar := fmt.Sprintf("%s%s", contextDirectoryPath, common.ContextFile)
+	contextBase := filepath.Base(contextPath)
+
+	if err := common.UntarFile(contextTar, contextDirectoryPath); err != nil {
 		logrus.WithError(err).Infoln("error untarring")
 		return err
 	}
 
-	if err := os.Remove(contextPath); err != nil {
-		logrus.WithError(err).Infoln("error removing tar")
+	if err := os.Remove(contextTar); err != nil {
 		return err
 	}
 
-	if err := os.Rename(dockerfilePath, fmt.Sprintf("%s%s", destination, filepath.Base(dockerfilePath))); err != nil {
-		logrus.WithError(err).Infoln("error moving dockerfile")
+	if err := os.Rename(dockerfilePath, fmt.Sprintf("%s%s/%s", contextDirectoryPath, contextBase, filepath.Base(dockerfilePath))); err != nil {
 		return err
 	}
 
-	if err := common.TarFile(destination, contextPath); err != nil {
-		logrus.WithError(err).Infoln("error tarring")
+	if err := common.TarFile(contextDirectoryPath+contextBase, contextDirectoryPath+common.ContextFile); err != nil {
+		return err
+	}
+
+	if err := os.RemoveAll(contextDirectoryPath + contextBase); err != nil {
 		return err
 	}
 
