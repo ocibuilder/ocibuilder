@@ -38,7 +38,7 @@ func TestLocalBuildContextReader_Read(t *testing.T) {
 	err = common.UntarFile(TEST_SERVICE_PATH+"/ocib/context/context.tar.gz", TEST_SERVICE_PATH+"/unpacked")
 	assert.Equal(t, nil, err)
 
-	files, err := ioutil.ReadDir(TEST_SERVICE_PATH + "/unpacked/go-test-service")
+	files, err := ioutil.ReadDir(TEST_SERVICE_PATH + "/unpacked/")
 	assert.Equal(t, nil, err)
 
 	var actualFileNames []string

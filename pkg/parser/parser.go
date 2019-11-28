@@ -69,6 +69,7 @@ func ParseBuildSpec(spec *v1alpha1.BuildSpec) ([]v1alpha1.ImageBuildArgs, error)
 			}
 			return nil, err
 		}
+
 		imageBuild := v1alpha1.ImageBuildArgs{
 			Name:             step.Name,
 			Tag:              step.Tag,

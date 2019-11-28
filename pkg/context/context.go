@@ -70,7 +70,6 @@ func InjectDockerfile(contextPath string, dockerfilePath string) error {
 
 	contextDirectoryPath := fmt.Sprintf("%s%s", contextPath, common.ContextDirectory)
 	contextTar := fmt.Sprintf("%s%s", contextDirectoryPath, common.ContextFile)
-	contextBase := filepath.Base(contextPath)
 
 	if err := common.UntarFile(contextTar, contextDirectoryPath); err != nil {
 		return errors.Wrap(err, "error extracting original context file at: "+contextTar)
@@ -80,28 +79,22 @@ func InjectDockerfile(contextPath string, dockerfilePath string) error {
 		return err
 	}
 
-	if err := os.Rename(dockerfilePath, fmt.Sprintf("%s%s/%s", contextDirectoryPath, contextBase, filepath.Base(dockerfilePath))); err != nil {
+	if err := os.Rename(dockerfilePath, fmt.Sprintf("%s%s", contextDirectoryPath, filepath.Base(dockerfilePath))); err != nil {
 		return errors.Wrap(err, "error attempting to move Dockerfile to new context directory")
 	}
 
-	if err := common.TarFile(contextDirectoryPath+contextBase, contextDirectoryPath+common.ContextFile); err != nil {
+	if err := common.TarFile(contextDirectoryPath, contextDirectoryPath+common.ContextFile); err != nil {
 		return errors.Wrap(err, "error tarring new directory with injected Dockerfile")
 	}
 
-	if contextBase != "." {
-		if err := os.RemoveAll(contextDirectoryPath + contextBase); err != nil {
-			return errors.Wrap(err, "error removing extracted files from"+contextDirectoryPath+contextBase)
-		}
-	} else {
-		files, err := ioutil.ReadDir(contextDirectoryPath + contextBase)
-		if err != nil {
-			return err
-		}
-		for _, file := range files {
-			if file.Name() != common.ContextFile {
-				if err := os.RemoveAll(contextDirectoryPath + file.Name()); err != nil {
-					return err
-				}
+	files, err := ioutil.ReadDir(contextDirectoryPath)
+	if err != nil {
+		return err
+	}
+	for _, file := range files {
+		if file.Name() != common.ContextFile {
+			if err := os.RemoveAll(contextDirectoryPath + file.Name()); err != nil {
+				return err
 			}
 		}
 	}
