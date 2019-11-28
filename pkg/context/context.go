@@ -65,7 +65,7 @@ func GetBuildContextReader(buildContext *v1alpha1.BuildContext, k8sConfigPath st
 }
 
 // InjectDockerfile embeds the generated ocibuilder dockerfile into your build context tar
-// looking in /ocibuilder/context/context.tar.gz
+// looking in /ocib/context/context.tar.gz
 func InjectDockerfile(contextPath string, dockerfilePath string) error {
 
 	contextDirectoryPath := fmt.Sprintf("%s%s", contextPath, common.ContextDirectory)

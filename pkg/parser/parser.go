@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 	"text/template"
 
@@ -71,7 +72,7 @@ func ParseBuildSpec(spec *v1alpha1.BuildSpec) ([]v1alpha1.ImageBuildArgs, error)
 		imageBuild := v1alpha1.ImageBuildArgs{
 			Name:             step.Name,
 			Tag:              step.Tag,
-			Dockerfile:       dockerfilePath,
+			Dockerfile:       filepath.Base(dockerfilePath),
 			Purge:            step.Purge,
 			BuildContextPath: buildContextPath,
 		}
