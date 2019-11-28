@@ -26,8 +26,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const TEST_SERVICE_PATH = "../../testing/e2e/resources/go-test-service"
-
 func TestLocalBuildContextReader_Read(t *testing.T) {
 
 	reader, err := GetBuildContextReader(buildContext, "")
@@ -37,7 +35,7 @@ func TestLocalBuildContextReader_Read(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, TEST_SERVICE_PATH, path)
 
-	err = common.UntarFile(TEST_SERVICE_PATH+"/ocibuilder/context/context.tar.gz", TEST_SERVICE_PATH+"/unpacked")
+	err = common.UntarFile(TEST_SERVICE_PATH+"/ocib/context/context.tar.gz", TEST_SERVICE_PATH+"/unpacked")
 	assert.Equal(t, nil, err)
 
 	files, err := ioutil.ReadDir(TEST_SERVICE_PATH + "/unpacked/go-test-service")
@@ -49,12 +47,14 @@ func TestLocalBuildContextReader_Read(t *testing.T) {
 	}
 	assert.Equal(t, expectedFileNames, actualFileNames)
 
-	err = os.RemoveAll(TEST_SERVICE_PATH + "/ocibuilder")
+	err = os.RemoveAll(TEST_SERVICE_PATH + "/ocib")
 	assert.Equal(t, nil, err)
 
 	err = os.RemoveAll(TEST_SERVICE_PATH + "/unpacked")
 	assert.Equal(t, nil, err)
 }
+
+const TEST_SERVICE_PATH = "../../testing/e2e/resources/go-test-service"
 
 var buildContext = &v1alpha1.BuildContext{
 	LocalContext: &v1alpha1.LocalContext{
@@ -62,4 +62,4 @@ var buildContext = &v1alpha1.BuildContext{
 	},
 }
 
-var expectedFileNames = []string{"Dockerfile", "main.go", "ocibuilder.yaml"}
+var expectedFileNames = []string{"main.go", "ocibuilder.yaml"}

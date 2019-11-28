@@ -74,7 +74,8 @@ func (b *Buildah) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 		buildResponses = append(buildResponses, out)
 
 		b.Metadata = append(b.Metadata, v1alpha1.ImageMetadata{
-			BuildFile: fullPath,
+			BuildFile:        fullPath,
+			ContextDirectory: opt.BuildContextPath,
 		})
 
 		if opt.Purge {
@@ -310,10 +311,10 @@ func createPurgeCommand(imageName string) []string {
 func (b Buildah) Clean() {
 	log := b.Logger
 	for _, m := range b.Metadata {
-		if m.BuildFile != "" {
-			log.WithField("filepath", m.BuildFile).Debugln("attempting to cleanup dockerfile")
-			if err := os.Remove(m.BuildFile); err != nil {
-				b.Logger.WithError(err).Errorln("error removing generated Dockerfile")
+		if m.ContextDirectory != "" {
+			log.WithField("filepath", m.ContextDirectory).Debugln("attempting to cleanup context")
+			if err := os.RemoveAll(m.ContextDirectory + "/ocib"); err != nil {
+				b.Logger.WithError(err).Errorln("error removing generated context")
 				continue
 			}
 		}

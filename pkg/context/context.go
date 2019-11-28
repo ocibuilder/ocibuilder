@@ -18,10 +18,9 @@ package context
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
-
-	"github.com/sirupsen/logrus"
 
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
@@ -74,8 +73,7 @@ func InjectDockerfile(contextPath string, dockerfilePath string) error {
 	contextBase := filepath.Base(contextPath)
 
 	if err := common.UntarFile(contextTar, contextDirectoryPath); err != nil {
-		logrus.WithError(err).Infoln("error untarring")
-		return err
+		return errors.Wrap(err, "error extracting original context file at: "+contextTar)
 	}
 
 	if err := os.Remove(contextTar); err != nil {
@@ -83,15 +81,29 @@ func InjectDockerfile(contextPath string, dockerfilePath string) error {
 	}
 
 	if err := os.Rename(dockerfilePath, fmt.Sprintf("%s%s/%s", contextDirectoryPath, contextBase, filepath.Base(dockerfilePath))); err != nil {
-		return err
+		return errors.Wrap(err, "error attempting to move Dockerfile to new context directory")
 	}
 
 	if err := common.TarFile(contextDirectoryPath+contextBase, contextDirectoryPath+common.ContextFile); err != nil {
-		return err
+		return errors.Wrap(err, "error tarring new directory with injected Dockerfile")
 	}
 
-	if err := os.RemoveAll(contextDirectoryPath + contextBase); err != nil {
-		return err
+	if contextBase != "." {
+		if err := os.RemoveAll(contextDirectoryPath + contextBase); err != nil {
+			return errors.Wrap(err, "error removing extracted files from"+contextDirectoryPath+contextBase)
+		}
+	} else {
+		files, err := ioutil.ReadDir(contextDirectoryPath + contextBase)
+		if err != nil {
+			return err
+		}
+		for _, file := range files {
+			if file.Name() != common.ContextFile {
+				if err := os.RemoveAll(contextDirectoryPath + file.Name()); err != nil {
+					return err
+				}
+			}
+		}
 	}
 
 	return nil

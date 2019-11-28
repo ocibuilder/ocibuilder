@@ -496,4 +496,6 @@ type Command struct {
 type ImageMetadata struct {
 	// BuildFile is the path to the buildfile
 	BuildFile string
+	// ContextDirectory is the path to the build context
+	ContextDirectory string
 }

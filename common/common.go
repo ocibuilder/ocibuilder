@@ -66,8 +66,8 @@ const (
 
 // Build context constants
 const (
-	// ContextDirectory holds the ocibuilder
-	ContextDirectory = "/ocibuilder/context/"
+	// ContextDirectory holds the ocibuilder context
+	ContextDirectory = "/ocib/context/"
 	// ContextFile contains the compressed build context
 	ContextFile = "context.tar.gz"
 	// ContextDirectoryUncompressed contains the uncompressed build context

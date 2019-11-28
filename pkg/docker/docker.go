@@ -27,6 +27,8 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/ocibuilder/ocibuilder/common"
+
 	"github.com/ocibuilder/ocibuilder/pkg/validate"
 
 	"github.com/ocibuilder/ocibuilder/pkg/parser"
@@ -58,7 +60,7 @@ func (d *Docker) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 	var buildResponses []io.ReadCloser
 	for _, opt := range buildOpts {
 		log.WithField("path", opt.BuildContextPath).Debugln("building with build context at path")
-		buildContext, err := os.Open(opt.BuildContextPath)
+		buildContext, err := os.Open(opt.BuildContextPath + common.ContextDirectory + common.ContextFile)
 		if err != nil {
 			log.WithError(err).Errorln("error reading image build context")
 			continue
@@ -80,7 +82,8 @@ func (d *Docker) Build(spec v1alpha1.OCIBuilderSpec) ([]io.ReadCloser, error) {
 		buildResponses = append(buildResponses, buildResponse.Body)
 
 		d.Metadata = append(d.Metadata, v1alpha1.ImageMetadata{
-			BuildFile: opt.BuildContextPath + "/" + opt.Dockerfile,
+			BuildFile:        opt.BuildContextPath + "/" + opt.Dockerfile,
+			ContextDirectory: opt.BuildContextPath,
 		})
 
 		if opt.Purge {
@@ -255,10 +258,10 @@ func encodeAuth(spec v1alpha1.LoginSpec) (string, error) {
 func (d Docker) Clean() {
 	log := d.Logger
 	for _, m := range d.Metadata {
-		if m.BuildFile != "" {
-			log.WithField("filepath", m.BuildFile).Debugln("attempting to cleanup dockerfile")
-			if err := os.Remove(m.BuildFile); err != nil {
-				d.Logger.WithError(err).Errorln("error removing generated Dockerfile")
+		if m.ContextDirectory != "" {
+			log.WithField("filepath", m.ContextDirectory).Debugln("attempting to cleanup context")
+			if err := os.RemoveAll(m.ContextDirectory + "/ocib"); err != nil {
+				d.Logger.WithError(err).Errorln("error removing generated context")
 				continue
 			}
 		}

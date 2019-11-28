@@ -18,11 +18,9 @@ package parser
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"strings"
 	"text/template"
 
@@ -32,6 +30,7 @@ import (
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/context"
 	"github.com/ocibuilder/ocibuilder/pkg/validate"
+	"github.com/pkg/errors"
 )
 
 // ParseBuildSpec parses the build specification which is read in through spec.yml
@@ -52,6 +51,11 @@ func ParseBuildSpec(spec *v1alpha1.BuildSpec) ([]v1alpha1.ImageBuildArgs, error)
 			return nil, err
 		}
 		dockerfilePath, err := GenerateDockerfile(step, spec.Templates, buildContextPath)
+
+		if err := context.InjectDockerfile(buildContextPath, dockerfilePath); err != nil {
+			return nil, errors.Wrap(err, "error attempting to inject Dockerfile")
+		}
+
 		// Perform cleanup of generated files if parse errors out
 		if err != nil {
 			for _, args := range imageBuilds {
@@ -114,7 +118,7 @@ func GenerateDockerfile(step v1alpha1.BuildStep, templates []v1alpha1.BuildTempl
 	if _, err = file.Write(dockerfile); err != nil {
 		return "", err
 	}
-	return filepath.Base(file.Name()), nil
+	return file.Name(), nil
 }
 
 // parseCmdType goes through a list of possible commands and parses them
