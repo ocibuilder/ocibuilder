@@ -22,6 +22,8 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/ocibuilder/ocibuilder/common"
+
 	"github.com/ocibuilder/ocibuilder/pkg/validate"
 
 	"github.com/ocibuilder/ocibuilder/pkg/parser"
@@ -111,7 +113,7 @@ func createBuildCommand(args v1alpha1.ImageBuildArgs, storageDriver string) []st
 	}
 
 	if image != "" {
-		return append(buildArgs, "-t", image, args.BuildContextPath)
+		return append(buildArgs, "-t", image, args.BuildContextPath+common.ContextDirectory+common.ContextFile)
 	}
 	return append(buildArgs, args.BuildContextPath)
 }
