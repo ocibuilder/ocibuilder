@@ -21,10 +21,11 @@ type Builder struct {
 func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBuildResponse, errChan chan<- error, finished chan<- bool) {
 	log := b.Logger
 	cli := b.Client
-
 	reader := common.Reader{
 		Logger: log,
 	}
+
+	defer b.Clean()
 
 	buildOpts, err := common.ParseBuildSpec(spec.Build)
 	if err != nil {
@@ -36,7 +37,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 		b.Metadata = append(b.Metadata, v1alpha1.ImageMetadata{BuildFile: opt.Dockerfile})
 
 		log.WithField("step: ", idx).Debugln("running build step")
-		ctx, path, err := reader.ReadContext(opt.Context)
+		buildContext, path, err := reader.ReadContext(opt.Context)
 		if err != nil {
 			log.WithError(err).Errorln("error reading image build context")
 			errChan <- err
@@ -48,11 +49,11 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 		builderOptions := v1alpha1.OCIBuildOptions{
 			Ctx:         context.Background(),
 			ContextPath: path,
-			Context:     ctx,
+			Context:     buildContext,
 			ImageBuildOptions: types.ImageBuildOptions{
 				Dockerfile: opt.Dockerfile,
 				Tags:       []string{imageName},
-				Context:    ctx,
+				Context:    buildContext,
 			},
 		}
 
@@ -82,8 +83,6 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 		}
 		log.WithField("step", idx).Debugln("build step has finished excuting")
 	}
-	defer b.Clean()
-
 	log.Debugln("running build file cleanup")
 	finished <- true
 }
@@ -257,7 +256,7 @@ func (b *Builder) Purge(imageName string) error {
 	return nil
 }
 
-func (b Builder) Clean() {
+func (b *Builder) Clean() {
 	log := b.Logger
 	log.WithField("metadata", b.Metadata).Debugln("attempting to cleanup files listed in metadata")
 	for _, m := range b.Metadata {

@@ -127,6 +127,12 @@ func (b *buildCmd) run(args []string) error {
 	errChan := make(chan error)
 	finished := make(chan bool)
 
+	defer func() {
+		close(res)
+		close(errChan)
+		close(finished)
+	}()
+
 	go builder.Build(ociBuilderSpec, res, errChan, finished)
 
 	for {
@@ -157,10 +163,7 @@ func (b *buildCmd) run(args []string) error {
 
 		case <-finished:
 			{
-				logger.Infoln("all build steps complete successfully")
-				close(res)
-				close(errChan)
-				close(finished)
+				logger.Infoln("all build steps complete")
 				return nil
 			}
 

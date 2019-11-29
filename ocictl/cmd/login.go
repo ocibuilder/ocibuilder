@@ -116,6 +116,12 @@ func (l *loginCmd) run(args []string) error {
 	errChan := make(chan error)
 	finished := make(chan bool)
 
+	defer func() {
+		close(res)
+		close(errChan)
+		close(finished)
+	}()
+
 	go builder.Login(ociBuilderSpec, res, errChan, finished)
 
 	for {
@@ -137,9 +143,6 @@ func (l *loginCmd) run(args []string) error {
 		case <-finished:
 			{
 				logger.Infoln("all login steps complete successfully")
-				close(res)
-				close(errChan)
-				close(finished)
 				return nil
 			}
 		}

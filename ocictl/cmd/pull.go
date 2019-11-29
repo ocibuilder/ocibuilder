@@ -123,6 +123,12 @@ func (p *pullCmd) run(args []string) error {
 	errChan := make(chan error)
 	finished := make(chan bool)
 
+	defer func() {
+		close(res)
+		close(errChan)
+		close(finished)
+	}()
+
 	go builder.Pull(ociBuilderSpec, p.name, res, errChan, finished)
 
 	for {
@@ -154,9 +160,6 @@ func (p *pullCmd) run(args []string) error {
 		case <-finished:
 			{
 				logger.Infoln("all pull steps complete successfully")
-				close(res)
-				close(errChan)
-				close(finished)
 				return nil
 			}
 

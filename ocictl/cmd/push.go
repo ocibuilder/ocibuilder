@@ -123,6 +123,12 @@ func (p *pushCmd) run(args []string) error {
 	errChan := make(chan error)
 	finished := make(chan bool)
 
+	defer func() {
+		close(res)
+		close(errChan)
+		close(finished)
+	}()
+
 	go builder.Push(ociBuilderSpec, res, errChan, finished)
 
 	for {
@@ -154,9 +160,6 @@ func (p *pushCmd) run(args []string) error {
 		case <-finished:
 			{
 				logger.Infoln("all push steps complete successfully")
-				close(res)
-				close(errChan)
-				close(finished)
 				return nil
 			}
 
