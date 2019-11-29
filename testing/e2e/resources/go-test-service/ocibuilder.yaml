@@ -6,6 +6,9 @@ build:
             inline:
               - ADD . /src
               - RUN cd /src && go build -o goapp
+        - ansible:
+            galaxy:
+              name: aniketkul.ansible_miniconda
     - name: template-2
       cmd:
         - docker:

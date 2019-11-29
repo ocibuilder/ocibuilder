@@ -191,7 +191,6 @@ func ParseAnsibleCommands(ansibleStep *v1alpha1.AnsibleStep) ([]byte, error) {
 		}
 		dockerfileBytes := buf.Bytes()
 		dockerfile = append(dockerfile, dockerfileBytes...)
-
 		return dockerfile, nil
 	}
 
@@ -201,7 +200,6 @@ func ParseAnsibleCommands(ansibleStep *v1alpha1.AnsibleStep) ([]byte, error) {
 // ParseDockerCommands parses the inputted docker commands and adds to dockerfile
 func ParseDockerCommands(dockerStep *v1alpha1.DockerStep) ([]byte, error) {
 	var dockerfile []byte
-
 	if dockerStep.Inline != nil {
 		return append(dockerfile, strings.Join(dockerStep.Inline, "\n")...), nil
 	}
@@ -269,7 +267,6 @@ func parseBaseImage(base v1alpha1.Base, name string) string {
 	if name != "" {
 		baseImage = fmt.Sprintf("%s AS %s", baseImage, name)
 	}
-
 	return fmt.Sprintf("%s\n", baseImage)
 }
 

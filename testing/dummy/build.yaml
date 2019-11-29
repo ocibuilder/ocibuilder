@@ -6,6 +6,9 @@ templates:
             - RUN pip install kubernetes
             - COPY app/ /bin/app
           path: ./commands_basic_parser_test.txt
+      - ansible:
+            galaxy:
+              name: aniketkul.ansible_miniconda
 steps:
   - metadata:
       name: test-build
