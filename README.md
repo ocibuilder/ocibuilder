@@ -1,5 +1,6 @@
 # ocibuilder - Build [Open Container Initiative (OCI)](https://www.opencontainers.org/) compliant images the declarative way
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/ocibuilder/ocibuilder)](https://goreportcard.com/report/github.com/ocibuilder/ocibuilder)
 [![CircleCI](https://circleci.com/gh/ocibuilder/ocibuilder.svg?style=shield)](https://circleci.com/gh/ocibuilder/ocibuilder)
 [![Docs](https://img.shields.io/badge/docs-ocibuilder-56b5f5)](https://ocibuilder.github.io/docs/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
@@ -8,7 +9,9 @@
 
 The **ocibuilder** offers a command line tool called the **ocictl** to build, push and pull [OCI](https://www.opencontainers.org/) compliant images through declarative specifications, allowing you to pick between [Buildah](https://github.com/containers/buildah) or [Docker](https://docs.docker.com/) as the container build tool.
 
-![logo](https://github.com/ocibuilder/docs/blob/master/assets/oci-gopher.png)
+<p align="center">
+  <img src="https://github.com/ocibuilder/docs/blob/master/assets/oci-gopher.png?raw=true" alt="Logo"/>
+</p>
 
 ## Features
 
@@ -30,12 +33,18 @@ The **ocibuilder** offers a command line tool called the **ocictl** to build, pu
 
 Binary downloads of the `ocictl` are available on the [Releases page](https://github.com/ocibuilder/ocibuilder/releases).
 
-Simply unpack the `ocictl` tar and add it to your path
+You can use the `install.sh` script to install the latest version of `ocictl`:
+
+```bash
+curl https://raw.githubusercontent.com/ocibuilder/ocibuilder/master/install.sh | sh
+```
+
+This requires `GOPATH` to be set, with bin added to your `PATH`.
 
 The latest images with Buildah and Docker pre-installed alongside the ocictl is available on our
 [Dockerhub repository](https://cloud.docker.com/u/ocibuilder/repository/docker/ocibuilder/ocictl).
 
-Read the full [installation guide](https://github.com/ocibuilder/docs/blob/master/INSTALL.md) available in our docs.
+Read the full [installation guide](https://ocibuilder.github.io/docs/installation/) available in our docs.
 
 ## Getting Started
 
