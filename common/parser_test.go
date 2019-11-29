@@ -21,8 +21,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ghodss/yaml"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -48,7 +48,7 @@ func TestGenerateDockerfile(t *testing.T) {
 				Path: "../testing/dummy/commands_basic_parser_test.txt",
 			},
 		},
-	}}}
+		}}}
 
 	buildSpecification := v1alpha1.BuildSpec{}
 	if err := yaml.Unmarshal(file, &buildSpecification); err != nil {
@@ -149,7 +149,7 @@ COPY files files
 COPY vars vars
 COPY tasks tasks
 ADD *.yaml ./
-RUN if [ -f /requirements.yaml ]; then annsible-galaxy install -r /requirements.yaml; fi
+RUN if [ -f /requirements.yaml ]; then ansible-galaxy install -r /requirements.yaml; fi
 RUN ansible-galaxy install TestGalaxy`
 
 const expectedInlineDockerfile = "FROM go / java / nodejs / python:ubuntu_xenial:v1.0.0 AS first-stage\nADD ./ /test-path\nWORKDIR /test-dir\nENV PORT=3001\nCMD [\"go\", \"run\", \"main.go\"]\n\nFROM alpine:latest AS second-stage\nCMD [\"echo\", \"done\"]"
