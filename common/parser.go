@@ -128,6 +128,8 @@ func parseCmdType(cmds []v1alpha1.BuildTemplateStep) ([]byte, error) {
 		}
 
 		if cmd.Ansible != nil {
+			// create directories: ["templates", "files", "tasks", "vars"] if they do not exist
+			createAnsibleDirs()
 			tmp, err := ParseAnsibleCommands(cmd.Ansible)
 			if err != nil {
 				return nil, err
@@ -284,4 +286,31 @@ func addCommandsToDockerfile(commands []v1alpha1.Command, dockerfile []byte) []b
 		dockerfile = append(dockerfile, line...)
 	}
 	return dockerfile
+}
+
+func createAnsibleDirs() error {
+	ansibleDirList := []string{"templates", "files", "tasks", "vars"}
+	for _, dir := range ansibleDirList {
+		ok := exists("../" + dir)
+		if !ok {
+			err := os.MkdirAll(dir, 0777)
+			if err != nil {
+				log.WithError(err).Errorln("cannot create dir: " + dir)
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// exists returns whether the given file or directory exists
+func exists(path string) bool {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true
+	}
+	if os.IsNotExist(err) {
+		return false
+	}
+	return true
 }
