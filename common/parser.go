@@ -120,8 +120,8 @@ func GenerateDockerfile(step v1alpha1.BuildStep, templates []v1alpha1.BuildTempl
 // based on the request e.g. Docker/Ansible Path/Inline
 func parseCmdType(cmds []v1alpha1.BuildTemplateStep) ([]byte, error) {
 	var dockerfile []byte
-	for _, cmd := range cmds {
 
+	for _, cmd := range cmds {
 		err := ValidateBuildTemplateStep(cmd)
 		if err != nil {
 			return nil, err
@@ -143,6 +143,7 @@ func parseCmdType(cmds []v1alpha1.BuildTemplateStep) ([]byte, error) {
 			dockerfile = append(dockerfile, tmp...)
 		}
 	}
+
 	return dockerfile, nil
 }
 
@@ -152,10 +153,12 @@ func ParseAnsibleCommands(ansibleStep *v1alpha1.AnsibleStep) ([]byte, error) {
 	var buf bytes.Buffer
 	var dockerfile []byte
 
+	// add newline to buffer before appending ansible commands
+	buf.WriteString("\n")
+
 	box := packr.NewBox("../templates/ansible")
 
 	if ansibleStep.Local != nil {
-
 		file, err := box.Find(v1alpha1.AnsiblePath)
 		if err != nil {
 			return nil, err
@@ -171,7 +174,6 @@ func ParseAnsibleCommands(ansibleStep *v1alpha1.AnsibleStep) ([]byte, error) {
 		}
 		dockerfileBytes := buf.Bytes()
 		dockerfile = append(dockerfile, dockerfileBytes...)
-
 		return dockerfile, nil
 	}
 
