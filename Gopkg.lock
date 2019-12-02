@@ -56,14 +56,6 @@
   version = "v1.3.0"
 
 [[projects]]
-  digest = "1:e29335d5a78621ed7a539ed75e10785c3705bb67d916e48b03b1cdf9b727508d"
-  name = "github.com/creack/pty"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "3a6a957789163cacdfe0e291617a1c8e80612c11"
-  version = "v1.1.9"
-
-[[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
@@ -1325,7 +1317,6 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/creack/pty",
     "github.com/docker/docker/api/types",
     "github.com/docker/docker/api/types/registry",
     "github.com/docker/docker/client",
@@ -1351,7 +1342,6 @@
     "github.com/stretchr/testify/assert",
     "github.com/tidwall/gjson",
     "github.com/tidwall/sjson",
-    "golang.org/x/net/context",
     "gopkg.in/src-d/go-git.v4",
     "k8s.io/api/batch/v1",
     "k8s.io/api/core/v1",
