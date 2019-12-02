@@ -29,7 +29,7 @@ func GenerateSpecification(generator v1alpha1.SpecGenerator, dry bool) error {
 	return nil
 }
 
-func generate(templateName string, specTmpl interface{}) ([]byte, error) {
+func generate(templateName string, templateSpec interface{}) ([]byte, error) {
 	var buf bytes.Buffer
 	box := packr.NewBox("../../config/templates")
 
@@ -43,7 +43,7 @@ func generate(templateName string, specTmpl interface{}) ([]byte, error) {
 		return nil, err
 	}
 
-	if err = tmpl.Execute(&buf, specTmpl); err != nil {
+	if err = tmpl.Execute(&buf, templateSpec); err != nil {
 		return nil, err
 	}
 	return buf.Bytes(), nil
