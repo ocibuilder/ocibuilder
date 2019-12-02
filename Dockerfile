@@ -1,4 +1,4 @@
-FROM busybox AS binary
+FROM busybox AS ocictl
 COPY dist/ocictl /bin/ocictl
 
 FROM ocibuilder/ocibase:v0.1.0
