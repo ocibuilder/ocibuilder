@@ -18,11 +18,12 @@ package context
 
 import (
 	"fmt"
+	"io"
+	"os"
+
 	"github.com/mholt/archiver"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"io"
-	"os"
 )
 
 // LocalContext stores the path for your local build context, implements the ContextReader interface
@@ -31,14 +32,14 @@ type LocalContext struct {
 	ContextPath string `json:"contextPath" protobuf:"bytes,1,opt,name=contextPath"`
 }
 
-func (ctx LocalContext) Read() (io.ReadCloser, error) {
+func (ctx LocalContext) Read() (io.ReadCloser, string, error) {
 	fullPath := fmt.Sprintf("%s/docker-ctx.tar", ctx.ContextPath)
 
 	if ctx.ContextPath == "" {
-		return nil, errors.New("cannot have empty contextPath: specify . for current directory")
+		return nil, "", errors.New("cannot have empty contextPath: specify . for current directory")
 	}
 
-	defer func(){
+	defer func() {
 		if r := recover(); r != nil {
 			logrus.Warnln("panic in context read, recovered for cleanup")
 		}
@@ -49,14 +50,14 @@ func (ctx LocalContext) Read() (io.ReadCloser, error) {
 
 	if err := archiver.Archive([]string{ctx.ContextPath + "/"}, fullPath); err != nil {
 		logrus.WithError(err).Errorln("error in building context...")
-		return nil, err
+		return nil, "", err
 	}
 
 	reader, err := os.Open(fullPath)
 	if err != nil {
 		logrus.WithError(err).Errorln("error in opening docker context...")
-		return nil, err
+		return nil, "", err
 	}
 
-	return reader, nil
+	return reader, ctx.ContextPath, nil
 }

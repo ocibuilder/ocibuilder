@@ -198,19 +198,19 @@ func (r Reader) applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error
 }
 
 // ReadContext reads the user supplied context for the image build
-func (r Reader) ReadContext(ctx v1alpha1.ImageContext) (io.ReadCloser, error) {
+func (r Reader) ReadContext(ctx v1alpha1.ImageContext) (out io.ReadCloser, path string, err error) {
 
 	if ctx.GitContext != nil {
-		return nil, errors.New("git context is not supported in this version of the ocibuilder")
+		return nil, "", errors.New("git context is not supported in this version of the ocibuilder")
 	}
 
 	if ctx.S3Context != nil {
-		return nil, errors.New("s3 context is not supported in this version of the ocibuilder")
+		return nil, "", errors.New("s3 context is not supported in this version of the ocibuilder")
 	}
 
 	if ctx.LocalContext != nil {
 		return ctx.LocalContext.Read()
 	}
 
-	return nil, errors.New("no context has been defined")
+	return nil, "", errors.New("no context has been defined")
 }

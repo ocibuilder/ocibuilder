@@ -20,9 +20,9 @@ import (
 	"io"
 	"os"
 
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/docker/pkg/term"
+	"github.com/ocibuilder/ocibuilder/common"
 )
 
 var log = common.GetLogger(false)
@@ -51,16 +51,14 @@ func OutputJson(ouput io.ReadCloser) error {
 }
 
 // Output outputs a readcloser to stdout in a stream without formatting.
-func Output(output io.ReadCloser) error {
-	if _, err := io.Copy(os.Stdout, output); err != nil {
-		// TODO: this needs to be replaced with a permanent fix, this error is thrown
-		// when reaching the end of the reader
-		if err.Error() == "read /dev/ptmx: input/output error" {
-			log.Infoln("finished reading output")
-			return nil
-		}
-		log.WithError(err).Errorln("error copying output to stdout")
-		return err
+func Output(stdout io.ReadCloser, stderr io.ReadCloser) error {
+	//TODO: error with premature read |0: file already closed when finished reading out, investigate further
+	if _, err := io.Copy(os.Stdout, stderr); err != nil {
+		log.WithError(err).Warnln("error copying output from stderr to stdout, could impact response output")
+	}
+
+	if _, err := io.Copy(os.Stdout, stdout); err != nil {
+		log.WithError(err).Warnln("error copying output from stdout to stdout, could impact response output")
 	}
 	return nil
 }
