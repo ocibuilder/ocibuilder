@@ -62,7 +62,7 @@ ocictl-package-build:
 	cd dist; rm -rf ./ocictl
 
 .PHONY: codegen
-test: codegen
+test:
 	go test $(shell go list ./... | grep -v /vendor/ | grep -v /testing/) -race -short -v -coverprofile=coverage.text
 
 .PHONY: lint

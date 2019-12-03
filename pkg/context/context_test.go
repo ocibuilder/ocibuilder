@@ -35,6 +35,6 @@ func TestInjectDockerfile(t *testing.T) {
 	err = InjectDockerfile("../../testing/e2e/resources/go-test-service", "../../testing/dummy/Dockerfile")
 	assert.Equal(t, nil, err)
 
-	err = os.Remove("../../testing/e2e/resources/go-test-service/ocib/context/context.tar.gz")
+	err = os.RemoveAll("../../testing/e2e/resources/go-test-service/ocib")
 	assert.Equal(t, nil, err)
 }
