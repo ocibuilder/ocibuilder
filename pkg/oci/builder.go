@@ -1,3 +1,19 @@
+/*
+Copyright 2019 BlackRock, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package oci
 
 import (
@@ -6,9 +22,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ocibuilder/ocibuilder/common"
-
 	"github.com/docker/docker/api/types"
+	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/parser"
 	"github.com/ocibuilder/ocibuilder/pkg/validate"
@@ -25,7 +40,10 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 	log := b.Logger
 	cli := b.Client
 
-	defer b.Clean()
+	defer func() {
+		b.Clean()
+		finished <- true
+	}()
 
 	buildOpts, err := parser.ParseBuildSpec(spec.Build)
 	if err != nil {
@@ -35,7 +53,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 
 	for idx, opt := range buildOpts {
 		b.Metadata = append(b.Metadata, v1alpha1.ImageMetadata{
-			BuildFile:        opt.BuildContextPath + "/" + opt.Dockerfile,
+			BuildFile:        opt.Dockerfile,
 			ContextDirectory: opt.BuildContextPath,
 		})
 
@@ -87,8 +105,6 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 		}
 		log.WithField("step", idx).Debugln("build step has finished excuting")
 	}
-	log.Debugln("running build file cleanup")
-	finished <- true
 }
 
 func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPushResponse, errChan chan<- error, finished chan<- bool) {

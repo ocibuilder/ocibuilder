@@ -51,7 +51,7 @@ func ParseBuildSpec(spec *v1alpha1.BuildSpec) ([]v1alpha1.ImageBuildArgs, error)
 		if err != nil {
 			return nil, err
 		}
-		dockerfilePath, err := GenerateDockerfile(step, spec.Templates, buildContextPath)
+		dockerfilePath, err := GenerateDockerfile(step, spec.Templates, buildContextPath+common.ContextDirectory)
 
 		if err := context.InjectDockerfile(buildContextPath, dockerfilePath); err != nil {
 			return nil, errors.Wrap(err, "error attempting to inject Dockerfile")

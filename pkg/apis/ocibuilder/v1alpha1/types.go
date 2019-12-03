@@ -512,11 +512,11 @@ type ImageMetadata struct {
 type OCIBuildOptions struct {
 	// ImageBuildOptions are standard Docker API image build options
 	types.ImageBuildOptions `json:"imageBuildOptions,inline" protobuf:"bytes,1,name=imageBuildOptions"`
-	// ContextPath is the path to the build context
+	// ContextPath is the path to the raw build context, used for Buildah builds
 	ContextPath string `json:"contextPath" protobuf:"bytes,2,name=contextPath"`
 	// Ctx is the goroutine context
 	Ctx ctx.Context `json:"ctx" protobuf:"bytes3,name=ctx"`
-	// Context is the docker/buildah build context and is read in as a tar.gz
+	// Context is the docker tared build context
 	Context io.Reader `json:"context" protobuf:"bytes,4,name=context"`
 	// StorageDriver is a buildah flag for storage driver e.g. vfs
 	StorageDriver string `json:"storageDriver" protobuf:"bytes,5,name=storageDriver"`

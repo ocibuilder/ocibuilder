@@ -21,6 +21,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
@@ -92,7 +93,7 @@ func InjectDockerfile(contextPath string, dockerfilePath string) error {
 		return err
 	}
 	for _, file := range files {
-		if file.Name() != common.ContextFile {
+		if file.Name() != common.ContextFile && !strings.HasPrefix(file.Name(), "Dockerfile") {
 			if err := os.RemoveAll(contextDirectoryPath + file.Name()); err != nil {
 				return err
 			}
