@@ -18,10 +18,8 @@ package context
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
@@ -86,18 +84,6 @@ func InjectDockerfile(contextPath string, dockerfilePath string) error {
 
 	if err := common.TarFile(contextDirectoryPath, contextDirectoryPath+common.ContextFile); err != nil {
 		return errors.Wrap(err, "error tarring new directory with injected Dockerfile")
-	}
-
-	files, err := ioutil.ReadDir(contextDirectoryPath)
-	if err != nil {
-		return err
-	}
-	for _, file := range files {
-		if file.Name() != common.ContextFile && !strings.HasPrefix(file.Name(), "Dockerfile") {
-			if err := os.RemoveAll(contextDirectoryPath + file.Name()); err != nil {
-				return err
-			}
-		}
 	}
 
 	return nil
