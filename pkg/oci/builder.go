@@ -70,7 +70,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 
 		builderOptions := v1alpha1.OCIBuildOptions{
 			Ctx:         context.Background(),
-			ContextPath: opt.BuildContextPath,
+			ContextPath: opt.BuildContextPath + common.ContextDirectory,
 			Context:     buildContext,
 			ImageBuildOptions: types.ImageBuildOptions{
 				Dockerfile: opt.Dockerfile,
