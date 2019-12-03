@@ -23,6 +23,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	batchv1 "k8s.io/api/batch/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -95,6 +96,13 @@ func (opCtx *operationContext) constructBuilderJob() *batchv1.Job {
 			BackoffLimit: &common.BackoffLimit,
 			Completions:  &common.Completions,
 			Parallelism:  &common.Parallelism,
+			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					GenerateName: opCtx.builder.Name,
+					Namespace:    opCtx.builder.Namespace,
+				},
+				Spec: corev1.PodSpec{},
+			},
 		},
 	}
 }
