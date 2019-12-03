@@ -20,9 +20,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/docker/docker/api/types"
+	dockertypes "github.com/docker/docker/api/types"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/types"
 	"github.com/ocibuilder/ocibuilder/testing/dummy"
 	"github.com/stretchr/testify/assert"
 )
@@ -34,7 +35,7 @@ func TestBuilder_Build(t *testing.T) {
 		Metadata: []v1alpha1.ImageMetadata{},
 	}
 
-	res := make(chan v1alpha1.OCIBuildResponse)
+	res := make(chan types.OCIBuildResponse)
 	errChan := make(chan error)
 	finished := make(chan bool)
 
@@ -90,24 +91,24 @@ func TestBuilder_Purge(t *testing.T) {
 
 }
 
-func (t testClient) ImageBuild(options v1alpha1.OCIBuildOptions) (v1alpha1.OCIBuildResponse, error) {
-	return v1alpha1.OCIBuildResponse{}, nil
+func (t testClient) ImageBuild(options types.OCIBuildOptions) (types.OCIBuildResponse, error) {
+	return types.OCIBuildResponse{}, nil
 }
 
-func (t testClient) ImagePull(options v1alpha1.OCIPullOptions) (v1alpha1.OCIPullResponse, error) {
-	return v1alpha1.OCIPullResponse{}, nil
+func (t testClient) ImagePull(options types.OCIPullOptions) (types.OCIPullResponse, error) {
+	return types.OCIPullResponse{}, nil
 }
-func (t testClient) ImagePush(options v1alpha1.OCIPushOptions) (v1alpha1.OCIPushResponse, error) {
-	return v1alpha1.OCIPushResponse{}, nil
+func (t testClient) ImagePush(options types.OCIPushOptions) (types.OCIPushResponse, error) {
+	return types.OCIPushResponse{}, nil
 }
-func (t testClient) ImageRemove(options v1alpha1.OCIRemoveOptions) (v1alpha1.OCIRemoveResponse, error) {
-	return v1alpha1.OCIRemoveResponse{}, nil
+func (t testClient) ImageRemove(options types.OCIRemoveOptions) (types.OCIRemoveResponse, error) {
+	return types.OCIRemoveResponse{}, nil
 }
-func (t testClient) RegistryLogin(options v1alpha1.OCILoginOptions) (v1alpha1.OCILoginResponse, error) {
-	return v1alpha1.OCILoginResponse{}, nil
+func (t testClient) RegistryLogin(options types.OCILoginOptions) (types.OCILoginResponse, error) {
+	return types.OCILoginResponse{}, nil
 }
 
-func (t testClient) GenerateAuthRegistryString(auth types.AuthConfig) string {
+func (t testClient) GenerateAuthRegistryString(auth dockertypes.AuthConfig) string {
 	return ""
 }
 

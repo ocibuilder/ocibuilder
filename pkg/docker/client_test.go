@@ -5,36 +5,36 @@ import (
 	"io"
 	"testing"
 
-	"github.com/docker/docker/api/types"
+	dockertypes "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/client"
 	"github.com/ocibuilder/ocibuilder/common"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/types"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_ImageBuild(t *testing.T) {
-	_, err := cli.ImageBuild(v1alpha1.OCIBuildOptions{})
+	_, err := cli.ImageBuild(types.OCIBuildOptions{})
 	assert.Equal(t, nil, err)
 }
 
 func TestClient_ImagePull(t *testing.T) {
-	_, err := cli.ImagePull(v1alpha1.OCIPullOptions{})
+	_, err := cli.ImagePull(types.OCIPullOptions{})
 	assert.Equal(t, nil, err)
 }
 
 func TestClient_ImagePush(t *testing.T) {
-	_, err := cli.ImagePush(v1alpha1.OCIPushOptions{})
+	_, err := cli.ImagePush(types.OCIPushOptions{})
 	assert.Equal(t, nil, err)
 }
 
 func TestClient_ImageRemove(t *testing.T) {
-	_, err := cli.ImageRemove(v1alpha1.OCIRemoveOptions{})
+	_, err := cli.ImageRemove(types.OCIRemoveOptions{})
 	assert.Equal(t, nil, err)
 }
 
 func TestClient_RegistryLogin(t *testing.T) {
-	_, err := cli.RegistryLogin(v1alpha1.OCILoginOptions{})
+	_, err := cli.RegistryLogin(types.OCILoginOptions{})
 	assert.Equal(t, nil, err)
 }
 
@@ -48,31 +48,31 @@ var cli = Client{
 	APIClient: testClient{},
 }
 
-var authConfig = types.AuthConfig{
+var authConfig = dockertypes.AuthConfig{
 	Username: "user",
 	Password: "pass",
 }
 
-func (t testClient) ImageBuild(ctx context.Context, context io.Reader, options types.ImageBuildOptions) (types.ImageBuildResponse, error) {
-	return types.ImageBuildResponse{
+func (t testClient) ImageBuild(ctx context.Context, context io.Reader, options dockertypes.ImageBuildOptions) (dockertypes.ImageBuildResponse, error) {
+	return dockertypes.ImageBuildResponse{
 		Body:   nil,
 		OSType: "",
 	}, nil
 }
 
-func (t testClient) ImagePull(ctx context.Context, ref string, options types.ImagePullOptions) (io.ReadCloser, error) {
+func (t testClient) ImagePull(ctx context.Context, ref string, options dockertypes.ImagePullOptions) (io.ReadCloser, error) {
 	return nil, nil
 }
 
-func (t testClient) ImagePush(ctx context.Context, ref string, options types.ImagePushOptions) (io.ReadCloser, error) {
+func (t testClient) ImagePush(ctx context.Context, ref string, options dockertypes.ImagePushOptions) (io.ReadCloser, error) {
 	return nil, nil
 }
 
-func (t testClient) ImageRemove(ctx context.Context, image string, options types.ImageRemoveOptions) ([]types.ImageDeleteResponseItem, error) {
+func (t testClient) ImageRemove(ctx context.Context, image string, options dockertypes.ImageRemoveOptions) ([]dockertypes.ImageDeleteResponseItem, error) {
 	return nil, nil
 }
 
-func (t testClient) RegistryLogin(ctx context.Context, auth types.AuthConfig) (registry.AuthenticateOKBody, error) {
+func (t testClient) RegistryLogin(ctx context.Context, auth dockertypes.AuthConfig) (registry.AuthenticateOKBody, error) {
 	return registry.AuthenticateOKBody{
 		IdentityToken: "",
 		Status:        "",

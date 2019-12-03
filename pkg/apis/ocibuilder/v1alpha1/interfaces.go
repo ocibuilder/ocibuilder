@@ -1,9 +1,25 @@
+/*
+Copyright 2019 BlackRock, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package v1alpha1
 
 import (
+	dockertypes "github.com/docker/docker/api/types"
+	"github.com/ocibuilder/ocibuilder/pkg/types"
 	"io"
-
-	"github.com/docker/docker/api/types"
 )
 
 // Overlay is the overlay interface for handling of overylaying onto specification files
@@ -18,10 +34,10 @@ type ContextReader interface {
 }
 
 type BuilderClient interface {
-	ImageBuild(options OCIBuildOptions) (OCIBuildResponse, error)
-	ImagePull(options OCIPullOptions) (OCIPullResponse, error)
-	ImagePush(options OCIPushOptions) (OCIPushResponse, error)
-	ImageRemove(options OCIRemoveOptions) (OCIRemoveResponse, error)
-	RegistryLogin(options OCILoginOptions) (OCILoginResponse, error)
-	GenerateAuthRegistryString(auth types.AuthConfig) string
+	ImageBuild(options types.OCIBuildOptions) (types.OCIBuildResponse, error)
+	ImagePull(options types.OCIPullOptions) (types.OCIPullResponse, error)
+	ImagePush(options types.OCIPushOptions) (types.OCIPushResponse, error)
+	ImageRemove(options types.OCIRemoveOptions) (types.OCIRemoveResponse, error)
+	RegistryLogin(options types.OCILoginOptions) (types.OCILoginResponse, error)
+	GenerateAuthRegistryString(auth dockertypes.AuthConfig) string
 }
