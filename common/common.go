@@ -73,3 +73,10 @@ const (
 	// ContextDirectoryUncompressed contains the uncompressed build context
 	ContextDirectoryUncompressed = "/ocibuilder/context/uncompressed/"
 )
+
+// K8s Job specific variables
+var (
+	BackoffLimit = int32(2)
+	Completions  = int32(1)
+	Parallelism  = int32(1)
+)

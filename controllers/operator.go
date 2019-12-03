@@ -23,6 +23,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	batchv1 "k8s.io/api/batch/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // the context of an operation on a ocibuilder object.
@@ -79,5 +80,21 @@ func (opCtx *operationContext) operate() error {
 
 // constructBuilderJob constructs a K8s job for ocibuilder build step.
 func (opCtx *operationContext) constructBuilderJob() *batchv1.Job {
-	return &batchv1.Job{}
+	return &batchv1.Job{
+		ObjectMeta: metav1.ObjectMeta{
+			GenerateName: opCtx.builder.Name,
+			Namespace:    opCtx.builder.Namespace,
+			OwnerReferences: []metav1.OwnerReference{
+				*metav1.NewControllerRef(opCtx.builder, opCtx.builder.GroupVersionKind()),
+			},
+		},
+		Spec: batchv1.JobSpec{
+			Selector: &metav1.LabelSelector{
+				MatchLabels: map[string]string{},
+			},
+			BackoffLimit: &common.BackoffLimit,
+			Completions:  &common.Completions,
+			Parallelism:  &common.Parallelism,
+		},
+	}
 }
