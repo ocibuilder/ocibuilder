@@ -14,12 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package common
+package validate
 
 import (
 	"os"
 
-	"github.com/ocibuilder/ocibuilder/common/context"
+	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
@@ -103,7 +103,7 @@ func ValidatePush(spec v1alpha1.OCIBuilderSpec) error {
 // ValidatePushSpec validates the lower level push specification
 func ValidatePushSpec(spec *v1alpha1.PushSpec) error {
 	if spec.Registry == "" {
-		spec.Registry = DefaultImageRegistry
+		spec.Registry = common.DefaultImageRegistry
 	}
 	if spec.Image == "" {
 		return errors.New("image name must be specified for push")
@@ -112,17 +112,6 @@ func ValidatePushSpec(spec *v1alpha1.PushSpec) error {
 		return errors.New("tag must be specified for push")
 	}
 	return nil
-}
-
-// ValidateContext validates image context, returns the current local directory as a default if none
-// exists
-func ValidateContext(spec v1alpha1.ImageContext) v1alpha1.ImageContext {
-	if spec.LocalContext == nil && spec.GitContext == nil && spec.S3Context == nil {
-		spec.LocalContext = &context.LocalContext{
-			ContextPath: ".",
-		}
-	}
-	return spec
 }
 
 func ValidateParams(specJSON []byte, src string) error {

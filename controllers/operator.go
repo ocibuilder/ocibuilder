@@ -19,6 +19,7 @@ package ocibuilder
 import (
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/validate"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	batchv1 "k8s.io/api/batch/v1"
@@ -59,7 +60,7 @@ func (opCtx *operationContext) operate() error {
 
 	log.Infoln("operating on the resource...")
 
-	if err := common.Validate(&opCtx.builder.Spec); err != nil {
+	if err := validate.Validate(&opCtx.builder.Spec); err != nil {
 		return errors.Wrap(err, "failed to validate the resource spec")
 	}
 

@@ -1,3 +1,19 @@
+/*
+Copyright 2019 BlackRock, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package oci
 
 import (
@@ -9,6 +25,8 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/parser"
+	"github.com/ocibuilder/ocibuilder/pkg/validate"
 	"github.com/sirupsen/logrus"
 )
 
@@ -21,23 +39,27 @@ type Builder struct {
 func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBuildResponse, errChan chan<- error, finished chan<- bool) {
 	log := b.Logger
 	cli := b.Client
-	reader := common.Reader{
-		Logger: log,
-	}
 
-	defer b.Clean()
+	defer func() {
+		b.Clean()
+		finished <- true
+	}()
 
-	buildOpts, err := common.ParseBuildSpec(spec.Build)
+	buildOpts, err := parser.ParseBuildSpec(spec.Build)
 	if err != nil {
 		log.WithError(err).Errorln("error in parsing build spec")
 		errChan <- err
 	}
 
 	for idx, opt := range buildOpts {
-		b.Metadata = append(b.Metadata, v1alpha1.ImageMetadata{BuildFile: opt.Dockerfile})
+		b.Metadata = append(b.Metadata, v1alpha1.ImageMetadata{
+			BuildFile:        opt.Dockerfile,
+			ContextDirectory: opt.BuildContextPath,
+		})
 
 		log.WithField("step: ", idx).Debugln("running build step")
-		buildContext, path, err := reader.ReadContext(opt.Context)
+		log.WithField("path", opt.BuildContextPath).Debugln("building with build context at path")
+		buildContext, err := os.Open(opt.BuildContextPath + common.ContextDirectory + common.ContextFile)
 		if err != nil {
 			log.WithError(err).Errorln("error reading image build context")
 			errChan <- err
@@ -48,7 +70,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 
 		builderOptions := v1alpha1.OCIBuildOptions{
 			Ctx:         context.Background(),
-			ContextPath: path,
+			ContextPath: opt.BuildContextPath + common.ContextDirectory,
 			Context:     buildContext,
 			ImageBuildOptions: types.ImageBuildOptions{
 				Dockerfile: opt.Dockerfile,
@@ -83,8 +105,6 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 		}
 		log.WithField("step", idx).Debugln("build step has finished excuting")
 	}
-	log.Debugln("running build file cleanup")
-	finished <- true
 }
 
 func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPushResponse, errChan chan<- error, finished chan<- bool) {
@@ -93,7 +113,7 @@ func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPush
 
 	for idx, pushSpec := range spec.Push {
 		log.WithField("step: ", idx).Debugln("running push step")
-		if err := common.ValidatePushSpec(&pushSpec); err != nil {
+		if err := validate.ValidatePushSpec(&pushSpec); err != nil {
 			errChan <- err
 		}
 
@@ -194,20 +214,20 @@ func (b *Builder) Login(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCILog
 	log := b.Logger
 	cli := b.Client
 
-	if err := common.ValidateLogin(spec); err != nil {
+	if err := validate.ValidateLogin(spec); err != nil {
 		errChan <- err
 		return
 	}
 
 	for idx, loginSpec := range spec.Login {
 		log.WithField("registry", loginSpec.Registry).Debugln("attempting to login to registry")
-		username, err := common.ValidateLoginUsername(loginSpec)
+		username, err := validate.ValidateLoginUsername(loginSpec)
 		if err != nil {
 			errChan <- err
 			return
 		}
 
-		password, err := common.ValidateLoginPassword(loginSpec)
+		password, err := validate.ValidateLoginPassword(loginSpec)
 		if err != nil {
 			errChan <- err
 			return
@@ -260,10 +280,10 @@ func (b *Builder) Clean() {
 	log := b.Logger
 	log.WithField("metadata", b.Metadata).Debugln("attempting to cleanup files listed in metadata")
 	for _, m := range b.Metadata {
-		if m.BuildFile != "" {
-			log.WithField("filepath", m.BuildFile).Debugln("attempting to cleanup dockerfile")
-			if err := os.Remove(m.BuildFile); err != nil {
-				b.Logger.WithError(err).Errorln("error removing generated Dockerfile")
+		if m.ContextDirectory != "" {
+			log.WithField("filepath", m.ContextDirectory).Debugln("attempting to cleanup context")
+			if err := os.RemoveAll(m.ContextDirectory + "/ocib"); err != nil {
+				b.Logger.WithError(err).Errorln("error removing generated context")
 				continue
 			}
 		}
@@ -271,17 +291,17 @@ func (b *Builder) Clean() {
 }
 
 func (b Builder) generateAuthRegistryString(registry string, spec v1alpha1.OCIBuilderSpec) (string, error) {
-	if err := common.ValidateLogin(spec); err != nil {
+	if err := validate.ValidateLogin(spec); err != nil {
 		return "", err
 	}
 	for _, spec := range spec.Login {
 		if spec.Registry == registry {
-			user, err := common.ValidateLoginUsername(spec)
+			user, err := validate.ValidateLoginUsername(spec)
 			if err != nil {
 				return "", err
 			}
 
-			pass, err := common.ValidateLoginPassword(spec)
+			pass, err := validate.ValidateLoginPassword(spec)
 			if err != nil {
 				return "", err
 			}
