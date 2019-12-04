@@ -16,7 +16,10 @@ limitations under the License.
 
 package common
 
-import "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder"
+import (
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder"
+	"time"
+)
 
 // Controller environment variables
 const (
@@ -51,7 +54,9 @@ const (
 	// LabelNamespace is the label to indicate K8s namespace
 	LabelNamespace = "namespace"
 	// LabelPhase is the label to indicate the phase of the ocibuilder resourc
-	LabelPhase = "phase"
+	LabelPhase   = "phase"
+	LabelOwner   = "owner"
+	LabelJobType = "job-type"
 )
 
 // logger labels
@@ -67,16 +72,29 @@ const (
 // Build context constants
 const (
 	// ContextDirectory holds the ocibuilder context
-	ContextDirectory = "/ocib/context/"
+	ContextDirectory = "/ocib/context"
+	// SpecFilePath is the path to the ocibuilder spec file
+	SpecFilePath = "spec/ocibuilder.yaml"
 	// ContextFile contains the compressed build context
 	ContextFile = "context.tar.gz"
 	// ContextDirectoryUncompressed contains the uncompressed build context
-	ContextDirectoryUncompressed = "/ocibuilder/context/uncompressed/"
+	ContextDirectoryUncompressed = "/ocibuilder/context/uncompressed"
 )
 
-// K8s Job specific variables
+// Default values of K8s Job specific variables
 var (
-	BackoffLimit = int32(2)
-	Completions  = int32(1)
-	Parallelism  = int32(1)
+	BackoffLimit            = int32(2)
+	Completions             = int32(1)
+	Parallelism             = int32(1)
+	TTLSecondsAfterFinished = time.Hour.Seconds() * 6
+	ActiveDeadlineSeconds   = time.Hour.Seconds() * 24
+)
+
+// Environment variables for the Job specific variables
+const (
+	EnvVarBackoffLimit            = "JOB_BACK_OFF_LIMIT"
+	EnvVarCompletions             = "JOB_COMPLETIONS"
+	EnvVarParallelisms            = "JOB_PARALLELISMS"
+	EnvVarTTLSecondsAfterFinished = "JOB_TTL_SECONDS_AFTER_FINISHED"
+	EnvVarActiveDeadlineSeconds   = "JOB_ACTIVE_DEADLINE_SECONDS"
 )
