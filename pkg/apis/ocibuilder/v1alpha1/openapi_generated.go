@@ -22,39 +22,90 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"github.com/go-openapi/spec"
-	"k8s.io/kube-openapi/pkg/common"
+	spec "github.com/go-openapi/spec"
+	common "k8s.io/kube-openapi/pkg/common"
 )
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AnsibleGalaxy":     schema_pkg_apis_ocibuilder_v1alpha1_AnsibleGalaxy(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AnsibleLocal":      schema_pkg_apis_ocibuilder_v1alpha1_AnsibleLocal(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AnsibleStep":       schema_pkg_apis_ocibuilder_v1alpha1_AnsibleStep(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Base":              schema_pkg_apis_ocibuilder_v1alpha1_Base(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildSpec":         schema_pkg_apis_ocibuilder_v1alpha1_BuildSpec(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildStep":         schema_pkg_apis_ocibuilder_v1alpha1_BuildStep(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildTemplate":     schema_pkg_apis_ocibuilder_v1alpha1_BuildTemplate(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildTemplateStep": schema_pkg_apis_ocibuilder_v1alpha1_BuildTemplateStep(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Command":           schema_pkg_apis_ocibuilder_v1alpha1_Command(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.DockerStep":        schema_pkg_apis_ocibuilder_v1alpha1_DockerStep(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.EnvCreds":          schema_pkg_apis_ocibuilder_v1alpha1_EnvCreds(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.ImageBuildArgs":    schema_pkg_apis_ocibuilder_v1alpha1_ImageBuildArgs(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.ImageContext":      schema_pkg_apis_ocibuilder_v1alpha1_ImageContext(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.ImageMetadata":     schema_pkg_apis_ocibuilder_v1alpha1_ImageMetadata(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.K8sCreds":          schema_pkg_apis_ocibuilder_v1alpha1_K8sCreds(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.LoginSpec":         schema_pkg_apis_ocibuilder_v1alpha1_LoginSpec(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Metadata":          schema_pkg_apis_ocibuilder_v1alpha1_Metadata(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.NodeStatus":        schema_pkg_apis_ocibuilder_v1alpha1_NodeStatus(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.OCIBuilder":        schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilder(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.OCIBuilderList":    schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderList(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.OCIBuilderSpec":    schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderSpec(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.OCIBuilderStatus":  schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderStatus(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Param":             schema_pkg_apis_ocibuilder_v1alpha1_Param(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.PlainCreds":        schema_pkg_apis_ocibuilder_v1alpha1_PlainCreds(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.PushSpec":          schema_pkg_apis_ocibuilder_v1alpha1_PushSpec(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.RegistryCreds":     schema_pkg_apis_ocibuilder_v1alpha1_RegistryCreds(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Stage":             schema_pkg_apis_ocibuilder_v1alpha1_Stage(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AliyunOSSContext":      schema_pkg_apis_ocibuilder_v1alpha1_AliyunOSSContext(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AnsibleGalaxy":         schema_pkg_apis_ocibuilder_v1alpha1_AnsibleGalaxy(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AnsibleLocal":          schema_pkg_apis_ocibuilder_v1alpha1_AnsibleLocal(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AnsibleStep":           schema_pkg_apis_ocibuilder_v1alpha1_AnsibleStep(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AzureBlobContext":      schema_pkg_apis_ocibuilder_v1alpha1_AzureBlobContext(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Base":                  schema_pkg_apis_ocibuilder_v1alpha1_Base(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildContext":          schema_pkg_apis_ocibuilder_v1alpha1_BuildContext(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildSpec":             schema_pkg_apis_ocibuilder_v1alpha1_BuildSpec(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildStep":             schema_pkg_apis_ocibuilder_v1alpha1_BuildStep(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildTemplate":         schema_pkg_apis_ocibuilder_v1alpha1_BuildTemplate(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildTemplateStep":     schema_pkg_apis_ocibuilder_v1alpha1_BuildTemplateStep(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Command":               schema_pkg_apis_ocibuilder_v1alpha1_Command(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Credentials":           schema_pkg_apis_ocibuilder_v1alpha1_Credentials(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.DockerStep":            schema_pkg_apis_ocibuilder_v1alpha1_DockerStep(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.EnvCreds":              schema_pkg_apis_ocibuilder_v1alpha1_EnvCreds(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.GCSContext":            schema_pkg_apis_ocibuilder_v1alpha1_GCSContext(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.GitContext":            schema_pkg_apis_ocibuilder_v1alpha1_GitContext(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.GitRemoteConfig":       schema_pkg_apis_ocibuilder_v1alpha1_GitRemoteConfig(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.ImageBuildArgs":        schema_pkg_apis_ocibuilder_v1alpha1_ImageBuildArgs(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.ImageMetadata":         schema_pkg_apis_ocibuilder_v1alpha1_ImageMetadata(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.K8sCreds":              schema_pkg_apis_ocibuilder_v1alpha1_K8sCreds(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.KubeSecretCredentials": schema_pkg_apis_ocibuilder_v1alpha1_KubeSecretCredentials(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.LocalContext":          schema_pkg_apis_ocibuilder_v1alpha1_LocalContext(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.LoginSpec":             schema_pkg_apis_ocibuilder_v1alpha1_LoginSpec(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Metadata":              schema_pkg_apis_ocibuilder_v1alpha1_Metadata(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.NodeStatus":            schema_pkg_apis_ocibuilder_v1alpha1_NodeStatus(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.OCIBuilder":            schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilder(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.OCIBuilderList":        schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderList(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.OCIBuilderSpec":        schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderSpec(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.OCIBuilderStatus":      schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderStatus(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Param":                 schema_pkg_apis_ocibuilder_v1alpha1_Param(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.PlainCreds":            schema_pkg_apis_ocibuilder_v1alpha1_PlainCreds(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.PushSpec":              schema_pkg_apis_ocibuilder_v1alpha1_PushSpec(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.RegistryCreds":         schema_pkg_apis_ocibuilder_v1alpha1_RegistryCreds(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.S3Bucket":              schema_pkg_apis_ocibuilder_v1alpha1_S3Bucket(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.S3Context":             schema_pkg_apis_ocibuilder_v1alpha1_S3Context(ref),
+		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Stage":                 schema_pkg_apis_ocibuilder_v1alpha1_Stage(ref),
+	}
+}
+
+func schema_pkg_apis_ocibuilder_v1alpha1_AliyunOSSContext(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "AliyunOSSContext refers to configuration required to fetch context from Aliyun OSS",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"accessId": {
+						SchemaProps: spec.SchemaProps{
+							Description: "AccessId refers to access id",
+							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Credentials"),
+						},
+					},
+					"accessSecret": {
+						SchemaProps: spec.SchemaProps{
+							Description: "AccessSecret refers to access secret",
+							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Credentials"),
+						},
+					},
+					"endpoint": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Endpoint is the storage to connect to",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"bucket": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Bucket refers to the bucket name on gcs",
+							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.S3Bucket"),
+						},
+					},
+				},
+				Required: []string{"accessId", "accessSecret", "endpoint", "bucket"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Credentials", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.S3Bucket"},
 	}
 }
 
@@ -837,18 +888,52 @@ func schema_pkg_apis_ocibuilder_v1alpha1_ImageBuildArgs(ref common.ReferenceCall
 							Format:      "",
 						},
 					},
-					"context": {
+					"buildContextPath": {
 						SchemaProps: spec.SchemaProps{
-							Description: "BuildContext is the context for Docker and Buildah defaults to LocalContext in current working directory",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildContext"),
+							Description: "BuildContextPath is the path of the build context for Docker and Buildah defaults to LocalContext in current working directory",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
 				},
 				Required: []string{"name", "tag"},
 			},
 		},
-		Dependencies: []string{
-			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.ImageContext"},
+	}
+}
+
+func schema_pkg_apis_ocibuilder_v1alpha1_ImageMetadata(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ImageMetadata represents build image metadata",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"buildFile": {
+						SchemaProps: spec.SchemaProps{
+							Description: "BuildFile is the path to the buildfile that was used for the image build",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"contextDirectory": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ContextDirectory is the path to the build context",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"daemon": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Daemon is whether the daemon was used to build or not (Docker or Buildah)",
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"buildFile", "contextDirectory", "daemon"},
+			},
+		},
 	}
 }
 
@@ -880,28 +965,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_K8sCreds(ref common.ReferenceCallback) 
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_ImageMetadata(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "ImageMetadata represents build image metadata",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"buildFile": {
-						SchemaProps: spec.SchemaProps{
-							Description: "BuildFile is the path to the buildfile",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"buildFile"},
-			},
-		},
-	}
-}
-
-func schema_pkg_apis_ocibuilder_v1alpha1_K8sCreds(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_ocibuilder_v1alpha1_KubeSecretCredentials(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -1554,37 +1618,16 @@ func schema_pkg_apis_ocibuilder_v1alpha1_PushSpec(ref common.ReferenceCallback) 
 				Description: "PushSpec contains the specification to push images to registries",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"registry": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Registry is the name of the registry",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
 					"image": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Image to push",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"user": {
-						SchemaProps: spec.SchemaProps{
-							Description: "User is the name of kubernetes namespace",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"token": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Token required for the OCI complaint registry authentication",
+							Description: "Registry is the name of the registry Registry string `json:\"registry\" protobuf:\"bytes,1,name=registry\"` Image to push",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"tag": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Tag version of the image (e.g: v0.1.1)",
+							Description: "User is the name of kubernetes namespace User string `json:\"user\" protobuf:\"bytes,3,name=user\"` Token required for the OCI complaint registry authentication Token string `json:\"token\" protobuf:\"bytes,4,name=token\"` Tag version of the image (e.g: v0.1.1)",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -1597,7 +1640,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_PushSpec(ref common.ReferenceCallback) 
 						},
 					},
 				},
-				Required: []string{"registry", "image", "user", "token", "tag"},
+				Required: []string{"image", "tag"},
 			},
 		},
 	}
