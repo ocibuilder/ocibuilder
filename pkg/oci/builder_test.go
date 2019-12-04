@@ -78,6 +78,9 @@ func TestBuilder_Build2(t *testing.T) {
 func TestBuilder_Pull(t *testing.T) {
 }
 
+func TestBuilder_Tag(t *testing.T) {
+}
+
 func TestBuilder_Push(t *testing.T) {
 }
 

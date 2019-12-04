@@ -286,13 +286,13 @@ type PlainCreds struct {
 // PushSpec contains the specification to push images to registries
 type PushSpec struct {
 	// Registry is the name of the registry
-	Registry string `json:"registry" protobuf:"bytes,1,name=registry"`
+	// Registry string `json:"registry" protobuf:"bytes,1,name=registry"`
 	// Image to push
 	Image string `json:"image" protobuf:"bytes,2,name=image"`
 	// User is the name of kubernetes namespace
-	User string `json:"user" protobuf:"bytes,3,name=user"`
+	// User string `json:"user" protobuf:"bytes,3,name=user"`
 	// Token required for the OCI complaint registry authentication
-	Token string `json:"token" protobuf:"bytes,4,name=token"`
+	// Token string `json:"token" protobuf:"bytes,4,name=token"`
 	// Tag version of the image (e.g: v0.1.1)
 	Tag string `json:"tag" protobuf:"bytes,5,name=tag"`
 	// Purge the image after it has been pushed

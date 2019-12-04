@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	dockertypes "github.com/docker/docker/api/types"
 	"github.com/ocibuilder/ocibuilder/common"
@@ -31,6 +32,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Builder is a struct which consists of an instance of logger, docker client and context path
 type Builder struct {
 	Logger   *logrus.Logger
 	Client   v1alpha1.BuilderClient
@@ -112,16 +114,31 @@ func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- types.OCIPushRes
 	log := b.Logger
 	cli := b.Client
 
+	buildSpec, err := common.ParseBuildSpec(spec.Build)
+	if err != nil {
+		log.WithError(err).Errorln("error in parsing build spec...")
+		return
+	}
+
 	for idx, pushSpec := range spec.Push {
 		log.WithField("step: ", idx).Debugln("running push step")
 		if err := validate.ValidatePushSpec(&pushSpec); err != nil {
 			errChan <- err
 		}
 
-		pushFullImageName := fmt.Sprintf("%s/%s:%s", pushSpec.Registry, pushSpec.Image, pushSpec.Tag)
+		builtImageName := fmt.Sprintf("%s:%s", buildSpec[idx].Name, buildSpec[idx].Tag)
+		pushFullImageName := fmt.Sprintf("%s:%s", pushSpec.Image, pushSpec.Tag)
+		registry := strings.Split(pushFullImageName, "/")[0]
+
+		err := cli.ImageTag(builtImageName, pushFullImageName)
+		if err != nil {
+			log.WithError(err).Errorln("failed to tag image before pushing")
+			return
+		}
+
 		log.WithField("name", pushFullImageName).Infoln("pushing image with name")
 
-		authString, err := b.generateAuthRegistryString(pushSpec.Registry, spec)
+		authString, err := b.generateAuthRegistryString(registry, spec)
 		if err != nil {
 			log.WithError(err).Errorln("unable to find login spec")
 			errChan <- err
@@ -255,6 +272,7 @@ func (b *Builder) Login(spec v1alpha1.OCIBuilderSpec, res chan<- types.OCILoginR
 	finished <- true
 }
 
+// Purge is used to purge image after the build
 func (b *Builder) Purge(imageName string) error {
 	log := b.Logger
 	cli := b.Client
@@ -277,6 +295,7 @@ func (b *Builder) Purge(imageName string) error {
 	return nil
 }
 
+// Clean is used to remove generated Dockerfile
 func (b *Builder) Clean() {
 	log := b.Logger
 	log.WithField("metadata", b.Metadata).Debugln("attempting to cleanup files listed in metadata")
@@ -291,6 +310,7 @@ func (b *Builder) Clean() {
 	}
 }
 
+// getPushAuthRegistryString is used to match a push registry with a passed in login specification, returning an auth string
 func (b Builder) generateAuthRegistryString(registry string, spec v1alpha1.OCIBuilderSpec) (string, error) {
 	if err := validate.ValidateLogin(spec); err != nil {
 		return "", err

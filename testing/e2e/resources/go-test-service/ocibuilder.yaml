@@ -53,9 +53,8 @@ login:
         username: REPLACED_BY_PARAM
 
 push:
-  - registry: docker.io
-    user: ocibuildere2e
-    image: go-test-service
+  # <registry>/<user>/<image-name>
+  - image: docker.io/ocibuildere2e/go-test-service
     tag: v0.1.0
 
 params:

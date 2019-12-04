@@ -61,7 +61,7 @@ ocictl-package-build:
 	cd dist; tar -czvf ocictl-mac-amd64.tar.gz ./ocictl
 	cd dist; rm -rf ./ocictl
 
-.PHONY: codegen
+.PHONY: test
 test:
 	go test $(shell go list ./... | grep -v /vendor/ | grep -v /testing/) -race -short -v -coverprofile=coverage.text
 
@@ -94,10 +94,11 @@ openapigen:
 	hack/update-openapigen.sh
 
 .PHONY: codegen
-codegen: generate-deepcopy generate-client generate-lister generate-informer
+codegen:
+	hack/update-codegen.sh
 
 .PHONY: verify-codegen
-verify-codegen: codegen
+verify-codegen:
 	hack/verify-codegen.sh
 
 .PHONY: generate-deepcopy

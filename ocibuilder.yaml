@@ -30,8 +30,7 @@ login:
         password: PASS_REPLACED
 
 push:
-  - registry: docker.io
-    image: ocibuilder/ocictl
+  - image: docker.io/ocibuilder/ocictl
     tag: TAG_REPLACED
 
 params:

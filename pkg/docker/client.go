@@ -26,6 +26,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Client represents docker client
 type Client struct {
 	APIClient client.APIClient
 	Logger    *logrus.Logger
