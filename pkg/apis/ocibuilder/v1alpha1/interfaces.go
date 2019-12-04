@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	dockertypes "github.com/docker/docker/api/types"
 	"github.com/ocibuilder/ocibuilder/pkg/types"
 
@@ -38,7 +40,7 @@ type ContextReader interface {
 type BuilderClient interface {
 	ImageBuild(options types.OCIBuildOptions) (types.OCIBuildResponse, error)
 	ImagePull(options types.OCIPullOptions) (types.OCIPullResponse, error)
-	ImageTag(source string, target string) error
+	ImageTag(context context.Context, source string, target string) error
 	ImagePush(options types.OCIPushOptions) (types.OCIPushResponse, error)
 	ImageRemove(options types.OCIRemoveOptions) (types.OCIRemoveResponse, error)
 	RegistryLogin(options types.OCILoginOptions) (types.OCILoginResponse, error)

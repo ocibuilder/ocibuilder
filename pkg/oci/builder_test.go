@@ -101,12 +101,19 @@ func (t testClient) ImageBuild(options types.OCIBuildOptions) (types.OCIBuildRes
 func (t testClient) ImagePull(options types.OCIPullOptions) (types.OCIPullResponse, error) {
 	return types.OCIPullResponse{}, nil
 }
+
+func (t testClient) ImageTag(source string, target string) error {
+	return nil
+}
+
 func (t testClient) ImagePush(options types.OCIPushOptions) (types.OCIPushResponse, error) {
 	return types.OCIPushResponse{}, nil
 }
+
 func (t testClient) ImageRemove(options types.OCIRemoveOptions) (types.OCIRemoveResponse, error) {
 	return types.OCIRemoveResponse{}, nil
 }
+
 func (t testClient) RegistryLogin(options types.OCILoginOptions) (types.OCILoginResponse, error) {
 	return types.OCILoginResponse{}, nil
 }

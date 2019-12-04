@@ -17,6 +17,7 @@ limitations under the License.
 package buildah
 
 import (
+	"context"
 	"fmt"
 	"io"
 
@@ -27,10 +28,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Client represents buildah client
 type Client struct {
 	Logger *logrus.Logger
 }
 
+// ImageBuild represents a buildah client function which builts image
 func (cli Client) ImageBuild(options types.OCIBuildOptions) (types.OCIBuildResponse, error) {
 
 	buildFlags := []command.Flag{
@@ -56,6 +59,7 @@ func (cli Client) ImageBuild(options types.OCIBuildOptions) (types.OCIBuildRespo
 	}, nil
 }
 
+// ImagePull represents a buildah client function which pulls image
 func (cli Client) ImagePull(options types.OCIPullOptions) (types.OCIPullResponse, error) {
 
 	pullFlags := []command.Flag{
@@ -78,6 +82,19 @@ func (cli Client) ImagePull(options types.OCIPullOptions) (types.OCIPullResponse
 	}, nil
 }
 
+// ImageTag represents a docker client function which tags image
+func (cli Client) ImageTag(ctx context.Context, source string, target string) error {
+	cmd := command.Builder("buildah").Command("tag").Args(source, target).Build()
+	cli.Logger.WithField("cmd", cmd).Debugln("executing tag with command")
+	_, _, err := execute(&cmd)
+	if err != nil {
+		cli.Logger.WithError(err).Errorln("error tagging image...")
+		return err
+	}
+	return nil
+}
+
+// ImagePush represents a buildah client function which pushes image
 func (cli Client) ImagePush(options types.OCIPushOptions) (types.OCIPushResponse, error) {
 
 	pushFlags := []command.Flag{
@@ -100,8 +117,8 @@ func (cli Client) ImagePush(options types.OCIPushOptions) (types.OCIPushResponse
 	}, nil
 }
 
+// ImageRemove represents a buildah client function which removes image
 func (cli Client) ImageRemove(options types.OCIRemoveOptions) (types.OCIRemoveResponse, error) {
-
 	cmd := command.Builder("buildah").Command("rmi").Args(options.Image).Build()
 	cli.Logger.WithField("cmd", cmd).Debugln("executing remove with command")
 
@@ -120,6 +137,7 @@ func (cli Client) ImageRemove(options types.OCIRemoveOptions) (types.OCIRemoveRe
 	}, nil
 }
 
+// RegistryLogin represents a buildah client function which does registry login
 func (cli Client) RegistryLogin(options types.OCILoginOptions) (types.OCILoginResponse, error) {
 
 	loginFlags := []command.Flag{
@@ -144,6 +162,7 @@ func (cli Client) RegistryLogin(options types.OCILoginOptions) (types.OCILoginRe
 	}, nil
 }
 
+// GenerateAuthRegistryString is used to parse auth config for registry
 func (cli Client) GenerateAuthRegistryString(auth dockertypes.AuthConfig) string {
 	return fmt.Sprintf("%s:%s", auth.Username, auth.Password)
 }

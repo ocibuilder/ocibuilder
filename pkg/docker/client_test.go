@@ -64,6 +64,10 @@ func (t testClient) ImagePull(ctx context.Context, ref string, options dockertyp
 	return nil, nil
 }
 
+func (t testClient) ImageTag(ctx context.Context, source string, target string) error {
+	return nil
+}
+
 func (t testClient) ImagePush(ctx context.Context, ref string, options dockertypes.ImagePushOptions) (io.ReadCloser, error) {
 	return nil, nil
 }

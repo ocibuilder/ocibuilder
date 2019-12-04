@@ -26,7 +26,6 @@ import (
 	dockertypes "github.com/docker/docker/api/types"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/parser"
 	"github.com/ocibuilder/ocibuilder/pkg/types"
 	"github.com/ocibuilder/ocibuilder/pkg/validate"
 	"github.com/sirupsen/logrus"
@@ -48,7 +47,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- types.OCIBuildR
 		finished <- true
 	}()
 
-	buildOpts, err := parser.ParseBuildSpec(spec.Build)
+	buildOpts, err := common.ParseBuildSpec(spec.Build)
 	if err != nil {
 		log.WithError(err).Errorln("error in parsing build spec")
 		errChan <- err
@@ -130,7 +129,7 @@ func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- types.OCIPushRes
 		pushFullImageName := fmt.Sprintf("%s:%s", pushSpec.Image, pushSpec.Tag)
 		registry := strings.Split(pushFullImageName, "/")[0]
 
-		err := cli.ImageTag(builtImageName, pushFullImageName)
+		err := cli.ImageTag(context.Background(), builtImageName, pushFullImageName)
 		if err != nil {
 			log.WithError(err).Errorln("failed to tag image before pushing")
 			return

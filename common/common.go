@@ -17,8 +17,9 @@ limitations under the License.
 package common
 
 import (
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder"
 	"time"
+
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder"
 )
 
 // Controller environment variables

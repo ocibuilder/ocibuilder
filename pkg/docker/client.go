@@ -17,6 +17,7 @@ limitations under the License.
 package docker
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 
@@ -32,6 +33,7 @@ type Client struct {
 	Logger    *logrus.Logger
 }
 
+// ImageBuild represents a docker client function which builts image
 func (cli Client) ImageBuild(options types.OCIBuildOptions) (types.OCIBuildResponse, error) {
 	apiCli := cli.APIClient
 	res, err := apiCli.ImageBuild(options.Ctx, options.Context, options.ImageBuildOptions)
@@ -43,6 +45,7 @@ func (cli Client) ImageBuild(options types.OCIBuildOptions) (types.OCIBuildRespo
 	}, nil
 }
 
+// ImagePull represents a docker client function which pulls image
 func (cli Client) ImagePull(options types.OCIPullOptions) (types.OCIPullResponse, error) {
 	apiCli := cli.APIClient
 	res, err := apiCli.ImagePull(options.Ctx, options.Ref, options.ImagePullOptions)
@@ -54,6 +57,17 @@ func (cli Client) ImagePull(options types.OCIPullOptions) (types.OCIPullResponse
 	}, nil
 }
 
+// ImageTag represents a docker client function which tags image
+func (cli Client) ImageTag(ctx context.Context, source string, target string) error {
+	apiCli := cli.APIClient
+	err := apiCli.ImageTag(ctx, source, target)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// ImagePush represents a docker client function which pushes image
 func (cli Client) ImagePush(options types.OCIPushOptions) (types.OCIPushResponse, error) {
 	apiCli := cli.APIClient
 	res, err := apiCli.ImagePush(options.Ctx, options.Ref, options.ImagePushOptions)
@@ -65,6 +79,7 @@ func (cli Client) ImagePush(options types.OCIPushOptions) (types.OCIPushResponse
 	}, nil
 }
 
+// ImageRemove represents a docker client function which removes image
 func (cli Client) ImageRemove(options types.OCIRemoveOptions) (types.OCIRemoveResponse, error) {
 	apiCli := cli.APIClient
 	res, err := apiCli.ImageRemove(options.Ctx, options.Image, options.ImageRemoveOptions)
@@ -76,6 +91,7 @@ func (cli Client) ImageRemove(options types.OCIRemoveOptions) (types.OCIRemoveRe
 	}, nil
 }
 
+// RegistryLogin represents a docker client function which does registry login
 func (cli Client) RegistryLogin(options types.OCILoginOptions) (types.OCILoginResponse, error) {
 	apiCli := cli.APIClient
 	res, err := apiCli.RegistryLogin(options.Ctx, options.AuthConfig)
@@ -87,6 +103,7 @@ func (cli Client) RegistryLogin(options types.OCILoginOptions) (types.OCILoginRe
 	}, nil
 }
 
+// GenerateAuthRegistryString is used to parse auth config for registry
 func (cli Client) GenerateAuthRegistryString(auth dockertypes.AuthConfig) string {
 	encodedJSON, err := json.Marshal(auth)
 	if err != nil {

@@ -1,12 +1,9 @@
 /*
 Copyright 2019 BlackRock, Inc.
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-
 	http://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package parser
+package common
 
 import (
 	"io/ioutil"
@@ -27,7 +24,7 @@ import (
 )
 
 func TestParseDockerCommands(t *testing.T) {
-	path := "../../testing/dummy/commands_basic_parser_test.txt"
+	path := "../testing/dummy/commands_basic_parser_test.txt"
 	dockerfile, err := ParseDockerCommands(&v1alpha1.DockerStep{
 		Path: path,
 	})
@@ -38,14 +35,14 @@ func TestParseDockerCommands(t *testing.T) {
 }
 
 func TestGenerateDockerfile(t *testing.T) {
-	file, err := ioutil.ReadFile("../../testing/dummy/build.yaml")
+	file, err := ioutil.ReadFile("../testing/dummy/build.yaml")
 	assert.Equal(t, nil, err)
 
 	templates := []v1alpha1.BuildTemplate{{
 		Name: "template-1",
 		Cmd: []v1alpha1.BuildTemplateStep{{
 			Docker: &v1alpha1.DockerStep{
-				Path: "../../testing/dummy/commands_basic_parser_test.txt",
+				Path: "../testing/dummy/commands_basic_parser_test.txt",
 			},
 		},
 		}}}
@@ -66,7 +63,7 @@ func TestGenerateDockerfile(t *testing.T) {
 }
 
 func TestGenerateDockerfileInline(t *testing.T) {
-	file, err := ioutil.ReadFile("../../testing/dummy/build.yaml")
+	file, err := ioutil.ReadFile("../testing/dummy/build.yaml")
 	assert.Equal(t, nil, err)
 
 	template := []v1alpha1.BuildTemplate{{
@@ -96,12 +93,12 @@ func TestGenerateDockerfileInline(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedInlineDockerfile, string(dockerfile))
 
-	path, err = GenerateDockerfile(buildSpecification.Steps[0], template, "../../testing/dummy")
+	path, err = GenerateDockerfile(buildSpecification.Steps[0], template, "../testing/dummy")
 	assert.Equal(t, nil, err)
 
-	dockerfile, err = ioutil.ReadFile("../../testing/dummy/" + path)
+	dockerfile, err = ioutil.ReadFile("../testing/dummy/" + path)
 	assert.Equal(t, nil, err)
-	defer os.Remove("../../testing/dummy/" + path)
+	defer os.Remove("../testing/dummy/" + path)
 
 	assert.Equal(t, expectedInlineDockerfile, string(dockerfile))
 }

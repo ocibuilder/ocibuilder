@@ -19,6 +19,8 @@ package v1alpha1
 import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/ocibuilder/ocibuilder/common/context"
 )
 
 // NodePhase is the label for the condition of a node.
@@ -203,7 +205,8 @@ type BuildStep struct {
 	// BuildContext used for image build
 	// default looks at the current working directory
 	// +optional
-	BuildContext *BuildContext `json:"context,omitempty" protobuf:"bytes,8,opt,name=context"`
+	// BuildContext *BuildContext `json:"context,omitempty" protobuf:"bytes,8,opt,name=context"`
+	Context ImageContext `json:"context,omitempty" protobuf:"bytes,9,opt,name=context"`
 }
 
 // Stage represents a stage within the build
@@ -334,27 +337,35 @@ type ImageBuildArgs struct {
 	// defaults to false
 	// +optional
 	Purge bool `json:"purge,omitempty" protobuf:"bytes,5,opt,name=purge"`
-	// BuildContextPath is the path of the build context for Docker and Buildah
+	// Context is the path of the build context for Docker and Buildah
 	// defaults to LocalContext in current working directory
 	// +optional
-	BuildContextPath string `json:"buildContextPath,omitempty" protobuf:"bytes,6,opt,name=buildContextPath"`
+	Context ImageContext `json:"context,omitempty" protobuf:"bytes,6,opt,name=context"`
+}
+
+// ImageContext stores the chosen build context for your build, this can be Local, S3 or Git
+type ImageContext struct {
+	// Local context contains local context information for a build
+	LocalContext *context.LocalContext `json:"localContext" protobuf:"bytes,1,opt,name=localContext"`
+	S3Context    *context.S3Context    `json:"s3Context" protobuf:"bytes,2,opt,name=s3Context"`
+	GitContext   *context.GitContext   `json:"gitContext" protobuf:"bytes,3,opt,name=gitContext"`
 }
 
 // BuildContext stores the chosen build context for your build, this can be Local, S3 or Git
-type BuildContext struct {
-	// Local context contains local context information for a build
-	LocalContext *LocalContext `json:"localContext,omitempty" protobuf:"bytes,1,opt,name=localContext"`
-	// S3Context refers to the context stored on S3 bucket for a build
-	S3Context *S3Context `json:"s3Context,omitempty" protobuf:"bytes,2,opt,name=s3Context"`
-	// GitContext refers to the context stored on Git repository
-	GitContext *GitContext `json:"gitContext,omitempty" protobuf:"bytes,3,opt,name=gitContext"`
-	// GCSContext refers to the context stored on the GCS
-	GCSContext *GCSContext `json:"gcsContext,omitempty" protobuf:"bytes,4,opt,name=gcsContext"`
-	// AzureBlobContext refers to the context stored on the Azure Storage Blob
-	AzureBlobContext *AzureBlobContext `json:"azureBlobContext,omitempty" protobuf:"bytes,5,opt,name=azureBlobContext"`
-	// AliyunOSSContext refers to the context stored on the Aliyun OSS
-	AliyunOSSContext *AliyunOSSContext `json:"aliyunOSSContext,omitempty" protobuf:"bytes,6,opt,name=aliyunOSSContext"`
-}
+// type BuildContext struct {
+// 	// Local context contains local context information for a build
+// 	LocalContext *LocalContext `json:"localContext,omitempty" protobuf:"bytes,1,opt,name=localContext"`
+// 	// S3Context refers to the context stored on S3 bucket for a build
+// 	S3Context *S3Context `json:"s3Context,omitempty" protobuf:"bytes,2,opt,name=s3Context"`
+// 	// GitContext refers to the context stored on Git repository
+// 	GitContext *GitContext `json:"gitContext,omitempty" protobuf:"bytes,3,opt,name=gitContext"`
+// 	// GCSContext refers to the context stored on the GCS
+// 	GCSContext *GCSContext `json:"gcsContext,omitempty" protobuf:"bytes,4,opt,name=gcsContext"`
+// 	// AzureBlobContext refers to the context stored on the Azure Storage Blob
+// 	AzureBlobContext *AzureBlobContext `json:"azureBlobContext,omitempty" protobuf:"bytes,5,opt,name=azureBlobContext"`
+// 	// AliyunOSSContext refers to the context stored on the Aliyun OSS
+// 	AliyunOSSContext *AliyunOSSContext `json:"aliyunOSSContext,omitempty" protobuf:"bytes,6,opt,name=aliyunOSSContext"`
+// }
 
 // LocalContext stores the path for your local build context, implements the ContextReader interface
 type LocalContext struct {

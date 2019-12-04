@@ -71,8 +71,7 @@ var LoginSpec = []v1alpha1.LoginSpec{
 
 var PushSpec = []v1alpha1.PushSpec{
 	{
-		Registry: "example-registry",
-		Image:    "example-image",
-		Tag:      "1.0.0",
+		Image: "example-image",
+		Tag:   "1.0.0",
 	},
 }
