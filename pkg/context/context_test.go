@@ -17,23 +17,24 @@ limitations under the License.
 package context
 
 import (
+	"io/ioutil"
+	"os"
 	"testing"
 
+	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestLocalContext_Read(t *testing.T) {
-	localContext := LocalContext{
-		ContextPath: "../../testing",
-	}
-	_, _, err := localContext.Read()
+func TestInjectDockerfile(t *testing.T) {
+	err := ioutil.WriteFile("../../testing/dummy/Dockerfile", []byte("FROM alpine\nCOPY . .\n"), 0644)
 	assert.Equal(t, nil, err)
-}
 
-func TestLocalContext_Read2(t *testing.T) {
-	localContext := LocalContext{
-		ContextPath: "",
-	}
-	_, _, err := localContext.Read()
-	assert.Error(t, err, "cannot have empty contextPath: specify . for current directory")
+	err = common.TarFile("../../testing/e2e/resources/go-test-service", "../../testing/e2e/resources/go-test-service/ocib/context/context.tar.gz")
+	assert.Equal(t, nil, err)
+
+	err = InjectDockerfile("../../testing/e2e/resources/go-test-service", "../../testing/dummy/Dockerfile")
+	assert.Equal(t, nil, err)
+
+	err = os.RemoveAll("../../testing/e2e/resources/go-test-service/ocib")
+	assert.Equal(t, nil, err)
 }

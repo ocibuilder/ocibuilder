@@ -14,71 +14,69 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package common
+package overlay
 
 import (
 	"bufio"
 	"errors"
 	"fmt"
-	cmdcore "github.com/k14s/ytt/pkg/cmd/core"
-	cmdtpl "github.com/k14s/ytt/pkg/cmd/template"
-	"github.com/k14s/ytt/pkg/files"
 	"io"
 	"io/ioutil"
 	"strings"
+
+	cmdcore "github.com/k14s/ytt/pkg/cmd/core"
+	cmdtpl "github.com/k14s/ytt/pkg/cmd/template"
+	"github.com/k14s/ytt/pkg/files"
+	"github.com/ocibuilder/ocibuilder/common"
 )
 
 // YttOverlay is the struct for handling overlays using ytt library https://github.com/k14s/ytt
 type YttOverlay struct {
 	// spec is the spec yaml in a []byte
-	spec []byte
+	Spec []byte
 	// overlay is the overlay yaml in a []byte
-	overlay OverlayFile
+	Overlay OverlayFile
 }
 
 // OverlayFile contains the overlay yaml in a ReadCloser and the path to the overlay file
 type OverlayFile struct {
-	file io.ReadCloser
-	path string
+	File io.ReadCloser
+	Path string
 }
 
 // Apply applies the overlay on a YttOverlay struct
 func (y YttOverlay) Apply() ([]byte, error) {
-	if y.spec == nil {
+	if y.Spec == nil {
 		return nil, errors.New("spec file is not defined, overlays is currently only supported for ocibuilder.yaml files")
 	}
-
-	annotatedOverlay := addYttAnnotations(y.overlay.file)
+	annotatedOverlay := addYttAnnotations(y.Overlay.File)
 	if annotatedOverlay == nil {
-		overlay, err := ioutil.ReadFile(y.overlay.path)
+		overlay, err := ioutil.ReadFile(y.Overlay.Path)
 		if err != nil {
 			return nil, err
 		}
 		annotatedOverlay = overlay
 	}
-
 	filesToProcess := []*files.File{
-		files.MustNewFileFromSource(files.NewBytesSource("ocibuilder.yaml", y.spec)),
-		files.MustNewFileFromSource(files.NewBytesSource(y.overlay.path, annotatedOverlay)),
+		files.MustNewFileFromSource(files.NewBytesSource("ocibuilder.yaml", y.Spec)),
+		files.MustNewFileFromSource(files.NewBytesSource(y.Overlay.Path, annotatedOverlay)),
 	}
 
 	defer func() {
 		if r := recover(); r != nil {
-			log.Warnln("panic recovered to execute final cleanup", r)
+			common.Logger.Warnln("panic recovered to execute final cleanup", r)
 		}
-		if err := y.overlay.file.Close(); err != nil {
-			log.WithError(err).Errorln("error closing file")
+		if err := y.Overlay.File.Close(); err != nil {
+			common.Logger.WithError(err).Errorln("error closing file")
 		}
 	}()
 
 	ui := cmdcore.NewPlainUI(false)
 	opts := cmdtpl.NewOptions()
-
 	out := opts.RunWithFiles(cmdtpl.TemplateInput{Files: filesToProcess}, ui)
 	if out.Err != nil {
 		return nil, out.Err
 	}
-
 	return out.Files[0].Bytes(), nil
 }
 
@@ -102,12 +100,10 @@ func addYttAnnotations(overlay io.ReadCloser) []byte {
 		if idx == 0 && strings.TrimSpace(scanner.Text()) == yttOverlayIdentifier {
 			return nil
 		}
-
 		if strings.TrimSpace(scanner.Text()) == "- metadata:" {
 			addTempToAnnotate()
 			tempSegment = nil
 		}
-
 		if strings.Contains(scanner.Text(), "overlay:") {
 			annotation := retrieveAnnotation(scanner.Text())
 
@@ -115,7 +111,6 @@ func addYttAnnotations(overlay io.ReadCloser) []byte {
 			addTempToAnnotate()
 			tempSegment = nil
 		}
-
 		tempSegment = append(tempSegment, scanner.Text())
 		idx++
 	}

@@ -14,20 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package common
+package parser
 
 import (
 	"io/ioutil"
 	"os"
 	"testing"
 
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ghodss/yaml"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestParseDockerCommands(t *testing.T) {
-	path := "../testing/dummy/commands_basic_parser_test.txt"
+	path := "../../testing/dummy/commands_basic_parser_test.txt"
 	dockerfile, err := ParseDockerCommands(&v1alpha1.DockerStep{
 		Path: path,
 	})
@@ -38,17 +38,17 @@ func TestParseDockerCommands(t *testing.T) {
 }
 
 func TestGenerateDockerfile(t *testing.T) {
-	file, err := ioutil.ReadFile("../testing/dummy/build.yaml")
+	file, err := ioutil.ReadFile("../../testing/dummy/build.yaml")
 	assert.Equal(t, nil, err)
 
 	templates := []v1alpha1.BuildTemplate{{
 		Name: "template-1",
 		Cmd: []v1alpha1.BuildTemplateStep{{
 			Docker: &v1alpha1.DockerStep{
-				Path: "../testing/dummy/commands_basic_parser_test.txt",
+				Path: "../../testing/dummy/commands_basic_parser_test.txt",
 			},
 		},
-	}}}
+		}}}
 
 	buildSpecification := v1alpha1.BuildSpec{}
 	if err := yaml.Unmarshal(file, &buildSpecification); err != nil {
@@ -66,7 +66,7 @@ func TestGenerateDockerfile(t *testing.T) {
 }
 
 func TestGenerateDockerfileInline(t *testing.T) {
-	file, err := ioutil.ReadFile("../testing/dummy/build.yaml")
+	file, err := ioutil.ReadFile("../../testing/dummy/build.yaml")
 	assert.Equal(t, nil, err)
 
 	template := []v1alpha1.BuildTemplate{{
@@ -96,12 +96,12 @@ func TestGenerateDockerfileInline(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedInlineDockerfile, string(dockerfile))
 
-	path, err = GenerateDockerfile(buildSpecification.Steps[0], template, "../testing/dummy")
+	path, err = GenerateDockerfile(buildSpecification.Steps[0], template, "../../testing/dummy")
 	assert.Equal(t, nil, err)
 
-	dockerfile, err = ioutil.ReadFile("../testing/dummy/" + path)
+	dockerfile, err = ioutil.ReadFile("../../testing/dummy/" + path)
 	assert.Equal(t, nil, err)
-	defer os.Remove("../testing/dummy/" + path)
+	defer os.Remove("../../testing/dummy/" + path)
 
 	assert.Equal(t, expectedInlineDockerfile, string(dockerfile))
 }

@@ -1,5 +1,6 @@
 # ocibuilder - Build [Open Container Initiative (OCI)](https://www.opencontainers.org/) compliant images the declarative way
 
+[![slack](https://img.shields.io/badge/slack-ocibuilder-brightgreen.svg?logo=slack)](https://urldefense.proofpoint.com/v2/url?u=https-3A__join.slack.com_t_ocibuilder_shared-5Finvite_enQtODYwMTczNzE0OTM1LTZmOWE5MzRlYzI5NzUxYmVmYmIwNjcyN2NlYTZjYTU1ZDAzNjQzZjIyYTQ0NDgwMDdjYzIyZTYyYjYzZWVhZmI&d=DwIFAg&c=zUO0BtkCe66yJvAZ4cAvZg&r=I1Kl9jPjMftKY0cYdNWKyldGY-ke5459qStXhg2CQ9Y&m=CVWkWRAvtaFIja4vZQVm0cJv1-09dRStxuVk4Fr-HBI&s=kkJIZPuFqO6U_nDxBwBTLLczhMnHEt6_f6PZBmcVCs4&e=)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ocibuilder/ocibuilder)](https://goreportcard.com/report/github.com/ocibuilder/ocibuilder)
 [![CircleCI](https://circleci.com/gh/ocibuilder/ocibuilder.svg?style=shield)](https://circleci.com/gh/ocibuilder/ocibuilder)
 [![Docs](https://img.shields.io/badge/docs-ocibuilder-56b5f5)](https://ocibuilder.github.io/docs/)

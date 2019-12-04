@@ -21,13 +21,13 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/ocibuilder/ocibuilder/pkg/oci"
-
 	"github.com/docker/docker/client"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/buildah"
 	"github.com/ocibuilder/ocibuilder/pkg/docker"
+	"github.com/ocibuilder/ocibuilder/pkg/oci"
+	"github.com/ocibuilder/ocibuilder/pkg/read"
 	"github.com/spf13/cobra"
 )
 
@@ -63,7 +63,7 @@ func newLoginCmd(out io.Writer) *cobra.Command {
 func (l *loginCmd) run(args []string) error {
 	var cli v1alpha1.BuilderClient
 	logger := common.GetLogger(l.debug)
-	reader := common.Reader{Logger: logger}
+	reader := read.Reader{Logger: logger}
 	ociBuilderSpec := v1alpha1.OCIBuilderSpec{Daemon: true}
 
 	if err := reader.Read(&ociBuilderSpec, "", l.path); err != nil {

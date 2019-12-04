@@ -28,6 +28,7 @@ import (
 	"github.com/ocibuilder/ocibuilder/pkg/buildah"
 	"github.com/ocibuilder/ocibuilder/pkg/docker"
 	"github.com/ocibuilder/ocibuilder/pkg/oci"
+	"github.com/ocibuilder/ocibuilder/pkg/read"
 	"github.com/spf13/cobra"
 )
 
@@ -70,7 +71,7 @@ func newPushCmd(out io.Writer) *cobra.Command {
 func (p *pushCmd) run(args []string) error {
 	var cli v1alpha1.BuilderClient
 	logger := common.GetLogger(p.debug)
-	reader := common.Reader{Logger: logger}
+	reader := read.Reader{Logger: logger}
 	ociBuilderSpec := v1alpha1.OCIBuilderSpec{Daemon: true}
 
 	if err := reader.Read(&ociBuilderSpec, "", p.path); err != nil {

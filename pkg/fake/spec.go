@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package dummy
+package fake
 
 import "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 
@@ -45,6 +45,11 @@ var BuildSpec = &v1alpha1.BuildSpec{
 							},
 						},
 					},
+				},
+			},
+			BuildContext: &v1alpha1.BuildContext{
+				LocalContext: &v1alpha1.LocalContext{
+					ContextPath: ".",
 				},
 			},
 		},

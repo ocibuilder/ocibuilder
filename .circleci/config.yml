@@ -92,7 +92,7 @@ jobs:
           command: |
             go get -u github.com/onsi/ginkgo/ginkgo
             go get -u github.com/onsi/gomega/...
-            ginkgo ./testing/e2e
+            ginkgo -v ./testing/e2e
   # build runs the build of the linux and mac ocictl artifacts and persists the packages to the circleci workspace
   build:
     docker:

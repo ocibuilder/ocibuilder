@@ -16,12 +16,9 @@ limitations under the License.
 
 package context
 
-import "io"
+import (
+	"testing"
+)
 
-type GitContext struct {
-	Url string
-}
-
-func (ctx GitContext) Read() (io.ReadCloser, error) {
-	return nil, nil
+func TestS3Context_Read(t *testing.T) {
 }
