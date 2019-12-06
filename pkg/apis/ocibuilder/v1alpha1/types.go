@@ -340,6 +340,10 @@ type ImageBuildArgs struct {
 	// defaults to false
 	// +optional
 	Purge bool `json:"purge,omitempty" protobuf:"bytes,5,opt,name=purge"`
+	// Cache for build
+	// Set to false by default
+	// +optional
+	Cache bool `json:"purge,omitempty" protobuf:"bytes,5,opt,name=purge"`
 	// BuildContextPath is the path of the build context for Docker and Buildah
 	// defaults to LocalContext in current working directory
 	// +optional
