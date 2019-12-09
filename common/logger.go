@@ -23,7 +23,7 @@ import (
 )
 
 // Create a new instance of the logger. You can have any number of instances.
-var log = GetLogger(false)
+var Logger = GetLogger(false)
 
 // GetLogger returns a new logger
 func GetLogger(debug bool) *logrus.Logger {

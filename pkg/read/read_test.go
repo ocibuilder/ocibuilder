@@ -14,13 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package common
+package read
 
 import (
 	"io/ioutil"
 	"os"
 	"testing"
 
+	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/stretchr/testify/assert"
 )
@@ -28,9 +29,9 @@ import (
 func TestReadLogin(t *testing.T) {
 	spec := v1alpha1.OCIBuilderSpec{}
 	reader := Reader{
-		Logger: GetLogger(true),
+		Logger: common.GetLogger(true),
 	}
-	err := reader.Read(&spec, "", "../testing/dummy")
+	err := reader.Read(&spec, "", "../../testing/dummy")
 
 	assert.Equal(t, nil, err)
 	assert.Equal(t, spec.Login, loginSpec, "the login spec to match the expected")
@@ -39,9 +40,9 @@ func TestReadLogin(t *testing.T) {
 func TestApplyParams(t *testing.T) {
 	spec := v1alpha1.OCIBuilderSpec{}
 	reader := Reader{
-		Logger: GetLogger(true),
+		Logger: common.GetLogger(true),
 	}
-	file, err := ioutil.ReadFile("../testing/dummy/spec_read_test.yaml")
+	file, err := ioutil.ReadFile("../../testing/dummy/spec_read_test.yaml")
 	assert.Equal(t, nil, err)
 
 	spec.Login = loginSpec
@@ -60,9 +61,9 @@ func TestApplyParams(t *testing.T) {
 func TestApplyInvalidParams(t *testing.T) {
 	spec := v1alpha1.OCIBuilderSpec{}
 	reader := Reader{
-		Logger: GetLogger(true),
+		Logger: common.GetLogger(true),
 	}
-	file, err := ioutil.ReadFile("../testing/dummy/spec_read_test.yaml")
+	file, err := ioutil.ReadFile("../../testing/dummy/spec_read_test.yaml")
 	assert.Equal(t, nil, err)
 
 	spec.Login = loginSpec
@@ -75,9 +76,9 @@ func TestApplyInvalidParams(t *testing.T) {
 func TestApplyParamsEnvVariable(t *testing.T) {
 	spec := v1alpha1.OCIBuilderSpec{}
 	reader := Reader{
-		Logger: GetLogger(true),
+		Logger: common.GetLogger(true),
 	}
-	file, err := ioutil.ReadFile("../testing/dummy/spec_read_test.yaml")
+	file, err := ioutil.ReadFile("../../testing/dummy/spec_read_test.yaml")
 	assert.Equal(t, nil, err)
 
 	spec.Login = loginSpec
@@ -103,9 +104,9 @@ func TestApplyParamsEnvVariable(t *testing.T) {
 func TestApplyInvalidParamsEnvVariable(t *testing.T) {
 	spec := v1alpha1.OCIBuilderSpec{}
 	reader := Reader{
-		Logger: GetLogger(true),
+		Logger: common.GetLogger(true),
 	}
-	file, err := ioutil.ReadFile("../testing/dummy/spec_read_test.yaml")
+	file, err := ioutil.ReadFile("../../testing/dummy/spec_read_test.yaml")
 	assert.Equal(t, nil, err)
 
 	spec.Login = loginSpec

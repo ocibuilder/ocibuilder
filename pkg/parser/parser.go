@@ -14,11 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package common
+package parser
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -28,49 +27,64 @@ import (
 
 	"github.com/gobuffalo/packr"
 	"github.com/moby/buildkit/frontend/dockerfile/parser"
+	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/context"
+	"github.com/ocibuilder/ocibuilder/pkg/validate"
+	"github.com/pkg/errors"
 )
 
 // ParseBuildSpec parses the build specification which is read in through spec.yml
 // or build.yaml and generates an array of build arguments
 func ParseBuildSpec(spec *v1alpha1.BuildSpec) ([]v1alpha1.ImageBuildArgs, error) {
 	var imageBuilds []v1alpha1.ImageBuildArgs
+	kubeConfig, ok := os.LookupEnv(common.EnvVarKubeConfig)
+	if !ok {
+		kubeConfig = ""
+	}
 	for _, step := range spec.Steps {
+		buildContext, err := context.GetBuildContextReader(step.BuildContext, kubeConfig)
+		if err != nil {
+			return nil, err
+		}
+		buildContextPath, err := buildContext.Read()
+		if err != nil {
+			return nil, err
+		}
+		dockerfilePath, err := GenerateDockerfile(step, spec.Templates, buildContextPath+common.ContextDirectory)
 
-		step.Context = ValidateContext(step.Context)
-
-		// TODO: support for more than just local context path in dockerfile generation
-		dockerfilePath, err := GenerateDockerfile(step, spec.Templates, step.Context.LocalContext.ContextPath)
+		if err := context.InjectDockerfile(buildContextPath, dockerfilePath); err != nil {
+			return nil, errors.Wrap(err, "error attempting to inject Dockerfile")
+		}
 
 		// Perform cleanup of generated files if parse errors out
 		if err != nil {
 			for _, args := range imageBuilds {
 				if err := os.Remove(args.Dockerfile); err != nil {
-					log.WithError(err).Errorln("error cleaning up generated files")
+					common.Logger.WithError(err).Errorln("error cleaning up generated files")
 				}
 			}
 			if err := os.Remove(dockerfilePath); err != nil {
-				log.WithError(err).Errorln("error cleaning up generated files")
+				common.Logger.WithError(err).Errorln("error cleaning up generated files")
 			}
 			return nil, err
 		}
 
 		imageBuild := v1alpha1.ImageBuildArgs{
-			Name:       step.Name,
-			Tag:        step.Tag,
-			Dockerfile: dockerfilePath,
-			Purge:      step.Purge,
-			Context:    step.Context,
+			Name:             step.Name,
+			Tag:              step.Tag,
+			Dockerfile:       filepath.Base(dockerfilePath),
+			Purge:            step.Purge,
+			BuildContextPath: buildContextPath,
 		}
 		imageBuilds = append(imageBuilds, imageBuild)
-
 	}
 	return imageBuilds, nil
 }
 
 // GenerateDockerfile takes in a build steps and generates a Dockerfile
 // returns path to generated dockerfile
-func GenerateDockerfile(step v1alpha1.BuildStep, templates []v1alpha1.BuildTemplate, contextPath string) (string, error) {
+func GenerateDockerfile(step v1alpha1.BuildStep, templates []v1alpha1.BuildTemplate, destination string) (string, error) {
 	var dockerfile []byte
 	for idx, stage := range step.Stages {
 		baseImage := parseBaseImage(stage.Base, stage.Name)
@@ -99,21 +113,14 @@ func GenerateDockerfile(step v1alpha1.BuildStep, templates []v1alpha1.BuildTempl
 		}
 	}
 
-	// if path not specified set to current working directory
-	if contextPath == "" {
-		contextPath = "."
-	}
-
-	file, err := ioutil.TempFile(contextPath, "Dockerfile")
+	file, err := ioutil.TempFile(destination, "Dockerfile")
 	if err != nil {
 		return "", err
 	}
-
 	if _, err = file.Write(dockerfile); err != nil {
 		return "", err
 	}
-
-	return filepath.Base(file.Name()), nil
+	return file.Name(), nil
 }
 
 // parseCmdType goes through a list of possible commands and parses them
@@ -121,12 +128,10 @@ func GenerateDockerfile(step v1alpha1.BuildStep, templates []v1alpha1.BuildTempl
 func parseCmdType(cmds []v1alpha1.BuildTemplateStep) ([]byte, error) {
 	var dockerfile []byte
 	for _, cmd := range cmds {
-
-		err := ValidateBuildTemplateStep(cmd)
+		err := validate.ValidateBuildTemplateStep(cmd)
 		if err != nil {
 			return nil, err
 		}
-
 		if cmd.Ansible != nil {
 			tmp, err := ParseAnsibleCommands(cmd.Ansible)
 			if err != nil {
@@ -134,7 +139,6 @@ func parseCmdType(cmds []v1alpha1.BuildTemplateStep) ([]byte, error) {
 			}
 			dockerfile = append(dockerfile, tmp...)
 		}
-
 		if cmd.Docker != nil {
 			tmp, err := ParseDockerCommands(cmd.Docker)
 			if err != nil {
@@ -152,82 +156,67 @@ func ParseAnsibleCommands(ansibleStep *v1alpha1.AnsibleStep) ([]byte, error) {
 	var buf bytes.Buffer
 	var dockerfile []byte
 
-	box := packr.NewBox("../templates/ansible")
+	box := packr.NewBox("../../templates/ansible")
 
 	if ansibleStep.Local != nil {
-
 		file, err := box.Find(v1alpha1.AnsiblePath)
 		if err != nil {
 			return nil, err
 		}
-
 		tmpl, err := template.New("ansibleLocal").Parse(string(file))
 		if err != nil {
 			return nil, err
 		}
-
 		if err = tmpl.Execute(&buf, ansibleStep.Local); err != nil {
 			return nil, err
 		}
 		dockerfileBytes := buf.Bytes()
 		dockerfile = append(dockerfile, dockerfileBytes...)
-
 		return dockerfile, nil
 	}
-
 	if ansibleStep.Galaxy != nil {
 		file, err := box.Find(v1alpha1.AnsibleGalaxyPath)
 		if err != nil {
 			return nil, err
 		}
-
 		tmpl, err := template.New("ansibleGalaxy").Parse(string(file))
 		if err != nil {
 			return nil, err
 		}
-
 		if err = tmpl.Execute(&buf, ansibleStep.Galaxy); err != nil {
 			return nil, err
 		}
 		dockerfileBytes := buf.Bytes()
 		dockerfile = append(dockerfile, dockerfileBytes...)
-
 		return dockerfile, nil
 	}
-
 	return nil, errors.New("no ansible galaxy or local definitions found")
 }
 
 // ParseDockerCommands parses the inputted docker commands and adds to dockerfile
 func ParseDockerCommands(dockerStep *v1alpha1.DockerStep) ([]byte, error) {
 	var dockerfile []byte
-
 	if dockerStep.Inline != nil {
 		return append(dockerfile, strings.Join(dockerStep.Inline, "\n")...), nil
 	}
-
 	if dockerStep.Path != "" {
 		file, err := os.Open(dockerStep.Path)
 		if err != nil {
 			return nil, err
 		}
-
 		defer func() {
 			if r := recover(); r != nil {
-				log.Warnln("panic recovered to execute final cleanup", r)
+				common.Logger.Warnln("panic recovered to execute final cleanup", r)
 			}
 			if err := file.Close(); err != nil {
-				log.WithError(err).Errorln("error closing file")
+				common.Logger.WithError(err).Errorln("error closing file")
 			}
 		}()
-
 		res, err := parser.Parse(file)
 		if err != nil {
 			return nil, err
 		}
-
 		var commands []v1alpha1.Command
-
 		for _, child := range res.AST.Children {
 			cmd := v1alpha1.Command{
 				Cmd:       child.Value,
@@ -235,12 +224,10 @@ func ParseDockerCommands(dockerStep *v1alpha1.DockerStep) ([]byte, error) {
 				StartLine: child.StartLine,
 				Flags:     child.Flags,
 			}
-
 			if child.Next != nil && len(child.Next.Children) > 0 {
 				cmd.SubCmd = child.Next.Children[0].Value
 				child = child.Next.Children[0]
 			}
-
 			cmd.IsJSON = child.Attributes["json"]
 			for n := child.Next; n != nil; n = n.Next {
 				cmd.Value = append(cmd.Value, n.Value)
@@ -249,7 +236,6 @@ func ParseDockerCommands(dockerStep *v1alpha1.DockerStep) ([]byte, error) {
 		}
 		return addCommandsToDockerfile(commands, dockerfile), nil
 	}
-
 	return nil, errors.New("no docker cmd path or inline docker commands defined")
 }
 
@@ -257,19 +243,15 @@ func ParseDockerCommands(dockerStep *v1alpha1.DockerStep) ([]byte, error) {
 // and as conditions
 func parseBaseImage(base v1alpha1.Base, name string) string {
 	baseImage := fmt.Sprintf("FROM %s", base.Image)
-
 	if base.Platform != "" {
 		baseImage = fmt.Sprintf("%s:%s", baseImage, base.Platform)
 	}
-
 	if base.Tag != "" {
 		baseImage = fmt.Sprintf("%s:%s", baseImage, base.Tag)
 	}
-
 	if name != "" {
 		baseImage = fmt.Sprintf("%s AS %s", baseImage, name)
 	}
-
 	return fmt.Sprintf("%s\n", baseImage)
 }
 
@@ -277,7 +259,6 @@ func parseBaseImage(base v1alpha1.Base, name string) string {
 func addCommandsToDockerfile(commands []v1alpha1.Command, dockerfile []byte) []byte {
 	for _, command := range commands {
 		cmd := command.Cmd
-
 		if cmd == "from" {
 			cmd = "\n" + cmd
 		}
