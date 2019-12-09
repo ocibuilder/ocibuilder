@@ -107,16 +107,23 @@ jobs:
       - run: go get -u github.com/gobuffalo/packr/packr
       - run:
           name: Build Linux Artifact
-          command: make ocictl-package-build
-      - run: ls ./dist/
+          command: make ocictl-package-linux
       - persist_to_workspace:
           root: .
           paths:
-            - ./dist/
+            - ./dist/ocictl-linux-amd64.tar.gz
+            - ./dist/ocictl/ocictl
+      - run:
+          name: Build Mac Artifact
+          command: make ocictl-package-mac
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./dist/ocictl-mac-amd64.tar.gz
   # push_container pushes the ocictl container to the ocibuilder docker registry when a new tag is added to ocibuilder
   push_container:
     docker:
-      - image: ocibuilder/ocictl:0.1.0-alpha
+      - image: ocibuilder/ocictl:0.1.0
     steps:
       - setup_remote_docker
       - checkout
@@ -140,7 +147,7 @@ jobs:
       - CIRCLE_PROJECT_USERNAME: ocibuilder
       - CIRCLE_PROJECT_REPONAME: ocibuilder
     docker:
-      - image: golang:1.13.1
+      - image: golang:alpine
     steps:
       - checkout
       - attach_workspace:
@@ -149,6 +156,7 @@ jobs:
           name: Publish Release Binaries to GitHub
           command: |
             export VERSION=$(cat ./VERSION)
+            apk add git
             go get github.com/tcnksm/ghr
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./dist/
 
