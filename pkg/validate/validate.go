@@ -105,9 +105,6 @@ func ValidatePushSpec(spec *v1alpha1.PushSpec) error {
 	if spec.Registry == "" {
 		spec.Registry = common.DefaultImageRegistry
 	}
-	if spec.User == "" {
-		return errors.New("user must be specified for push")
-	}
 	if spec.Image == "" {
 		return errors.New("image name must be specified for push")
 	}
