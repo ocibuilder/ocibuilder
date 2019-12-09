@@ -51,15 +51,19 @@ ocictl-mac:
 	make clean
 	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 make ocictl
 
-.PHONY: ocictl-package-build
-ocictl-package-build:
+.PHONY: ocictl-package-linux
+ocictl-package-linux:
 	make ocictl-linux
 	cp README.md ./dist/ocictl
 	cp LICENSE ./dist/ocictl
 	cd dist; tar -czvf ocictl-linux-amd64.tar.gz ./ocictl
+
+.PHONY: ocictl-package-mac
+ocictl-package-mac:
 	make ocictl-mac
+	cp README.md ./dist/ocictl
+	cp LICENSE ./dist/ocictl
 	cd dist; tar -czvf ocictl-mac-amd64.tar.gz ./ocictl
-	cd dist; rm -rf ./ocictl
 
 .PHONY: codegen
 test:
