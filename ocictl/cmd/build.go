@@ -26,6 +26,8 @@ import (
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/buildah"
 	"github.com/ocibuilder/ocibuilder/pkg/docker"
+	"github.com/ocibuilder/ocibuilder/pkg/oci"
+	"github.com/ocibuilder/ocibuilder/pkg/read"
 	"github.com/spf13/cobra"
 )
 
@@ -66,14 +68,10 @@ func newBuildCmd(out io.Writer) *cobra.Command {
 }
 
 func (b *buildCmd) run(args []string) error {
+	var cli v1alpha1.BuilderClient
 	logger := common.GetLogger(b.debug)
-	ociBuilderSpec := v1alpha1.OCIBuilderSpec{
-		Daemon: true,
-	}
-
-	reader := common.Reader{
-		Logger: logger,
-	}
+	reader := read.Reader{Logger: logger}
+	ociBuilderSpec := v1alpha1.OCIBuilderSpec{Daemon: true}
 
 	if err := reader.Read(&ociBuilderSpec, b.overlay, b.path); err != nil {
 		log.WithError(err).Errorln("failed to read spec")
@@ -81,78 +79,36 @@ func (b *buildCmd) run(args []string) error {
 	}
 
 	// Prioritise builder passed in as argument, default builder is docker
-	builder := b.builder
+	builderType := b.builder
 	if !ociBuilderSpec.Daemon {
-		builder = "buildah"
+		builderType = "buildah"
 	}
 
-	switch v1alpha1.Framework(builder) {
+	switch v1alpha1.Framework(builderType) {
 
 	case v1alpha1.DockerFramework:
 		{
-			cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+			apiClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 			if err != nil {
-				log.WithError(err).Errorln("failed to fetch docker client")
+				log.WithError(err).Errorln("failed to fetch docker api client")
 				return err
 			}
 
-			d := docker.Docker{
-				Client: cli,
-				Logger: logger,
-			}
-			log := d.Logger
-
-			res, err := d.Build(ociBuilderSpec)
-			if err != nil {
-				return err
+			cli = docker.Client{
+				APIClient: apiClient,
+				Logger:    logger,
 			}
 
-			log.WithField("responses", len(res)).Debugln("received responses and running build")
-			for idx, imageResponse := range res {
-				log.WithField("step: ", idx).Infoln("running build step")
-
-				if imageResponse == nil {
-					return errors.New("no response received from daemon - check if docker is installed and running")
-				}
-
-				if err := utils.OutputJson(imageResponse); err != nil {
-					return err
-				}
-				log.WithField("response", idx).Debugln("response has finished executing")
-			}
-			log.Debugln("running build file cleanup")
-			d.Clean()
-			log.Infoln("docker build complete")
+			ociBuilderSpec.Daemon = true
 		}
 
 	case v1alpha1.BuildahFramework:
 		{
-			b := buildah.Buildah{
-				Logger:        logger,
-				StorageDriver: b.storageDriver,
-			}
-			log := b.Logger
-
-			res, err := b.Build(ociBuilderSpec)
-			if err != nil {
-				log.WithError(err).Errorln("error executing build on ocibuilder spec")
-				return err
+			cli = buildah.Client{
+				Logger: logger,
 			}
 
-			log.WithField("responses", len(res)).Debugln("received responses and running build")
-			for idx, imageResponse := range res {
-				log.WithField("step: ", idx).Infoln("running build step")
-				if err := utils.Output(imageResponse); err != nil {
-					return err
-				}
-				if err := b.Wait(idx); err != nil {
-					return err
-				}
-				log.WithField("response", idx).Debugln("response has finished executing")
-			}
-			log.Debugln("running build file cleanup")
-			b.Clean()
-			log.Infoln("buildah build complete")
+			ociBuilderSpec.Daemon = false
 		}
 
 	default:
@@ -162,5 +118,56 @@ func (b *buildCmd) run(args []string) error {
 
 	}
 
-	return nil
+	builder := oci.Builder{
+		Logger: logger,
+		Client: cli,
+	}
+
+	res := make(chan v1alpha1.OCIBuildResponse)
+	errChan := make(chan error)
+	finished := make(chan bool)
+
+	defer func() {
+		close(res)
+		close(errChan)
+		close(finished)
+	}()
+
+	go builder.Build(ociBuilderSpec, res, errChan, finished)
+
+	for {
+		select {
+
+		case err := <-errChan:
+			{
+				if err != nil {
+					logger.WithError(err).Errorln("error received from error channel whilst building")
+					return err
+				}
+			}
+
+		case buildResponse := <-res:
+			{
+				logger.Infoln("executing build step")
+				if builderType == "docker" {
+					if err := utils.OutputJson(buildResponse.Body); err != nil {
+						return err
+					}
+				} else {
+					if err := utils.Output(buildResponse.Body, buildResponse.Stderr); err != nil {
+						return err
+					}
+				}
+				logger.Infoln("build step complete")
+			}
+
+		case <-finished:
+			{
+				logger.Infoln("all build steps complete")
+				return nil
+			}
+
+		}
+	}
+
 }

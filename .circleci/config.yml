@@ -8,7 +8,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v2
+            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v3
             - go-dep-cache-
       - run:
           name: Install dependencies
@@ -18,7 +18,7 @@ jobs:
             dep version
             dep ensure -v
       - save_cache:
-          key: go-dep-cache-{{ checksum "Gopkg.lock" }}-v2
+          key: go-dep-cache-{{ checksum "Gopkg.lock" }}-v3
           paths:
             - ./vendor
   # lint is the initial job which lints the codebase using standard golangci-lint linter
@@ -30,7 +30,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v2
+            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v3
             - go-dep-cache-
       - run: apk update && apk add curl git build-base bash
       - run: curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.21.0
@@ -44,7 +44,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v2
+            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v3
             - go-dep-cache-
       - run:
           name: Run unit tests
@@ -78,7 +78,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v2
+            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v3
             - go-dep-cache-
       - run: go get -u github.com/gobuffalo/packr/packr
       - run:
@@ -92,7 +92,7 @@ jobs:
           command: |
             go get -u github.com/onsi/ginkgo/ginkgo
             go get -u github.com/onsi/gomega/...
-            ginkgo ./testing/e2e
+            ginkgo -v ./testing/e2e
   # build runs the build of the linux and mac ocictl artifacts and persists the packages to the circleci workspace
   build:
     docker:
@@ -102,7 +102,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v2
+            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v3
             - go-dep-cache-
       - run: go get -u github.com/gobuffalo/packr/packr
       - run:
@@ -140,7 +140,7 @@ jobs:
       - CIRCLE_PROJECT_USERNAME: ocibuilder
       - CIRCLE_PROJECT_REPONAME: ocibuilder
     docker:
-      - image: golang:1.13.1-alpine
+      - image: golang:1.13.1
     steps:
       - checkout
       - attach_workspace:

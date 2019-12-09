@@ -18,14 +18,16 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"io"
 
 	"github.com/docker/docker/client"
 	"github.com/ocibuilder/ocibuilder/common"
-	"github.com/ocibuilder/ocibuilder/ocictl/pkg/utils"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/buildah"
 	"github.com/ocibuilder/ocibuilder/pkg/docker"
+	"github.com/ocibuilder/ocibuilder/pkg/oci"
+	"github.com/ocibuilder/ocibuilder/pkg/read"
 	"github.com/spf13/cobra"
 )
 
@@ -59,87 +61,91 @@ func newLoginCmd(out io.Writer) *cobra.Command {
 }
 
 func (l *loginCmd) run(args []string) error {
-	ociBuilderSpec := v1alpha1.OCIBuilderSpec{
-		Daemon: true,
-	}
+	var cli v1alpha1.BuilderClient
 	logger := common.GetLogger(l.debug)
+	reader := read.Reader{Logger: logger}
+	ociBuilderSpec := v1alpha1.OCIBuilderSpec{Daemon: true}
 
-	reader := common.Reader{
-		Logger: logger,
-	}
 	if err := reader.Read(&ociBuilderSpec, "", l.path); err != nil {
 		log.WithError(err).Errorln("failed to read spec")
 		return err
 	}
 
 	// Prioritise builder passed in as argument, default builder is docker
-	builder := l.builder
+	builderType := l.builder
 	if !ociBuilderSpec.Daemon {
-		builder = "buildah"
+		builderType = "buildah"
 	}
 
-	switch v1alpha1.Framework(builder) {
+	switch v1alpha1.Framework(builderType) {
 
 	case v1alpha1.DockerFramework:
 		{
-			cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+			apiClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 			if err != nil {
-				log.WithError(err).Errorln("failed to fetch docker client")
+				log.WithError(err).Errorln("failed to fetch docker api client")
 				return err
 			}
 
-			d := docker.Docker{
-				Client: cli,
-				Logger: logger,
+			cli = docker.Client{
+				APIClient: apiClient,
+				Logger:    logger,
 			}
-			log := d.Logger
-
-			res, err := d.Login(ociBuilderSpec)
-			if err != nil {
-				log.WithError(err).Errorln("failed to login to registry")
-				return err
-			}
-
-			log.WithField("responses", len(res)).Debugln("received responses and running login")
-			for idx, loginResponse := range res {
-				if err := utils.Output(loginResponse); err != nil {
-					return err
-				}
-				log.WithField("response", idx).Debugln("response has finished executing")
-			}
-			log.Infoln("docker login completed")
 		}
 
 	case v1alpha1.BuildahFramework:
 		{
-			b := buildah.Buildah{
+			cli = buildah.Client{
 				Logger: logger,
 			}
-			log := b.Logger
-
-			res, err := b.Login(ociBuilderSpec)
-			if err != nil {
-				log.WithError(err).Errorln("failed to login to registry")
-				return err
-			}
-
-			log.WithField("responses", len(res)).Debugln("received responses and running login")
-			for idx, loginResponse := range res {
-				if err := utils.Output(loginResponse); err != nil {
-					return err
-				}
-				if err := b.Wait(idx); err != nil {
-					return err
-				}
-				log.WithField("response", idx).Debugln("response has finished executing")
-			}
-			log.Infoln("buildah login complete")
 		}
 
 	default:
 		{
 			return errors.New("invalid builder specified, try --builder=docker or --builder=buildah")
 		}
+
 	}
-	return nil
+
+	builder := oci.Builder{
+		Logger: logger,
+		Client: cli,
+	}
+
+	res := make(chan v1alpha1.OCILoginResponse)
+	errChan := make(chan error)
+	finished := make(chan bool)
+
+	defer func() {
+		close(res)
+		close(errChan)
+		close(finished)
+	}()
+
+	go builder.Login(ociBuilderSpec, res, errChan, finished)
+
+	for {
+		select {
+
+		case err := <-errChan:
+			{
+				logger.WithError(err).Errorln("error received from error channel whilst logging in")
+				return err
+			}
+
+		case loginResponse := <-res:
+			{
+				logger.Infoln("executing login step")
+				//TODO: make this output nicer
+				fmt.Println(loginResponse)
+			}
+
+		case <-finished:
+			{
+				logger.Infoln("all login steps complete successfully")
+				return nil
+			}
+		}
+	}
+
 }
