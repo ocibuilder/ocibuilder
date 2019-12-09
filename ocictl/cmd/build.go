@@ -142,6 +142,7 @@ func (b *buildCmd) run(args []string) error {
 			{
 				if err != nil {
 					logger.WithError(err).Errorln("error received from error channel whilst building")
+					builder.Clean()
 					return err
 				}
 			}
