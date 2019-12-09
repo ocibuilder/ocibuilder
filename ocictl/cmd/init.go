@@ -18,10 +18,10 @@ package cmd
 
 import (
 	"io"
-	"io/ioutil"
 
 	"github.com/gobuffalo/packr"
 	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/pkg/initialize"
 	"github.com/spf13/cobra"
 )
 
@@ -44,28 +44,57 @@ func newInitCmd(out io.Writer) *cobra.Command {
 	f.BoolVar(&ic.dry, "dry", false, "Run a dry spec generation which is outputted to the terminal")
 	f.BoolVarP(&ic.debug, "debug", "d", false, "Turn on debug logging")
 
+	cmd.AddCommand(newFromDockerCmd(out))
 	return cmd
 }
 
 func (i *initCmd) run(args []string) error {
-	log := common.GetLogger(i.debug)
-	box := packr.NewBox("../../templates/spec")
+	initializer := initialize.Initializer{
+		Box:    packr.NewBox("../../templates/spec"),
+		Dry:    i.dry,
+		Logger: common.GetLogger(i.debug),
+	}
 
-	template, err := box.Find("simple_spec_template.yaml")
-	if err != nil {
-		log.WithError(err).Errorln("error reading in template from docs")
+	if err := initializer.Basic(); err != nil {
 		return err
 	}
 
-	if i.dry {
-		if _, err := i.out.Write(template); err != nil {
-			log.WithError(err).Errorln("error writing template to stdout")
-			return err
-		}
+	return nil
+}
+
+type fromDockerCmd struct {
+	out       io.Writer
+	debug     bool
+	dry       bool
+	imageName string
+	path      string
+}
+
+func newFromDockerCmd(out io.Writer) *cobra.Command {
+	fd := &fromDockerCmd{out: out}
+	cmd := &cobra.Command{
+		Use:   "from-docker",
+		Short: "Initialises a template ocibuilder.yaml file from a docker file",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return fd.run(args)
+		},
+	}
+	f := cmd.Flags()
+	f.BoolVarP(&fd.debug, "debug", "d", false, "Turn on debug logging")
+	f.BoolVar(&fd.dry, "dry", false, "Run a dry spec generation which is outputted to the terminal")
+	f.StringVarP(&fd.path, "path", "p", "", "Path to your Dockerfile")
+	f.StringVarP(&fd.imageName, "tag", "t", "", "The name and tag for your image")
+
+	return cmd
+}
+
+func (i *fromDockerCmd) run(args []string) error {
+	initializer := initialize.Initializer{
+		Dry:    i.dry,
+		Logger: common.GetLogger(i.debug),
 	}
 
-	if err := ioutil.WriteFile("ocibuilder.yaml", template, 0777); err != nil {
-		log.WithError(err).Errorln("error generating ocibuilder.yaml template file")
+	if err := initializer.FromDocker(i.imageName, i.path); err != nil {
 		return err
 	}
 
