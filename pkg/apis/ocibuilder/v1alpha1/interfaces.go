@@ -17,6 +17,12 @@ type ContextReader interface {
 	Read() (io.ReadCloser, error)
 }
 
+// SpecGenerator provides an interface for spec generation for ocibuilder.yaml specification files
+type SpecGenerator interface {
+	Generate() ([]byte, error)
+}
+
+// BuilderClient is the client interface for the ocibuilder
 type BuilderClient interface {
 	ImageBuild(options OCIBuildOptions) (OCIBuildResponse, error)
 	ImagePull(options OCIPullOptions) (OCIPullResponse, error)

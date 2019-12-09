@@ -609,3 +609,22 @@ type OCILoginResponse struct {
 	// Stderr is the stderr output stream used to stream buildah response
 	Stderr io.ReadCloser `json:"stderr,inline" protobuf:"bytes,3,name=stderr"`
 }
+
+type GenerateTemplate struct {
+	ImageName string
+	Tag       string
+	Stages    []string
+	Templates []string
+}
+
+type StageGenTemplate struct {
+	Base         string
+	BaseTag      string
+	StageName    string
+	TemplateName string
+}
+
+type BuildGenTemplate struct {
+	Name string
+	Cmds []string
+}

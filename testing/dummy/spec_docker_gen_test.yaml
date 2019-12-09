@@ -1,0 +1,37 @@
+build:
+  templates:
+    - name: build-template-1
+      cmd:
+        - docker:
+            inline:
+              - ADD . /src
+              - RUN cd /src && go build -o goapp
+    - name: build-template-2
+      cmd:
+        - docker:
+            inline:
+              - WORKDIR /app
+              - COPY --from=build-env /src/goapp /app/
+              - ENTRYPOINT ./goapp
+  steps:
+    - metadata:
+        name: test-image
+        labels:
+          createdBy: spec-gen
+      tag: v0.1.0
+      daemon: true
+      context:
+        localContext:
+          contextPath: .
+      stages:
+        - metadata:
+            name: build-env
+          base:
+            image: golang
+            tag: 1.13.4
+          template: build-template-1
+        - metadata:
+            name: build-stage
+          base:
+            image: alpine
+          template: build-template-2

@@ -1,0 +1,6 @@
+    - name: {{ .Name }}
+      cmd:
+        - docker:
+            inline:
+              {{ range .Cmds }}- {{ . }}
+              {{ end }}
