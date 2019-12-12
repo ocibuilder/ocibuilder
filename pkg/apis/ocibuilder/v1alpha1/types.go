@@ -344,6 +344,9 @@ type ImageBuildArgs struct {
 	// defaults to LocalContext in current working directory
 	// +optional
 	BuildContextPath string `json:"buildContextPath,omitempty" protobuf:"bytes,6,opt,name=buildContextPath"`
+	// Labels for the step
+	// +optional
+	Labels map[string]string `json:"labels,omitempty" protobuf:"bytes,7,opt,name=labels"`
 }
 
 // BuildContext stores the chosen build context for your build, this can be Local, S3 or Git

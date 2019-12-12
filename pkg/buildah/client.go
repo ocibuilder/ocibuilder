@@ -23,6 +23,10 @@ func (cli Client) ImageBuild(options v1alpha1.OCIBuildOptions) (v1alpha1.OCIBuil
 		{Name: "t", Value: options.Tags[0], Short: true, OmitEmpty: true},
 	}
 
+	for _, l := range options.Labels {
+		buildFlags = append(buildFlags, command.Flag{Name: "label", Value: l, Short: false, OmitEmpty: true})
+	}
+
 	cmd := command.Builder("buildah").Command("bud").Flags(buildFlags...).Args(options.ContextPath).Build()
 	cli.Logger.WithField("cmd", cmd).Debugln("executing build with command")
 

@@ -80,6 +80,7 @@ func ParseBuildSpec(spec *v1alpha1.BuildSpec) ([]v1alpha1.ImageBuildArgs, error)
 			Dockerfile:       filepath.Base(dockerfilePath),
 			Purge:            step.Purge,
 			BuildContextPath: buildContextPath,
+			Labels:           step.Labels,
 		}
 		imageBuilds = append(imageBuilds, imageBuild)
 	}
