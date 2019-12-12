@@ -20,12 +20,15 @@ import (
 	"errors"
 	"io"
 
+	"github.com/ocibuilder/ocibuilder/ocictl/pkg/utils"
+
 	"github.com/docker/docker/client"
 	"github.com/ocibuilder/ocibuilder/common"
-	"github.com/ocibuilder/ocibuilder/ocictl/pkg/utils"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/buildah"
 	"github.com/ocibuilder/ocibuilder/pkg/docker"
+	"github.com/ocibuilder/ocibuilder/pkg/oci"
+	"github.com/ocibuilder/ocibuilder/pkg/read"
 	"github.com/spf13/cobra"
 )
 
@@ -59,64 +62,50 @@ func newPushCmd(out io.Writer) *cobra.Command {
 		},
 	}
 	f := cmd.Flags()
-	f.StringVarP(&pc.path, "path", "p", "", "Path to your spec.yaml or push.yaml. By default will look in the current working directory")
+	f.StringVarP(&pc.path, "path", "p", "", "Path to your ocibuilder.yaml or push.yaml. By default will look in the current working directory")
 	f.StringVarP(&pc.builder, "builder", "b", "docker", "Choose either docker and buildah as the targetted image builder. By default the builder is docker.")
 	f.BoolVarP(&pc.debug, "debug", "d", false, "Turn on debug logging")
 	return cmd
 }
 
 func (p *pushCmd) run(args []string) error {
-	ociBuilderSpec := v1alpha1.OCIBuilderSpec{}
-	if err := common.Read(&ociBuilderSpec, "", p.path); err != nil {
+	var cli v1alpha1.BuilderClient
+	logger := common.GetLogger(p.debug)
+	reader := read.Reader{Logger: logger}
+	ociBuilderSpec := v1alpha1.OCIBuilderSpec{Daemon: true}
+
+	if err := reader.Read(&ociBuilderSpec, "", p.path); err != nil {
 		log.WithError(err).Errorln("failed to read spec")
 		return err
 	}
 
-	switch v1alpha1.Framework(p.builder) {
+	// Prioritise builder passed in as argument, default builder is docker
+	builderType := p.builder
+	if !ociBuilderSpec.Daemon {
+		builderType = "buildah"
+	}
+
+	switch v1alpha1.Framework(builderType) {
 
 	case v1alpha1.DockerFramework:
 		{
-			cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+			apiClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 			if err != nil {
-				log.WithError(err).Errorln("failed to fetch docker client")
-				return err
-			}
-			d := docker.Docker{
-				Client: cli,
-				Logger: common.GetLogger(p.debug),
-			}
-			res, err := d.Push(ociBuilderSpec)
-			if err != nil {
+				log.WithError(err).Errorln("failed to fetch docker api client")
 				return err
 			}
 
-			for idx, imageResponse := range res {
-				log.WithField("step: ", idx).Infoln("running push step")
-				err := utils.OutputJson(imageResponse)
-				if err != nil {
-					return err
-				}
+			cli = docker.Client{
+				APIClient: apiClient,
+				Logger:    logger,
 			}
-			log.Infoln("docker push complete")
 		}
 
 	case v1alpha1.BuildahFramework:
 		{
-			b := buildah.Buildah{
-				Logger: common.GetLogger(p.debug),
+			cli = buildah.Client{
+				Logger: logger,
 			}
-			res, err := b.Push(ociBuilderSpec)
-			if err != nil {
-				return err
-			}
-
-			for idx, imageResponse := range res {
-				log.WithField("step: ", idx).Infoln("running push step")
-				if err := utils.Output(imageResponse); err != nil {
-					return err
-				}
-			}
-			log.Infoln("buildah push complete")
 		}
 
 	default:
@@ -125,5 +114,57 @@ func (p *pushCmd) run(args []string) error {
 		}
 
 	}
-	return nil
+
+	builder := oci.Builder{
+		Logger: logger,
+		Client: cli,
+	}
+
+	res := make(chan v1alpha1.OCIPushResponse)
+	errChan := make(chan error)
+	finished := make(chan bool)
+
+	defer func() {
+		close(res)
+		close(errChan)
+		close(finished)
+	}()
+
+	go builder.Push(ociBuilderSpec, res, errChan, finished)
+
+	for {
+		select {
+
+		case err := <-errChan:
+			{
+				if err != nil {
+					logger.WithError(err).Errorln("error received from error channel whilst pushing")
+					return err
+				}
+			}
+
+		case pushResponse := <-res:
+			{
+				logger.Infoln("executing push step")
+				if builderType == "docker" {
+					if err := utils.OutputJson(pushResponse.Body); err != nil {
+						return err
+					}
+				} else {
+					if err := utils.Output(pushResponse.Body, pushResponse.Stderr); err != nil {
+						return err
+					}
+				}
+				logger.Infoln("push step complete")
+			}
+
+		case <-finished:
+			{
+				logger.Infoln("all push steps complete successfully")
+				return nil
+			}
+
+		}
+	}
+
 }
