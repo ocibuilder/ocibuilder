@@ -18,5 +18,5 @@ func TestDockerGenerator_Generate(t *testing.T) {
 
 	spec, err := dockerGen.Generate()
 	assert.Equal(t, nil, err)
-	assert.Equal(t, file, spec)
+	assert.Equal(t, string(file), string(spec))
 }

@@ -62,16 +62,16 @@ func TestRetrieveOverlayFile(t *testing.T) {
 
 	bodyLocal, err := ioutil.ReadAll(overlayLocal)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, expectedOverlay, bodyLocal)
+	assert.Equal(t, expectedOverlay, string(bodyLocal))
 
 	overlayRemote, err := retrieveOverlayFile("https://raw.githubusercontent.com/ocibuilder/ocibuilder/master/testing/dummy/overlay_overlay_test.yaml")
 	bodyRemote, err := ioutil.ReadAll(overlayRemote)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, expectedOverlay, bodyRemote)
+	assert.Equal(t, expectedOverlay, string(bodyRemote))
 
 }
 
-var expectedOverlay = []byte(`build:
+var expectedOverlay = `build:
   steps:
     - metadata:
         name: go-service
@@ -83,7 +83,7 @@ var expectedOverlay = []byte(`build:
             labels:
               overlay: stage-1
       tag: v0.2.0
-`)
+`
 
 var yamlTplData = []byte(`build:
   templates:
