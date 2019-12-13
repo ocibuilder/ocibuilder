@@ -82,8 +82,7 @@ var expectedOverlay = `build:
             name: build-env
             labels:
               overlay: stage-1
-      tag: v0.2.0
-`
+      tag: v0.2.0`
 
 var yamlTplData = []byte(`build:
   templates:
