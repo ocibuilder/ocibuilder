@@ -18,16 +18,19 @@ package overlay
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/http"
+	"net/url"
+	"os"
 	"strings"
 
 	cmdcore "github.com/k14s/ytt/pkg/cmd/core"
 	cmdtpl "github.com/k14s/ytt/pkg/cmd/template"
 	"github.com/k14s/ytt/pkg/files"
 	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/pkg/errors"
 )
 
 // YttOverlay is the struct for handling overlays using ytt library https://github.com/k14s/ytt
@@ -35,12 +38,6 @@ type YttOverlay struct {
 	// spec is the spec yaml in a []byte
 	Spec []byte
 	// overlay is the overlay yaml in a []byte
-	Overlay OverlayFile
-}
-
-// OverlayFile contains the overlay yaml in a ReadCloser and the path to the overlay file
-type OverlayFile struct {
-	File io.ReadCloser
 	Path string
 }
 
@@ -49,9 +46,16 @@ func (y YttOverlay) Apply() ([]byte, error) {
 	if y.Spec == nil {
 		return nil, errors.New("spec file is not defined, overlays is currently only supported for ocibuilder.yaml files")
 	}
-	annotatedOverlay := addYttAnnotations(y.Overlay.File)
+
+	overlayFile, err := retrieveOverlayFile(y.Path)
+	if err != nil {
+		return nil, err
+	}
+
+	annotatedOverlay := addYttAnnotations(overlayFile)
+
 	if annotatedOverlay == nil {
-		overlay, err := ioutil.ReadFile(y.Overlay.Path)
+		overlay, err := ioutil.ReadFile(y.Path)
 		if err != nil {
 			return nil, err
 		}
@@ -59,14 +63,14 @@ func (y YttOverlay) Apply() ([]byte, error) {
 	}
 	filesToProcess := []*files.File{
 		files.MustNewFileFromSource(files.NewBytesSource("ocibuilder.yaml", y.Spec)),
-		files.MustNewFileFromSource(files.NewBytesSource(y.Overlay.Path, annotatedOverlay)),
+		files.MustNewFileFromSource(files.NewBytesSource(y.Path, annotatedOverlay)),
 	}
 
 	defer func() {
 		if r := recover(); r != nil {
 			common.Logger.Warnln("panic recovered to execute final cleanup", r)
 		}
-		if err := y.Overlay.File.Close(); err != nil {
+		if err := overlayFile.Close(); err != nil {
 			common.Logger.WithError(err).Errorln("error closing file")
 		}
 	}()
@@ -78,6 +82,36 @@ func (y YttOverlay) Apply() ([]byte, error) {
 		return nil, out.Err
 	}
 	return out.Files[0].Bytes(), nil
+}
+
+func retrieveOverlayFile(path string) (io.ReadCloser, error) {
+	_, err := url.ParseRequestURI(path)
+
+	// Path is not a valid URI, open local overlay.yaml instead
+	if err != nil {
+		overlayFile, err := os.Open(path)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to read overlay file")
+		}
+		return overlayFile, nil
+	}
+
+	res, err := http.Get(path)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	overlayFile, err := os.Create("./overlay.yaml")
+	if err != nil {
+		return nil, err
+	}
+
+	if _, err := io.Copy(overlayFile, res.Body); err != nil {
+		return nil, err
+	}
+
+	return overlayFile, nil
 }
 
 // addYttAnnotations adds the expected ytt annotations for ytt overlays
