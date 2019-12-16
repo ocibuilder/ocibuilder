@@ -154,7 +154,7 @@ func parseCmdType(cmds []v1alpha1.BuildTemplateStep) ([]byte, error) {
 			}
 
 			if cmd.Docker.Path != "" {
-				tmp, err := ParseDockerCommands(cmd.Docker, cmd.Docker.Path)
+				tmp, err := ParseDockerCommands(cmd.Docker.Path)
 				if err != nil {
 					return nil, err
 				}
@@ -166,7 +166,7 @@ func parseCmdType(cmds []v1alpha1.BuildTemplateStep) ([]byte, error) {
 					return nil, err
 				}
 
-				tmp, err := ParseDockerCommands(cmd.Docker, common.DockerStepPath)
+				tmp, err := ParseDockerCommands(common.DockerStepPath)
 				if err != nil {
 					return nil, err
 				}
@@ -226,7 +226,7 @@ func ParseAnsibleCommands(ansibleStep *v1alpha1.AnsibleStep) ([]byte, error) {
 }
 
 // ParseDockerCommands parses the inputted docker commands and adds to dockerfile
-func ParseDockerCommands(dockerStep *v1alpha1.DockerStep, dockerCmdFilepath string) ([]byte, error) {
+func ParseDockerCommands(dockerCmdFilepath string) ([]byte, error) {
 	var dockerfile []byte
 	cmdFile, err := os.Open(dockerCmdFilepath)
 
