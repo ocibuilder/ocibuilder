@@ -44,7 +44,7 @@ type buildCmd struct {
 	overlay       string
 	storageDriver string
 	debug         bool
-	nocache 		  bool
+	nocache       string
 }
 
 func newBuildCmd(out io.Writer) *cobra.Command {
@@ -64,7 +64,7 @@ func newBuildCmd(out io.Writer) *cobra.Command {
 	f.BoolVarP(&bc.debug, "debug", "d", false, "Turn on debug logging")
 	f.StringVarP(&bc.overlay, "overlay", "o", "", "Path to your overlay.yaml file")
 	f.StringVarP(&bc.storageDriver, "storage-driver", "s", "overlay", "Storage-driver for Buildah. vfs enables the use of buildah within an unprivileged container. By default the storage driver is overlay")
-	f.BoolVarP(&bc.nocache, "nocache", "n", false, "Run build without cache")
+	f.StringVarP(&bc.nocache, "nocache", "c", "false", "Run build without cache")
 
 	return cmd
 }

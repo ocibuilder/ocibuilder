@@ -20,14 +20,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
-
 	"github.com/docker/docker/api/types"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/parser"
 	"github.com/ocibuilder/ocibuilder/pkg/validate"
 	"github.com/sirupsen/logrus"
+	"os"
+	"strconv"
 )
 
 type Builder struct {
@@ -68,6 +68,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 
 		imageName := fmt.Sprintf("%s:%s", opt.Name, opt.Tag)
 
+		nocache, err := strconv.ParseBool(opt.Cache)
 		builderOptions := v1alpha1.OCIBuildOptions{
 			Ctx:         context.Background(),
 			ContextPath: opt.BuildContextPath + common.ContextDirectory,
@@ -76,7 +77,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 				Dockerfile: opt.Dockerfile,
 				Tags:       []string{imageName},
 				Context:    buildContext,
-				NoCache:    opt.Cache,
+				NoCache:    nocache,
 			},
 		}
 
@@ -96,8 +97,8 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 				return
 			}
 		}
-
-		if opt.Purge {
+		purge, _ := strconv.ParseBool(opt.Purge)
+		if purge {
 			if err := b.Purge(imageName); err != nil {
 				log.WithError(err).Errorln("unable to complete image purge")
 				errChan <- err

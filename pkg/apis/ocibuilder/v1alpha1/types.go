@@ -201,11 +201,11 @@ type BuildStep struct {
 	// Cache for build
 	// Set to false by default
 	// +optional
-	Cache bool `json:"cache,omitempty" protobuf:"bytes,6,opt,name=cache"`
+	Cache string `json:"cache,omitempty" protobuf:"bytes,6,opt,name=cache"`
 	// Purge the build
 	// defaults to false
 	// +optional
-	Purge bool `json:"purge,omitempty" protobuf:"bytes,7,opt,name=purge"`
+	Purge string `json:"purge,omitempty" protobuf:"bytes,7,opt,name=purge"`
 	// BuildContext used for image build
 	// default looks at the current working directory
 	// +optional
@@ -339,11 +339,11 @@ type ImageBuildArgs struct {
 	// Purge the image after it has been pushed
 	// defaults to false
 	// +optional
-	Purge bool `json:"purge,omitempty" protobuf:"bytes,5,opt,name=purge"`
+	Purge string `json:"purge,omitempty" protobuf:"bytes,5,opt,name=purge"`
 	// Cache for build
 	// Set to false by default
 	// +optional
-	Cache bool `json:"purge,omitempty" protobuf:"bytes,5,opt,name=purge"`
+	Cache string `json:"purge,omitempty" protobuf:"bytes,5,opt,name=purge"`
 	// BuildContextPath is the path of the build context for Docker and Buildah
 	// defaults to LocalContext in current working directory
 	// +optional
