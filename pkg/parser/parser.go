@@ -32,6 +32,7 @@ import (
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/context"
+	"github.com/ocibuilder/ocibuilder/pkg/request"
 	"github.com/ocibuilder/ocibuilder/pkg/validate"
 	"github.com/pkg/errors"
 )
@@ -133,10 +134,11 @@ func GenerateDockerfile(step v1alpha1.BuildStep, templates []v1alpha1.BuildTempl
 func parseCmdType(cmds []v1alpha1.BuildTemplateStep) ([]byte, error) {
 	var dockerfile []byte
 	for _, cmd := range cmds {
-		err := validate.ValidateBuildTemplateStep(cmd)
-		if err != nil {
+
+		if err := validate.ValidateBuildTemplateStep(cmd); err != nil {
 			return nil, err
 		}
+
 		if cmd.Ansible != nil {
 			tmp, err := ParseAnsibleCommands(cmd.Ansible)
 			if err != nil {
@@ -144,13 +146,36 @@ func parseCmdType(cmds []v1alpha1.BuildTemplateStep) ([]byte, error) {
 			}
 			dockerfile = append(dockerfile, tmp...)
 		}
+
 		if cmd.Docker != nil {
-			tmp, err := ParseDockerCommands(cmd.Docker)
-			if err != nil {
-				return nil, err
+
+			if cmd.Docker.Inline != nil {
+				return append(dockerfile, strings.Join(cmd.Docker.Inline, "\n")...), nil
 			}
-			dockerfile = append(dockerfile, tmp...)
+
+			if cmd.Docker.Path != "" {
+				tmp, err := ParseDockerCommands(cmd.Docker, cmd.Docker.Path)
+				if err != nil {
+					return nil, err
+				}
+				dockerfile = append(dockerfile, tmp...)
+			}
+
+			if cmd.Docker.Url != "" {
+				if err := request.RequestRemote(cmd.Docker.Url, common.DockerStepPath, cmd.Docker.Auth); err != nil {
+					return nil, err
+				}
+
+				tmp, err := ParseDockerCommands(cmd.Docker, common.DockerStepPath)
+				if err != nil {
+					return nil, err
+				}
+				dockerfile = append(dockerfile, tmp...)
+			}
+			return nil, errors.New("no docker cmd path, inline docker commands or remote url defined")
+
 		}
+
 	}
 	return dockerfile, nil
 }
@@ -201,49 +226,49 @@ func ParseAnsibleCommands(ansibleStep *v1alpha1.AnsibleStep) ([]byte, error) {
 }
 
 // ParseDockerCommands parses the inputted docker commands and adds to dockerfile
-func ParseDockerCommands(dockerStep *v1alpha1.DockerStep) ([]byte, error) {
+func ParseDockerCommands(dockerStep *v1alpha1.DockerStep, dockerCmdFilepath string) ([]byte, error) {
 	var dockerfile []byte
-	if dockerStep.Inline != nil {
-		return append(dockerfile, strings.Join(dockerStep.Inline, "\n")...), nil
+	cmdFile, err := os.Open(dockerCmdFilepath)
+
+	defer func() {
+		if r := recover(); r != nil {
+			common.Logger.Warnln("panic recovered to execute final cleanup", r)
+		}
+		if err := cmdFile.Close(); err != nil {
+			common.Logger.WithError(err).Errorln("error closing cmdFile")
+		}
+	}()
+
+	if err != nil {
+		return nil, err
 	}
-	if dockerStep.Path != "" {
-		file, err := os.Open(dockerStep.Path)
-		if err != nil {
-			return nil, err
-		}
-		defer func() {
-			if r := recover(); r != nil {
-				common.Logger.Warnln("panic recovered to execute final cleanup", r)
-			}
-			if err := file.Close(); err != nil {
-				common.Logger.WithError(err).Errorln("error closing file")
-			}
-		}()
-		res, err := parser.Parse(file)
-		if err != nil {
-			return nil, err
-		}
-		var commands []v1alpha1.Command
-		for _, child := range res.AST.Children {
-			cmd := v1alpha1.Command{
-				Cmd:       child.Value,
-				Original:  child.Original,
-				StartLine: child.StartLine,
-				Flags:     child.Flags,
-			}
-			if child.Next != nil && len(child.Next.Children) > 0 {
-				cmd.SubCmd = child.Next.Children[0].Value
-				child = child.Next.Children[0]
-			}
-			cmd.IsJSON = child.Attributes["json"]
-			for n := child.Next; n != nil; n = n.Next {
-				cmd.Value = append(cmd.Value, n.Value)
-			}
-			commands = append(commands, cmd)
-		}
-		return addCommandsToDockerfile(commands, dockerfile), nil
+
+	res, err := parser.Parse(cmdFile)
+	if err != nil {
+		return nil, err
 	}
-	return nil, errors.New("no docker cmd path or inline docker commands defined")
+
+	var commands []v1alpha1.Command
+	for _, child := range res.AST.Children {
+		cmd := v1alpha1.Command{
+			Cmd:       child.Value,
+			Original:  child.Original,
+			StartLine: child.StartLine,
+			Flags:     child.Flags,
+		}
+		if child.Next != nil && len(child.Next.Children) > 0 {
+			cmd.SubCmd = child.Next.Children[0].Value
+			child = child.Next.Children[0]
+		}
+		cmd.IsJSON = child.Attributes["json"]
+		for n := child.Next; n != nil; n = n.Next {
+			cmd.Value = append(cmd.Value, n.Value)
+		}
+		commands = append(commands, cmd)
+	}
+
+	return addCommandsToDockerfile(commands, dockerfile), nil
+
 }
 
 // parseBaseImage parses the base image specification to include image, platform

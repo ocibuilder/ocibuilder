@@ -158,6 +158,12 @@ type DockerStep struct {
 	// Path to a file that contains Dockerfile commands
 	// +optional
 	Path string `json:"path,omitempty" protobuf:"bytes,2,opt,name=path"`
+	// Remote url to a file that contains docker commands
+	// +optional
+	Url string `json:"url,omitempty" protobuf:"bytes,3,opt,name=url"`
+	// Auth for remote access to a url
+	// +optional
+	Auth types.AuthConfig `json:"authConfig,inline" protobuf:"bytes,4,name=authConfig"`
 }
 
 // AnsibleStep represents an ansible install  within a build
