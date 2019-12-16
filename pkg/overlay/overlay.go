@@ -58,6 +58,9 @@ func (y YttOverlay) Apply() ([]byte, error) {
 			common.Logger.WithError(err).Errorln("error closing file")
 		}
 		if err := os.Remove(common.OverlayPath); err != nil {
+			if os.IsNotExist(err) {
+				return
+			}
 			common.Logger.WithError(err).Errorln("error removing file")
 		}
 	}()
