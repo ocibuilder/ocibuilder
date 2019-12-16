@@ -21,15 +21,16 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"net/http"
 	"net/url"
 	"os"
 	"strings"
 
+	"github.com/docker/docker/api/types"
 	cmdcore "github.com/k14s/ytt/pkg/cmd/core"
 	cmdtpl "github.com/k14s/ytt/pkg/cmd/template"
 	"github.com/k14s/ytt/pkg/files"
 	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/pkg/request"
 	"github.com/pkg/errors"
 )
 
@@ -48,6 +49,19 @@ func (y YttOverlay) Apply() ([]byte, error) {
 	}
 
 	overlayFile, err := retrieveOverlayFile(y.Path)
+
+	defer func() {
+		if r := recover(); r != nil {
+			common.Logger.Warnln("panic recovered to execute final cleanup", r)
+		}
+		if err := overlayFile.Close(); err != nil {
+			common.Logger.WithError(err).Errorln("error closing file")
+		}
+		if err := os.Remove(common.OverlayPath); err != nil {
+			common.Logger.WithError(err).Errorln("error removing file")
+		}
+	}()
+
 	if err != nil {
 		return nil, err
 	}
@@ -66,15 +80,6 @@ func (y YttOverlay) Apply() ([]byte, error) {
 		files.MustNewFileFromSource(files.NewBytesSource(y.Path, annotatedOverlay)),
 	}
 
-	defer func() {
-		if r := recover(); r != nil {
-			common.Logger.Warnln("panic recovered to execute final cleanup", r)
-		}
-		if err := overlayFile.Close(); err != nil {
-			common.Logger.WithError(err).Errorln("error closing file")
-		}
-	}()
-
 	ui := cmdcore.NewPlainUI(false)
 	opts := cmdtpl.NewOptions()
 	out := opts.RunWithFiles(cmdtpl.TemplateInput{Files: filesToProcess}, ui)
@@ -85,10 +90,9 @@ func (y YttOverlay) Apply() ([]byte, error) {
 }
 
 func retrieveOverlayFile(path string) (io.ReadCloser, error) {
-	_, err := url.ParseRequestURI(path)
 
 	// Path is not a valid URI, open local overlay.yaml instead
-	if err != nil {
+	if _, err := url.ParseRequestURI(path); err != nil {
 		overlayFile, err := os.Open(path)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to read overlay file")
@@ -96,21 +100,13 @@ func retrieveOverlayFile(path string) (io.ReadCloser, error) {
 		return overlayFile, nil
 	}
 
-	res, err := http.Get(path)
+	if err := request.RequestRemote(path, common.OverlayPath, types.AuthConfig{}); err != nil {
+		return nil, err
+	}
+	overlayFile, err := os.Open(common.OverlayPath)
 	if err != nil {
 		return nil, err
 	}
-	defer res.Body.Close()
-
-	overlayFile, err := os.Create("./overlay.yaml")
-	if err != nil {
-		return nil, err
-	}
-
-	if _, err := io.Copy(overlayFile, res.Body); err != nil {
-		return nil, err
-	}
-
 	return overlayFile, nil
 }
 

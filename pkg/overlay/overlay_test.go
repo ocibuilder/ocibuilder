@@ -21,6 +21,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -56,6 +57,8 @@ func TestAddYttAnnotations(t *testing.T) {
 }
 
 func TestRetrieveOverlayFile(t *testing.T) {
+
+	defer os.Remove(common.OverlayPath)
 
 	overlayLocal, err := retrieveOverlayFile("../../testing/dummy/overlay_overlay_test.yaml")
 	assert.Equal(t, nil, err)
