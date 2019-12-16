@@ -37,7 +37,9 @@ func RequestRemote(url string, filepath string, auth types.AuthConfig) error {
 	}
 
 	defer func() {
-		res.Body.Close()
+		if err := res.Body.Close(); err != nil {
+			return
+		}
 	}()
 
 	file, err := os.Create(filepath)
