@@ -8,7 +8,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v2
+            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v3
             - go-dep-cache-
       - run:
           name: Install dependencies
@@ -18,7 +18,7 @@ jobs:
             dep version
             dep ensure -v
       - save_cache:
-          key: go-dep-cache-{{ checksum "Gopkg.lock" }}-v2
+          key: go-dep-cache-{{ checksum "Gopkg.lock" }}-v3
           paths:
             - ./vendor
   # lint is the initial job which lints the codebase using standard golangci-lint linter
@@ -30,7 +30,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v2
+            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v3
             - go-dep-cache-
       - run: apk update && apk add curl git build-base bash
       - run: curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.21.0
@@ -44,7 +44,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v2
+            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v3
             - go-dep-cache-
       - run:
           name: Run unit tests
@@ -78,7 +78,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v2
+            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v3
             - go-dep-cache-
       - run: go get -u github.com/gobuffalo/packr/packr
       - run:
@@ -102,21 +102,28 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v2
+            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v3
             - go-dep-cache-
       - run: go get -u github.com/gobuffalo/packr/packr
       - run:
           name: Build Linux Artifact
-          command: make ocictl-package-build
-      - run: ls ./dist/
+          command: make ocictl-package-linux
       - persist_to_workspace:
           root: .
           paths:
-            - ./dist/
+            - ./dist/ocictl-linux-amd64.tar.gz
+            - ./dist/ocictl/ocictl
+      - run:
+          name: Build Mac Artifact
+          command: make ocictl-package-mac
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./dist/ocictl-mac-amd64.tar.gz
   # push_container pushes the ocictl container to the ocibuilder docker registry when a new tag is added to ocibuilder
   push_container:
     docker:
-      - image: ocibuilder/ocictl:0.1.0-alpha
+      - image: ocibuilder/ocictl:0.1.0
     steps:
       - setup_remote_docker
       - checkout
@@ -140,7 +147,7 @@ jobs:
       - CIRCLE_PROJECT_USERNAME: ocibuilder
       - CIRCLE_PROJECT_REPONAME: ocibuilder
     docker:
-      - image: golang:1.13.1
+      - image: golang:alpine
     steps:
       - checkout
       - attach_workspace:
@@ -149,6 +156,7 @@ jobs:
           name: Publish Release Binaries to GitHub
           command: |
             export VERSION=$(cat ./VERSION)
+            apk add git
             go get github.com/tcnksm/ghr
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./dist/
 

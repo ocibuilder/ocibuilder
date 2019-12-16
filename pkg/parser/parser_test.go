@@ -26,6 +26,33 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const expectedAnsibleLocalCommands = `
+ENV PLAYBOOK_DIR /etc/ansible/
+RUN mkdir -p $PLAYBOOK_DIR
+WORKDIR $PLAYBOOK_DIR
+COPY templates templates
+COPY files files
+COPY vars vars
+COPY tasks tasks
+ADD *.yaml ./
+RUN ansible-playbook /playbook.yaml`
+
+const expectedAnsibleGalaxyCommands = `
+ENV PLAYBOOK_DIR /etc/ansible/
+RUN mkdir -p $PLAYBOOK_DIR
+WORKDIR $PLAYBOOK_DIR
+COPY templates templates
+COPY files files
+COPY vars vars
+COPY tasks tasks
+ADD *.yaml ./
+RUN if [ -f /requirements.yaml ]; then ansible-galaxy install -r /requirements.yaml; fi
+RUN ansible-galaxy install TestGalaxy`
+
+const expectedInlineDockerfile = "FROM go / java / nodejs / python:ubuntu_xenial:v1.0.0 AS first-stage\nADD ./ /test-path\nWORKDIR /test-dir\nENV PORT=3001\nCMD [\"go\", \"run\", \"main.go\"]\n\nFROM alpine:latest AS second-stage\nCMD [\"echo\", \"done\"]"
+
+const expectedDockerfile = "FROM go / java / nodejs / python:ubuntu_xenial:v1.0.0 AS first-stage\nRUN pip install kubernetes\nCOPY app/ /bin/app\n\n\nFROM alpine:latest AS second-stage\nCMD [\"echo\", \"done\"]"
+
 func TestParseDockerCommands(t *testing.T) {
 	path := "../../testing/dummy/commands_basic_parser_test.txt"
 	dockerfile, err := ParseDockerCommands(&v1alpha1.DockerStep{
@@ -114,7 +141,6 @@ func TestParseAnsibleCommands(t *testing.T) {
 	}
 	dockerfile, err := ParseAnsibleCommands(ansibleStep)
 	assert.Equal(t, nil, err)
-
 	assert.Equal(t, expectedAnsibleLocalCommands, string(dockerfile), "The generated ansible local commands must match expected")
 }
 
@@ -127,31 +153,5 @@ func TestParseAnsibleGalaxyCommands(t *testing.T) {
 	}
 	dockerfile, err := ParseAnsibleCommands(ansibleStepGalaxy)
 	assert.Equal(t, nil, err)
-
 	assert.Equal(t, expectedAnsibleGalaxyCommands, string(dockerfile), "The generated ansible galaxy comnmands must match expected")
 }
-
-const expectedAnsibleLocalCommands = `ENV PLAYBOOK_DIR /etc/ansible/
-RUN mkdir -p $PLAYBOOK_DIR
-WORKDIR $PLAYBOOK_DIR
-COPY templates templates
-COPY files files
-COPY vars vars
-COPY tasks tasks
-ADD *.yaml ./
-RUN ansible-playbook /playbook.yaml`
-
-const expectedAnsibleGalaxyCommands = `ENV PLAYBOOK_DIR /etc/ansible/
-RUN mkdir -p $PLAYBOOK_DIR
-WORKDIR $PLAYBOOK_DIR
-COPY templates templates
-COPY files files
-COPY vars vars
-COPY tasks tasks
-ADD *.yaml ./
-RUN if [ -f /requirements.yaml ]; then annsible-galaxy install -r /requirements.yaml; fi
-RUN ansible-galaxy install TestGalaxy`
-
-const expectedInlineDockerfile = "FROM go / java / nodejs / python:ubuntu_xenial:v1.0.0 AS first-stage\nADD ./ /test-path\nWORKDIR /test-dir\nENV PORT=3001\nCMD [\"go\", \"run\", \"main.go\"]\n\nFROM alpine:latest AS second-stage\nCMD [\"echo\", \"done\"]"
-
-const expectedDockerfile = "FROM go / java / nodejs / python:ubuntu_xenial:v1.0.0 AS first-stage\nRUN pip install kubernetes\nCOPY app/ /bin/app\n\n\nFROM alpine:latest AS second-stage\nCMD [\"echo\", \"done\"]"

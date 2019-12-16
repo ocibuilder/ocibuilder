@@ -10,7 +10,7 @@ build:
           cmd:
             - docker:
                 inline:
-                  - COPY dist/ocictl /bin/ocictl
+                  - COPY dist/ocictl/ocictl /bin/ocictl
         - metadata:
             name: build
           base:

@@ -78,6 +78,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 				Tags:       []string{imageName},
 				Context:    buildContext,
 				NoCache:    nocache,
+				Labels:     opt.Labels,
 			},
 		}
 

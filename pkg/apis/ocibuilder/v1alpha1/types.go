@@ -348,6 +348,9 @@ type ImageBuildArgs struct {
 	// defaults to LocalContext in current working directory
 	// +optional
 	BuildContextPath string `json:"buildContextPath,omitempty" protobuf:"bytes,6,opt,name=buildContextPath"`
+	// Labels for the step
+	// +optional
+	Labels map[string]string `json:"labels,omitempty" protobuf:"bytes,7,opt,name=labels"`
 }
 
 // BuildContext stores the chosen build context for your build, this can be Local, S3 or Git
@@ -612,4 +615,23 @@ type OCILoginResponse struct {
 	Exec *command.Command `json:"exec,inline" protobuf:"bytes,2,name=exec"`
 	// Stderr is the stderr output stream used to stream buildah response
 	Stderr io.ReadCloser `json:"stderr,inline" protobuf:"bytes,3,name=stderr"`
+}
+
+type GenerateTemplate struct {
+	ImageName string
+	Tag       string
+	Stages    []string
+	Templates []string
+}
+
+type StageGenTemplate struct {
+	Base         string
+	BaseTag      string
+	StageName    string
+	TemplateName string
+}
+
+type BuildGenTemplate struct {
+	Name string
+	Cmds []string
 }

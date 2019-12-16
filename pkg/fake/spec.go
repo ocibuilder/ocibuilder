@@ -73,6 +73,7 @@ var PushSpec = []v1alpha1.PushSpec{
 	{
 		Registry: "example-registry",
 		Image:    "example-image",
+		User:     "namespace",
 		Tag:      "1.0.0",
 	},
 }
