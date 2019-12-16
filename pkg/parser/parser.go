@@ -172,7 +172,6 @@ func parseCmdType(cmds []v1alpha1.BuildTemplateStep) ([]byte, error) {
 				}
 				dockerfile = append(dockerfile, tmp...)
 			}
-			return nil, errors.New("no docker cmd path, inline docker commands or remote url defined")
 
 		}
 

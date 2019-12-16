@@ -68,6 +68,8 @@ func TestRetrieveOverlayFile(t *testing.T) {
 	assert.Equal(t, expectedOverlay, string(bodyLocal))
 
 	overlayRemote, err := retrieveOverlayFile("https://raw.githubusercontent.com/ocibuilder/ocibuilder/master/testing/dummy/overlay_overlay_test.yaml")
+	assert.Equal(t, nil, err)
+
 	bodyRemote, err := ioutil.ReadAll(overlayRemote)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedOverlay, string(bodyRemote))

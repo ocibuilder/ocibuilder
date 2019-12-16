@@ -163,7 +163,7 @@ type DockerStep struct {
 	Url string `json:"url,omitempty" protobuf:"bytes,3,opt,name=url"`
 	// Auth for remote access to a url
 	// +optional
-	Auth types.AuthConfig `json:"authConfig,inline" protobuf:"bytes,4,name=authConfig"`
+	Auth RemoteCreds `json:"auth,inline" protobuf:"bytes,4,name=auth"`
 }
 
 // AnsibleStep represents an ansible install  within a build
@@ -267,6 +267,14 @@ type LoginSpec struct {
 type RegistryCreds struct {
 	// K8s refer to the credentials stored in K8s secrets
 	K8s K8sCreds `json:"k8s,omitempty" protobuf:"bytes,1,opt,name=k8s"`
+	// Env refers to the credentials stored in environment variables
+	Env EnvCreds `json:"env,omitempty" protobuf:"bytes,2,opt,name=env"`
+	// Plain refers to the credentials set inline
+	Plain PlainCreds `json:"plain,omitempty" protobuf:"bytes,3,opt,name=plain"`
+}
+
+// RemoteCreds holds the credentials to pull from a remote url
+type RemoteCreds struct {
 	// Env refers to the credentials stored in environment variables
 	Env EnvCreds `json:"env,omitempty" protobuf:"bytes,2,opt,name=env"`
 	// Plain refers to the credentials set inline
