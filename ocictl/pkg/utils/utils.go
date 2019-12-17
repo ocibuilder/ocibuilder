@@ -29,12 +29,12 @@ var log = common.GetLogger(false)
 
 // OutputJson streams and formats the output to stdout from returned ReadClosers by docker
 // commands.
-func OutputJson(ouput io.ReadCloser) error {
+func OutputJson(output io.ReadCloser) error {
 
 	termFd, isTerm := term.GetFdInfo(os.Stdout)
 
 	err := jsonmessage.DisplayJSONMessagesStream(
-		ouput,
+		output,
 		os.Stdout,
 		termFd,
 		isTerm,

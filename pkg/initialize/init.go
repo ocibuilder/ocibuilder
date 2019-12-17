@@ -26,12 +26,14 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Initializer is the struct for holding the state for the ocictl init command
 type Initializer struct {
 	Box    packr.Box
 	Dry    bool
 	Logger *logrus.Logger
 }
 
+// Basic handles a basic ocictl init, creating a documented ocibuilder.yaml specification to be modified
 func (i Initializer) Basic() error {
 	box := i.Box
 	log := i.Logger
@@ -57,6 +59,7 @@ func (i Initializer) Basic() error {
 	return nil
 }
 
+// FromDocker handles an init from a docker file, generating an ocibuilder spec
 func (i Initializer) FromDocker(imageName string, path string) error {
 
 	tags := strings.Split(imageName, ":")

@@ -54,6 +54,7 @@ func UntarFile(source string, destination string) error {
 	return nil
 }
 
+// TarFile zips/tars a file
 func TarFile(source string, destination string) error {
 
 	if source == "" {

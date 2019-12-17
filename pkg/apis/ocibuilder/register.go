@@ -20,9 +20,12 @@ const (
 	// Group is the API Group
 	Group string = "github.com"
 
-	// Sensor constants
-	Kind     string = "OCIBuilder"
+	// Kind is the kind constant for the sensor
+	Kind string = "OCIBuilder"
+	// Singular is the singular constant for the sensor
 	Singular string = "ocibuilder"
-	Plural   string = "ocibuilders"
+	// Plural is the plural constant for the sensor
+	Plural string = "ocibuilders"
+	// FullName is the full name constant for the sensor
 	FullName string = Plural + "." + Group
 )
