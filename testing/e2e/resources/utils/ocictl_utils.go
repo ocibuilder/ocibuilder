@@ -21,3 +21,11 @@ func RunOcictl(path string, args []string) *gexec.Session {
 
 	return session
 }
+
+func RunDockerInspect(imageName string) *gexec.Session {
+	cmd := exec.Command("docker", "image", "inspect", imageName)
+	session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
+	Expect(err).NotTo(HaveOccurred())
+
+	return session
+}
