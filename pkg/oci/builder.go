@@ -287,9 +287,11 @@ func (b *Builder) Clean() {
 				b.Logger.WithError(err).Errorln("error removing generated context")
 				continue
 			}
-			if err := os.Remove(common.DockerStepPath); err != nil {
-				b.Logger.WithError(err).Errorln("error removing downloaded step file")
-				continue
+			if _, err := os.Stat(common.DockerStepPath); err == nil {
+				if err := os.Remove(common.DockerStepPath); err != nil {
+					b.Logger.WithError(err).Errorln("error removing downloaded step file")
+					continue
+				}
 			}
 		}
 	}
