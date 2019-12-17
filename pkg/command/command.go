@@ -9,6 +9,7 @@ import (
 
 var executor = exec.Command
 
+// Command is a single executable command
 type Command struct {
 	name    string
 	command string
@@ -18,6 +19,7 @@ type Command struct {
 	execCmd *exec.Cmd
 }
 
+// CommandBuilder is a builder for a Command
 type CommandBuilder struct {
 	name    string
 	command string
@@ -25,8 +27,11 @@ type CommandBuilder struct {
 	args    []string
 }
 
+// Flag is a command flag
 type Flag struct {
-	Name  string
+	// Name is the name of the flag
+	Name string
+	// Value is the value of the flag
 	Value string
 	// Short determines whether the flag used is a short variation or not
 	Short bool
@@ -34,6 +39,7 @@ type Flag struct {
 	OmitEmpty bool
 }
 
+// Build builds a command from a CommandBuilder
 func (builder *CommandBuilder) Build() Command {
 	return Command{
 		name:    builder.name,
@@ -43,11 +49,13 @@ func (builder *CommandBuilder) Build() Command {
 	}
 }
 
+// Command specifies the command to exec for the builder
 func (builder *CommandBuilder) Command(command string) *CommandBuilder {
 	builder.command = command
 	return builder
 }
 
+// Flags specifies the flags to exec for the builder
 func (builder *CommandBuilder) Flags(flags ...Flag) *CommandBuilder {
 	var builderFlags []Flag
 	for _, f := range flags {
@@ -62,11 +70,13 @@ func (builder *CommandBuilder) Flags(flags ...Flag) *CommandBuilder {
 	return builder
 }
 
+// Args specifies the args to exec for the builder
 func (builder *CommandBuilder) Args(args ...string) *CommandBuilder {
 	builder.args = args
 	return builder
 }
 
+// Builder initializes the CommandBuilder with default values
 func Builder(name string) *CommandBuilder {
 	cmdBuilder := new(CommandBuilder)
 	cmdBuilder.args = make([]string, 0)
@@ -76,6 +86,7 @@ func Builder(name string) *CommandBuilder {
 	return cmdBuilder
 }
 
+// Exec executes a command, returning readers for both stdout and stderr pipes
 func (c *Command) Exec() (stdout io.ReadCloser, stderr io.ReadCloser, err error) {
 	command := c.constructCommand()
 	cmd := executor(c.name, command...)
@@ -88,6 +99,7 @@ func (c *Command) Exec() (stdout io.ReadCloser, stderr io.ReadCloser, err error)
 	return stdout, stderr, nil
 }
 
+// Wait calls wait on a started exec command
 func (c Command) Wait() error {
 	if err := c.execCmd.Wait(); err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {

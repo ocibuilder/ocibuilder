@@ -627,6 +627,7 @@ type OCILoginResponse struct {
 	Stderr io.ReadCloser `json:"stderr,inline" protobuf:"bytes,3,name=stderr"`
 }
 
+// GenerateTemplate is the template for a docker generate
 type GenerateTemplate struct {
 	ImageName string
 	Tag       string
@@ -634,6 +635,7 @@ type GenerateTemplate struct {
 	Templates []string
 }
 
+// StageGenTemplate is the template for a stage in docker generate
 type StageGenTemplate struct {
 	Base         string
 	BaseTag      string
@@ -641,6 +643,7 @@ type StageGenTemplate struct {
 	TemplateName string
 }
 
+// BuildGenTemplate is the template for a build template in docker generate
 type BuildGenTemplate struct {
 	Name string
 	Cmds []string
