@@ -38,7 +38,7 @@ var _ = Describe("ocictl docker", func() {
 	}, 30)
 
 	It("completes a build with an overlay and exits with status code 0", func() {
-		args := []string{"build", "-p", utils.BuildPath, "--overlay", "./resources/overlay.yaml"}
+		args := []string{"build", "-p", utils.BuildPath, "--overlay", utils.OverlayPath}
 		session = utils.RunOcictl(ocictlPath, args)
 		Eventually(func() *gexec.Session {
 			return session
