@@ -67,6 +67,14 @@ func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepath
 		}
 	}
 
+	if err = yaml.Unmarshal(file, spec); err != nil {
+		return errors.Wrap(err, "failed to unmarshal spec at directory")
+	}
+
+	if err := validate.Validate(spec); err != nil {
+		return errors.Wrap(err, "failed to validate spec at directory")
+	}
+
 	if spec.Params != nil {
 		if err = r.applyParams(file, spec); err != nil {
 			return errors.Wrap(err, "failed to apply params to spec")
