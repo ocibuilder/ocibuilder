@@ -127,7 +127,6 @@ func addYttAnnotations(overlay io.ReadCloser) []byte {
 	addTempToAnnotate := func() {
 		annotatedOverlay = annotatedOverlay + "\n" + strings.Join(tempSegment, "\n")
 	}
-
 	scanner := bufio.NewScanner(overlay)
 	for idx := 0; scanner.Scan(); {
 		if idx == 0 && strings.TrimSpace(scanner.Text()) == yttOverlayIdentifier {
