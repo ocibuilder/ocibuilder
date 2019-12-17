@@ -12,13 +12,19 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// DockerGenerator is the struct which holds the state to Generate
 type DockerGenerator struct {
-	Filepath  string
+	// Filepath is the filepath to your Dockerfile
+	Filepath string
+	// ImageName is the intended image name
 	ImageName string
-	Tag       string
-	Logger    *logrus.Logger
+	// Tag is the intended image tag
+	Tag string
+	// Logger is the generator logger
+	Logger *logrus.Logger
 }
 
+// Generate aims to generate an ocibuilder.yaml specification from a Dockerfile
 func (d DockerGenerator) Generate() ([]byte, error) {
 	file, err := os.Open(d.Filepath)
 	if err != nil {

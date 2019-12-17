@@ -29,7 +29,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-// AzureBlobContextReader implements BuildContextReader for the context stored on Azure Storage Blob
+// AzureBlobBuildContextReader implements BuildContextReader for the context stored on Azure Storage Blob
 type AzureBlobBuildContextReader struct {
 	// buildContext contains configuration required to read the build context stored on the Azure Storage Blob
 	buildContext *v1alpha1.AzureBlobContext

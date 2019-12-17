@@ -55,7 +55,7 @@ func newLoginCmd(out io.Writer) *cobra.Command {
 	}
 	f := cmd.Flags()
 	f.StringVarP(&lc.path, "path", "p", "", "Path to your ocibuilder.yaml or login.yaml. By default will look in the current working directory")
-	f.StringVarP(&lc.builder, "builder", "b", "docker", "Choose either docker and buildah as the targetted image puller. By default the builder is docker.")
+	f.StringVarP(&lc.builder, "builder", "b", "docker", "Choose either docker and buildah as the targeted image builder. By default the builder is docker.")
 	f.BoolVarP(&lc.debug, "debug", "d", false, "Turn on debug logging")
 	return cmd
 }
