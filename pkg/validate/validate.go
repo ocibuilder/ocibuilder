@@ -47,7 +47,7 @@ func ValidateBuildTemplateStep(step v1alpha1.BuildTemplateStep) error {
 	if step.Ansible != nil && step.Ansible.Galaxy == nil && step.Ansible.Local == nil {
 		return errors.New("at least one ansible role location should be defined")
 	}
-	if step.Docker != nil && step.Docker.Inline == nil && step.Docker.Path == "" {
+	if step.Docker != nil && step.Docker.Inline == nil && step.Docker.Path == "" && step.Docker.Url == "" {
 		return errors.New("at least one docker cmd location should be defined")
 	}
 	return nil

@@ -57,11 +57,6 @@ func ParseBuildSpec(spec *v1alpha1.BuildSpec) ([]v1alpha1.ImageBuildArgs, error)
 		cleanOnKill(buildContextPath)
 
 		dockerfilePath, err := GenerateDockerfile(step, spec.Templates, buildContextPath+common.ContextDirectory)
-
-		if err := context.InjectDockerfile(buildContextPath, dockerfilePath); err != nil {
-			return nil, errors.Wrap(err, "error attempting to inject Dockerfile")
-		}
-
 		// Perform cleanup of generated files if parse errors out
 		if err != nil {
 			for _, args := range imageBuilds {
@@ -73,6 +68,10 @@ func ParseBuildSpec(spec *v1alpha1.BuildSpec) ([]v1alpha1.ImageBuildArgs, error)
 				common.Logger.WithError(err).Errorln("error cleaning up generated files")
 			}
 			return nil, err
+		}
+
+		if err := context.InjectDockerfile(buildContextPath, dockerfilePath); err != nil {
+			return nil, errors.Wrap(err, "error attempting to inject Dockerfile")
 		}
 
 		imageBuild := v1alpha1.ImageBuildArgs{
@@ -134,7 +133,6 @@ func GenerateDockerfile(step v1alpha1.BuildStep, templates []v1alpha1.BuildTempl
 func parseCmdType(cmds []v1alpha1.BuildTemplateStep) ([]byte, error) {
 	var dockerfile []byte
 	for _, cmd := range cmds {
-
 		if err := validate.ValidateBuildTemplateStep(cmd); err != nil {
 			return nil, err
 		}
