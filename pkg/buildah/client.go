@@ -27,10 +27,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Client is the client used for building with Buildah using the ocibuilder
 type Client struct {
 	Logger *logrus.Logger
 }
 
+// ImageBuild conducts an image build with Buildah using the ocibuilder
 func (cli Client) ImageBuild(options v1alpha1.OCIBuildOptions) (v1alpha1.OCIBuildResponse, error) {
 
 	buildFlags := []command.Flag{
@@ -60,6 +62,7 @@ func (cli Client) ImageBuild(options v1alpha1.OCIBuildOptions) (v1alpha1.OCIBuil
 	}, nil
 }
 
+// ImagePull conducts an image pull with Buildah using the ocibuilder
 func (cli Client) ImagePull(options v1alpha1.OCIPullOptions) (v1alpha1.OCIPullResponse, error) {
 
 	pullFlags := []command.Flag{
@@ -82,6 +85,7 @@ func (cli Client) ImagePull(options v1alpha1.OCIPullOptions) (v1alpha1.OCIPullRe
 	}, nil
 }
 
+// ImagePush conducts an image push with Buildah using the ocibuilder
 func (cli Client) ImagePush(options v1alpha1.OCIPushOptions) (v1alpha1.OCIPushResponse, error) {
 
 	pushFlags := []command.Flag{
@@ -104,6 +108,7 @@ func (cli Client) ImagePush(options v1alpha1.OCIPushOptions) (v1alpha1.OCIPushRe
 	}, nil
 }
 
+// ImageRemove conducts an image remove with Buildah using the ocibuilder
 func (cli Client) ImageRemove(options v1alpha1.OCIRemoveOptions) (v1alpha1.OCIRemoveResponse, error) {
 
 	cmd := command.Builder("buildah").Command("rmi").Args(options.Image).Build()
@@ -124,6 +129,7 @@ func (cli Client) ImageRemove(options v1alpha1.OCIRemoveOptions) (v1alpha1.OCIRe
 	}, nil
 }
 
+// RegistryLogin conducts a registry login with Buildah using the ocibuilder
 func (cli Client) RegistryLogin(options v1alpha1.OCILoginOptions) (v1alpha1.OCILoginResponse, error) {
 
 	loginFlags := []command.Flag{
@@ -148,6 +154,7 @@ func (cli Client) RegistryLogin(options v1alpha1.OCILoginOptions) (v1alpha1.OCIL
 	}, nil
 }
 
+// GenerateAuthRegistryString generates the auth registry string for pushing and pulling images targeting Buildah
 func (cli Client) GenerateAuthRegistryString(auth types.AuthConfig) string {
 	return fmt.Sprintf("%s:%s", auth.Username, auth.Password)
 }

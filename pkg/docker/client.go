@@ -27,11 +27,13 @@ import (
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 )
 
+// Client is the client used for building with Docker using the ocibuilder
 type Client struct {
 	APIClient client.APIClient
 	Logger    *logrus.Logger
 }
 
+// ImageBuild conducts an image build with Docker using the ocibuilder
 func (cli Client) ImageBuild(options v1alpha1.OCIBuildOptions) (v1alpha1.OCIBuildResponse, error) {
 	apiCli := cli.APIClient
 	res, err := apiCli.ImageBuild(options.Ctx, options.Context, options.ImageBuildOptions)
@@ -43,6 +45,7 @@ func (cli Client) ImageBuild(options v1alpha1.OCIBuildOptions) (v1alpha1.OCIBuil
 	}, nil
 }
 
+// ImagePull conducts an image pull with Docker using the ocibuilder
 func (cli Client) ImagePull(options v1alpha1.OCIPullOptions) (v1alpha1.OCIPullResponse, error) {
 	apiCli := cli.APIClient
 	res, err := apiCli.ImagePull(options.Ctx, options.Ref, options.ImagePullOptions)
@@ -54,6 +57,7 @@ func (cli Client) ImagePull(options v1alpha1.OCIPullOptions) (v1alpha1.OCIPullRe
 	}, nil
 }
 
+// ImagePush conducts an image push with Docker using the ocibuilder
 func (cli Client) ImagePush(options v1alpha1.OCIPushOptions) (v1alpha1.OCIPushResponse, error) {
 	apiCli := cli.APIClient
 	res, err := apiCli.ImagePush(options.Ctx, options.Ref, options.ImagePushOptions)
@@ -65,6 +69,7 @@ func (cli Client) ImagePush(options v1alpha1.OCIPushOptions) (v1alpha1.OCIPushRe
 	}, nil
 }
 
+// ImageRemove conducts an image remove with Docker using the ocibuilder
 func (cli Client) ImageRemove(options v1alpha1.OCIRemoveOptions) (v1alpha1.OCIRemoveResponse, error) {
 	apiCli := cli.APIClient
 	res, err := apiCli.ImageRemove(options.Ctx, options.Image, options.ImageRemoveOptions)
@@ -76,6 +81,7 @@ func (cli Client) ImageRemove(options v1alpha1.OCIRemoveOptions) (v1alpha1.OCIRe
 	}, nil
 }
 
+// RegistryLogin conducts a registry login with Docker using the ocibuilder
 func (cli Client) RegistryLogin(options v1alpha1.OCILoginOptions) (v1alpha1.OCILoginResponse, error) {
 	apiCli := cli.APIClient
 	res, err := apiCli.RegistryLogin(options.Ctx, options.AuthConfig)
@@ -87,6 +93,7 @@ func (cli Client) RegistryLogin(options v1alpha1.OCILoginOptions) (v1alpha1.OCIL
 	}, nil
 }
 
+// GenerateAuthRegistryString generates the auth registry string for pushing and pulling images targeting the Docker daemon
 func (cli Client) GenerateAuthRegistryString(auth types.AuthConfig) string {
 	encodedJSON, err := json.Marshal(auth)
 	if err != nil {
