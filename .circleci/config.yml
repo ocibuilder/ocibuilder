@@ -2,36 +2,36 @@ version: 2
 jobs:
   install_dep:
     docker:
-      - image: golang:1.13.1-alpine
+      - image: golang:1.13.1
+        environment:
+          GO111MODULE: "on"
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v3
-            - go-dep-cache-
+            - go-mod-v1-{{ checksum "go.sum" }}
+            - go-mod-v1-
       - run:
           name: Install dependencies
-          command: |
-            apk update && apk add curl git build-base bash
-            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-            dep version
-            dep ensure -v
+          command: go mod download
       - save_cache:
-          key: go-dep-cache-{{ checksum "Gopkg.lock" }}-v3
+          key: go-mod-v1-{{ checksum "go.sum" }}
           paths:
-            - ./vendor
+            - "/go/pkg/mod"
   # lint is the initial job which lints the codebase using standard golangci-lint linter
   lint:
     docker:
-      - image: golang:1.13.1-alpine
+      - image: golang:1.13.1
+        environment:
+          GO111MODULE: "on"
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v3
-            - go-dep-cache-
+            - go-mod-v1-{{ checksum "go.sum" }}
+            - go-mod-v1-
       - run: apk update && apk add curl git build-base bash
       - run: curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.21.0
       - run: make lint
@@ -39,19 +39,23 @@ jobs:
   test:
     docker:
       - image: golang:1.13.1
+        environment:
+          GO111MODULE: "on"
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v3
-            - go-dep-cache-
+            - go-mod-v1-{{ checksum "go.sum" }}
+            - go-mod-v1-
       - run:
           name: Run unit tests
           command: make test
   e2e_test:
     machine:
       image: ubuntu-1604:201903-01
+      environment:
+        GO111MODULE: "on"
     working_directory: /home/circleci/.go_workspace/src/github.com/ocibuilder/ocibuilder
     steps:
       - run: |
@@ -78,8 +82,8 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v3
-            - go-dep-cache-
+            - go-mod-v1-{{ checksum "go.sum" }}
+            - go-mod-v1-
       - run: go get -u github.com/gobuffalo/packr/packr
       - run:
           name: Copy Dependencies
@@ -97,13 +101,15 @@ jobs:
   build:
     docker:
       - image: golang:1.13.1
+        environment:
+          GO111MODULE: "on"
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
       - restore_cache:
           keys:
-            - go-dep-cache-{{ checksum "Gopkg.lock" }}-v3
-            - go-dep-cache-
+            - go-mod-v1-{{ checksum "go.sum" }}
+            - go-mod-v1-
       - run: go get -u github.com/gobuffalo/packr/packr
       - run:
           name: Build Linux Artifact
@@ -123,7 +129,7 @@ jobs:
   # push_container pushes the ocictl container to the ocibuilder docker registry when a new tag is added to ocibuilder
   push_container:
     docker:
-      - image: ocibuilder/ocictl:0.1.0
+      - image: ocibuilder/ocictl:0.1.1
     steps:
       - setup_remote_docker
       - checkout
