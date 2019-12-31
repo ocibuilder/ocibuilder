@@ -14,15 +14,11 @@ jobs:
             - go-mod-v1-
       - run:
           name: Install dependencies
-          command: |
-            apk update && apk add curl git build-base bash
-            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-            dep version
-            dep ensure -v
+          command: go mod download
       - save_cache:
           key: go-mod-v1-{{ checksum "go.sum" }}
           paths:
-            - ./vendor
+            - "/go/pkg/mod"
   # lint is the initial job which lints the codebase using standard golangci-lint linter
   lint:
     docker:
