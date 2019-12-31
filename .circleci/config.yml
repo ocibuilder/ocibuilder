@@ -2,7 +2,7 @@ version: 2
 jobs:
   install_dep:
     docker:
-      - image: golang:1.13.1-alpine
+      - image: golang:1.13.1
         environment:
           GO111MODULE: "on"
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
@@ -22,7 +22,7 @@ jobs:
   # lint is the initial job which lints the codebase using standard golangci-lint linter
   lint:
     docker:
-      - image: golang:1.13.1-alpine
+      - image: golang:1.13.1
         environment:
           GO111MODULE: "on"
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
@@ -129,7 +129,7 @@ jobs:
   # push_container pushes the ocictl container to the ocibuilder docker registry when a new tag is added to ocibuilder
   push_container:
     docker:
-      - image: ocibuilder/ocictl:0.1.0
+      - image: ocibuilder/ocictl:0.1.1
     steps:
       - setup_remote_docker
       - checkout
