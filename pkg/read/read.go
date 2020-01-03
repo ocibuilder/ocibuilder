@@ -115,17 +115,10 @@ func (r Reader) readIndividualSpecs(spec *v1alpha1.OCIBuilderSpec, path string) 
 
 // applyOverlay applys a ytt overalay to the specification
 func applyOverlay(yamlTemplate []byte, overlayPath string) ([]byte, error) {
-	file, err := os.Open(overlayPath)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to read overlay file")
-	}
 
 	yttOverlay := overlay.YttOverlay{
 		Spec: yamlTemplate,
-		Overlay: overlay.OverlayFile{
-			Path: overlayPath,
-			File: file,
-		},
+		Path: overlayPath,
 	}
 
 	overlayedSpec, err := yttOverlay.Apply()

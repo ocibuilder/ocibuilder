@@ -17,22 +17,19 @@ limitations under the License.
 package overlay
 
 import (
+	"io/ioutil"
 	"os"
 	"testing"
 
+	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestYttOverlay_Apply(t *testing.T) {
-	file, err := os.Open("../../testing/dummy/overlay_overlay_test.yaml")
-	assert.Equal(t, nil, err)
 
 	yttOverlay := YttOverlay{
 		Spec: yamlTplData,
-		Overlay: OverlayFile{
-			File: file,
-			Path: "../../testing/dummy/overlay_overlay_test.yaml",
-		},
+		Path: "../../testing/dummy/overlay_overlay_test.yaml",
 	}
 	overlayedSpec, err := yttOverlay.Apply()
 	assert.Equal(t, nil, err)
@@ -40,15 +37,10 @@ func TestYttOverlay_Apply(t *testing.T) {
 }
 
 func TestYttOverlay_ApplyAnnotated(t *testing.T) {
-	file, err := os.Open("../../testing/dummy/overlay_overlay_annotated_test.yaml")
-	assert.Equal(t, nil, err)
 
 	yttOverlay := YttOverlay{
 		Spec: yamlTplData,
-		Overlay: OverlayFile{
-			File: file,
-			Path: "../../testing/dummy/overlay_overlay_annotated_test.yaml",
-		},
+		Path: "../../testing/dummy/overlay_overlay_annotated_test.yaml",
 	}
 	overlayedSpec, err := yttOverlay.Apply()
 
@@ -63,6 +55,39 @@ func TestAddYttAnnotations(t *testing.T) {
 	annotatedOverlay := addYttAnnotations(file)
 	assert.Equal(t, expectedAnnotatedOverlay, annotatedOverlay)
 }
+
+func TestRetrieveOverlayFile(t *testing.T) {
+
+	defer os.Remove(common.OverlayPath)
+
+	overlayLocal, err := retrieveOverlayFile("../../testing/dummy/overlay_overlay_test.yaml")
+	assert.Equal(t, nil, err)
+
+	bodyLocal, err := ioutil.ReadAll(overlayLocal)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedOverlay, string(bodyLocal))
+
+	overlayRemote, err := retrieveOverlayFile("https://raw.githubusercontent.com/ocibuilder/ocibuilder/master/testing/dummy/overlay_overlay_test.yaml")
+	assert.Equal(t, nil, err)
+
+	bodyRemote, err := ioutil.ReadAll(overlayRemote)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, expectedOverlay, string(bodyRemote))
+
+}
+
+var expectedOverlay = `build:
+  steps:
+    - metadata:
+        name: go-service
+        labels:
+          overlay: build-1
+      stages:
+        - metadata:
+            name: build-env
+            labels:
+              overlay: stage-1
+      tag: v0.2.0`
 
 var yamlTplData = []byte(`build:
   templates:
