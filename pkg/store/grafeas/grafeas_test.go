@@ -14,28 +14,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package store
+package grafeas
 
-import (
-	"time"
+import "testing"
 
-	"github.com/artbegolli/grafeas"
-)
+func TestGraf_List(t *testing.T) {
 
-// Store is a data storage interface
-type MetaStore interface {
-	// Write records
-	Write(rec ...*Record) error
 }
 
-// Record represents a data record
-type Record struct {
-	Key    string
-	Value  []byte
-	Expiry time.Duration
-	// Occurrence is the name of a grafeas occurrence to push to grafeas
-	Occurrence   string
-	Build        *grafeas.V1beta1buildDetails
-	DerivedImage *grafeas.V1beta1imageDetails
-	Attestation  *grafeas.V1beta1attestationDetails
+func TestGraf_Write(t *testing.T) {
+
+}
+
+func TestGraf_Delete(t *testing.T) {
+
+}
+
+func TestGraf_Read(t *testing.T) {
+
+}
+
+func TestNewStore(t *testing.T) {
+
 }

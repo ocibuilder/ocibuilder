@@ -59,22 +59,12 @@ const (
 type MetadataType string
 
 const (
-	// Builder is the builder that was used when building an image (docker/buildah)
-	Builder MetadataType = "builder"
-	// Time is the time the image was created
-	Time MetadataType = "time"
-	// TimeTaken is the time taken to create the image
-	TimeTaken MetadataType = "time_taken"
-	// Digest is the sha digest of the built image
-	Digest MetadataType = "digest"
-	// Attestation is the cgp signed image digest to be stored
+	// Build is the build related metadata type
+	Build MetadataType = "build"
+	// Attestation is attestation metadata
 	Attestation MetadataType = "attestation"
-	// ImageSize is the size of the build image
-	ImageSize MetadataType = "image_size"
-	// ImageLayers are the number of image layers
-	ImageLayers MetadataType = "image_layers"
-	// BaseImage is the base image used
-	BaseImage MetadataType = "base_image"
+	// DerviedImage any metadata related to the derived image
+	DerivedImaged MetadataType = "derived_image"
 )
 
 // OCIBuilder is the definition of a ocibuilder resource
@@ -680,12 +670,10 @@ type MetadataStoreType struct {
 type Grafeas struct {
 	// Project is the name of the project ID to store the occurrence
 	Project string `json:"project,omitempty" protobuf:"bytes,1,opt,name=project"`
-	// Occurrence is the name of the occurrence to push to grafeas
-	Occurrence string `json:"occurrence,omitempty" protobuf:"bytes,2,opt,name=occurrence"`
 	// Resource Required. Immutable. The resource for which the occurrence applies.
-	Resource string `json:"resource,omitempty" protobuf:"bytes,3,opt,name=resource"`
+	Resource string `json:"resource,omitempty" protobuf:"bytes,2,opt,name=resource"`
 	// NoteName Required. Immutable. The analysis note associated with this occurrence, in the form of `projects/[PROVIDER_ID]/notes/[NOTE_ID]`. This field can be used as a filter in list requests.
-	NoteName string `json:"noteName,omitempty" protobuf:"bytes,4,opt,name=noteName"`
+	NoteName string `json:"noteName,omitempty" protobuf:"bytes,3,opt,name=noteName"`
 	// Output only. This explicitly denotes which of the occurrence details are specified. This field can be used as a filter in list requests.
-	Kind string `json:"kind,omitempty" protobuf:"bytes,5,opt,name=kind"`
+	Kind string `json:"kind,omitempty" protobuf:"bytes,4,opt,name=kind"`
 }

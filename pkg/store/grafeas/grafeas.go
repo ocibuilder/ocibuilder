@@ -18,68 +18,90 @@ package grafeas
 
 import (
 	ctx "context"
+	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/artbegolli/grafeas"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/store"
+	"github.com/sirupsen/logrus"
 )
 
 type graf struct {
 	// Client is the grafeas API client
 	Client *grafeas.APIClient
-	// Project is the metadata project for grafeas image build metadata
-	Project string
+	// Options stores the options for pushing to Grafeas
+	Options v1alpha1.Grafeas
+	// Logger is the logger
+	Logger *logrus.Logger
 }
 
-func (g *graf) List() ([]*store.Record, error) {
-	return nil, nil
-}
-
-func (g *graf) Read(key ...string) ([]*store.Record, error) {
-	return nil, nil
-}
-
+// Write writes to the Grafeas metadata store. It is a variadic function
+// and takes in a number of Records.
+// The records are parsed as follows
 func (g *graf) Write(rec ...*store.Record) error {
 
-	requestMap := make(map[string]grafeas.V1beta1Occurrence)
+	var occurrenceRequests []grafeas.V1beta1Occurrence
 	for _, r := range rec {
-		requestMap[r.Key] = grafeas.V1beta1Occurrence{
-			Name:          "",
-			Resource:      nil,
-			NoteName:      "",
-			Kind:          nil,
-			Remediation:   "",
-			CreateTime:    time.Time{},
-			UpdateTime:    time.Time{},
-			Vulnerability: nil,
-			Build:         nil,
-			DerivedImage:  nil,
-			Installation:  nil,
-			Deployment:    nil,
-			Discovered:    nil,
-			Attestation:   nil,
+
+		occ := grafeas.V1beta1Occurrence{
+			Name:       "",
+			Resource:   nil,
+			NoteName:   "",
+			Kind:       nil,
+			CreateTime: time.Now(),
 		}
+
+		if r.Build != nil {
+			occ.Build = r.Build
+			continue
+		}
+
+		if r.DerivedImage != nil {
+			occ.DerivedImage = r.DerivedImage
+			continue
+		}
+
+		if r.Attestation != nil {
+			occ.Attestation = r.Attestation
+			continue
+		}
+
 	}
 
-	batchNotesRequest := grafeas.V1beta1BatchCreateNotesRequest{}
+	req := grafeas.V1beta1BatchCreateOccurrencesRequest{
+		Parent:      "",
+		Occurrences: occurrenceRequests,
+	}
 
-	_, _, err := g.Client.GrafeasV1Beta1Api.BatchCreateNotes(ctx.Background(), g.Project, batchNotesRequest)
+	res, httpRes, err := g.Client.GrafeasV1Beta1Api.BatchCreateOccurrences(ctx.Background(), g.Options.Project, req)
+
 	if err != nil {
 		return err
 	}
 
+	if httpRes.StatusCode != http.StatusOK {
+		return fmt.Errorf("error making write request to grafeas - returned with status code %s", httpRes.Status)
+	}
+
+	for _, occurrenceResponse := range res.Occurrences {
+		g.Logger.WithFields(logrus.Fields{
+			"name":        occurrenceResponse.Name,
+			"create_time": occurrenceResponse.CreateTime,
+			"kind":        occurrenceResponse.Kind,
+		}).Debugln("finished pushing metadata to Grafeas")
+	}
+
 	return nil
 }
 
-func (g *graf) Delete(key ...string) error {
-	return nil
-}
-
-func NewStore(project string, configuration *grafeas.Configuration) store.Store {
+func NewStore(configuration *grafeas.Configuration, options v1alpha1.Grafeas, logger *logrus.Logger) store.MetaStore {
 	cli := grafeas.NewAPIClient(configuration)
 
 	return &graf{
-		Project: project,
 		Client:  cli,
+		Options: options,
+		Logger:  logger,
 	}
 }
