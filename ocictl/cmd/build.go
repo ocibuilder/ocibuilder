@@ -17,15 +17,11 @@ limitations under the License.
 package cmd
 
 import (
-	"errors"
 	"io"
 
-	"github.com/docker/docker/client"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/ocictl/pkg/utils"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/buildah"
-	"github.com/ocibuilder/ocibuilder/pkg/docker"
 	"github.com/ocibuilder/ocibuilder/pkg/oci"
 	"github.com/ocibuilder/ocibuilder/pkg/read"
 	"github.com/spf13/cobra"
@@ -68,59 +64,25 @@ func newBuildCmd(out io.Writer) *cobra.Command {
 }
 
 func (b *buildCmd) run(args []string) error {
-	var cli v1alpha1.BuilderClient
 	logger := common.GetLogger(b.debug)
 	reader := read.Reader{Logger: logger}
-	ociBuilderSpec := v1alpha1.OCIBuilderSpec{Daemon: true}
 
-	if err := reader.Read(&ociBuilderSpec, b.overlay, b.path); err != nil {
-		log.WithError(err).Errorln("failed to read spec")
+	ociBuilderSpec, err := reader.Read(b.overlay, b.path)
+	if err != nil {
 		return err
 	}
 
-	// Prioritise builder passed in as argument, default builder is docker
-	builderType := b.builder
-	if !ociBuilderSpec.Daemon {
-		builderType = "buildah"
+	client, err := utils.GetClient(b.builder, logger)
+	if err != nil {
+		return err
 	}
 
-	switch v1alpha1.Framework(builderType) {
-
-	case v1alpha1.DockerFramework:
-		{
-			apiClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-			if err != nil {
-				log.WithError(err).Errorln("failed to fetch docker api client")
-				return err
-			}
-
-			cli = docker.Client{
-				APIClient: apiClient,
-				Logger:    logger,
-			}
-
-			ociBuilderSpec.Daemon = true
-		}
-
-	case v1alpha1.BuildahFramework:
-		{
-			cli = buildah.Client{
-				Logger: logger,
-			}
-
-			ociBuilderSpec.Daemon = false
-		}
-
-	default:
-		{
-			return errors.New("invalid builder specified, try --builder=docker or --builder=buildah")
-		}
-
-	}
+	// TODO: Instead of having user mention the type of the builder, it makes sense to derive builder value just from Daemon -> true or false
+	ociBuilderSpec.Daemon = utils.HasDaemon(b.builder)
 
 	builder := oci.Builder{
 		Logger: logger,
-		Client: cli,
+		Client: client,
 	}
 
 	res := make(chan v1alpha1.OCIBuildResponse)
@@ -150,7 +112,7 @@ func (b *buildCmd) run(args []string) error {
 		case buildResponse := <-res:
 			{
 				logger.Infoln("executing build step")
-				if builderType == "docker" {
+				if b.builder == "docker" {
 					if err := utils.OutputJson(buildResponse.Body); err != nil {
 						return err
 					}

@@ -20,9 +20,15 @@ import (
 	"io"
 	"os"
 
+	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/docker/pkg/term"
 	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/buildah"
+	"github.com/ocibuilder/ocibuilder/pkg/docker"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 var log = common.GetLogger(false)
@@ -61,4 +67,34 @@ func Output(stdout io.ReadCloser, stderr io.ReadCloser) error {
 		log.WithError(err).Debugln("error copying output from stdout to stdout, could impact response output")
 	}
 	return nil
+}
+
+// GetClient returns a OCIBuilder client
+func GetClient(builderType string, logger *logrus.Logger) (v1alpha1.BuilderClient, error) {
+	switch v1alpha1.Framework(builderType) {
+	case v1alpha1.DockerFramework:
+		apiClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to create a docker client")
+		}
+		return docker.Client{
+			APIClient: apiClient,
+			Logger:    logger,
+		}, nil
+
+	case v1alpha1.BuildahFramework:
+		return buildah.Client{
+			Logger: logger,
+		}, nil
+	default:
+		return nil, errors.Errorf("invalid builder %s, try --builder=docker or --builder=buildah", builderType)
+	}
+}
+
+// HasDaemon determines if docker daemon is required for given OCIBuilder type
+func HasDaemon(builderType string) bool {
+	if v1alpha1.Framework(builderType) == v1alpha1.DockerFramework {
+		return true
+	}
+	return false
 }

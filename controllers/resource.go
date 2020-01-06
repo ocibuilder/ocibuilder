@@ -113,7 +113,7 @@ func (opctx *operationContext) generateCommands() []command.CommandBuilder {
 
 // constructBuilderJob constructs a K8s job for ocibuilder build step.
 func (opctx *operationContext) constructBuilderJob() (*batchv1.Job, error) {
-	cfg := opctx.readJobConfiguration()
+	jobCfg := opctx.readJobConfiguration()
 
 	labels := map[string]string{
 		common.LabelOwner:   opctx.builder.Name,

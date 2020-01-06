@@ -26,7 +26,6 @@ import (
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/parser"
-	"github.com/ocibuilder/ocibuilder/pkg/types"
 	"github.com/ocibuilder/ocibuilder/pkg/validate"
 	"github.com/sirupsen/logrus"
 )
@@ -37,7 +36,7 @@ type Builder struct {
 	Metadata []v1alpha1.ImageMetadata
 }
 
-func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- types.OCIBuildResponse, errChan chan<- error, finished chan<- bool) {
+func (b *Builder) Build(spec *v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBuildResponse, errChan chan<- error, finished chan<- bool) {
 	log := b.Logger
 	cli := b.Client
 
@@ -69,7 +68,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- types.OCIBuildR
 
 		imageName := fmt.Sprintf("%s:%s", opt.Name, opt.Tag)
 
-		builderOptions := types.OCIBuildOptions{
+		builderOptions := v1alpha1.OCIBuildOptions{
 			Ctx:         context.Background(),
 			ContextPath: opt.BuildContextPath + common.ContextDirectory,
 			Context:     buildContext,
@@ -109,7 +108,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- types.OCIBuildR
 	}
 }
 
-func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- types.OCIPushResponse, errChan chan<- error, finished chan<- bool) {
+func (b *Builder) Push(spec *v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPushResponse, errChan chan<- error, finished chan<- bool) {
 	log := b.Logger
 	cli := b.Client
 
@@ -129,7 +128,7 @@ func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- types.OCIPushRes
 			return
 		}
 
-		pushOptions := types.OCIPushOptions{
+		pushOptions := v1alpha1.OCIPushOptions{
 			Ctx: context.Background(),
 			Ref: pushFullImageName,
 			ImagePushOptions: dockertypes.ImagePushOptions{
@@ -165,7 +164,7 @@ func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- types.OCIPushRes
 	finished <- true
 }
 
-func (b *Builder) Pull(spec v1alpha1.OCIBuilderSpec, imageName string, res chan<- types.OCIPullResponse, errChan chan<- error, finished chan<- bool) {
+func (b *Builder) Pull(spec *v1alpha1.OCIBuilderSpec, imageName string, res chan<- v1alpha1.OCIPullResponse, errChan chan<- error, finished chan<- bool) {
 	log := b.Logger
 	cli := b.Client
 
@@ -183,7 +182,7 @@ func (b *Builder) Pull(spec v1alpha1.OCIBuilderSpec, imageName string, res chan<
 			return
 		}
 
-		pullOptions := types.OCIPullOptions{
+		pullOptions := v1alpha1.OCIPullOptions{
 			Ctx: context.Background(),
 			Ref: registry + imageName,
 			ImagePullOptions: dockertypes.ImagePullOptions{
@@ -212,7 +211,7 @@ func (b *Builder) Pull(spec v1alpha1.OCIBuilderSpec, imageName string, res chan<
 	finished <- true
 }
 
-func (b *Builder) Login(spec v1alpha1.OCIBuilderSpec, res chan<- types.OCILoginResponse, errChan chan<- error, finished chan<- bool) {
+func (b *Builder) Login(spec *v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCILoginResponse, errChan chan<- error, finished chan<- bool) {
 	log := b.Logger
 	cli := b.Client
 
@@ -234,7 +233,7 @@ func (b *Builder) Login(spec v1alpha1.OCIBuilderSpec, res chan<- types.OCILoginR
 			errChan <- err
 			return
 		}
-		loginOptions := types.OCILoginOptions{
+		loginOptions := v1alpha1.OCILoginOptions{
 			Ctx: context.Background(),
 			AuthConfig: dockertypes.AuthConfig{
 				Username:      username,
@@ -262,7 +261,7 @@ func (b *Builder) Purge(imageName string) error {
 
 	log.WithField("image", imageName).Debugln("attempting to purge image")
 
-	removeOptions := types.OCIRemoveOptions{
+	removeOptions := v1alpha1.OCIRemoveOptions{
 		Image:              imageName,
 		Ctx:                context.Background(),
 		ImageRemoveOptions: dockertypes.ImageRemoveOptions{},
@@ -292,7 +291,7 @@ func (b *Builder) Clean() {
 	}
 }
 
-func (b Builder) generateAuthRegistryString(registry string, spec v1alpha1.OCIBuilderSpec) (string, error) {
+func (b Builder) generateAuthRegistryString(registry string, spec *v1alpha1.OCIBuilderSpec) (string, error) {
 	if err := validate.ValidateLogin(spec); err != nil {
 		return "", err
 	}

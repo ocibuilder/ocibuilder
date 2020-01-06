@@ -41,10 +41,11 @@ type Reader struct {
 // combined in ocibuilder.yaml or separated in login.yaml, build.yaml and push.yaml.
 // The passed in OCIBuilderSpec reference is populated
 // If a filepath is not specified the current working directory is used
-func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepaths ...string) error {
+func (r Reader) Read(overlayPath string, filepaths ...string) (*v1alpha1.OCIBuilderSpec, error) {
+	spec := &v1alpha1.OCIBuilderSpec{}
 	dir, err := os.Getwd()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	filepath := strings.Join(filepaths[:], "/")
 	if filepath != "" {
@@ -55,7 +56,7 @@ func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepath
 	if err != nil {
 		r.Logger.Infoln("ocibuilder.yaml file not found, looking for individual specifications...")
 		if err := r.readIndividualSpecs(spec, dir); err != nil {
-			return errors.Wrap(err, "failed to read individual specs")
+			return nil, errors.Wrap(err, "failed to read individual specs")
 		}
 	}
 
@@ -63,25 +64,25 @@ func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepath
 		r.Logger.WithField("overlayPath", overlayPath).Debugln("overlay path not empty - looking for overlay file")
 		file, err = applyOverlay(file, overlayPath)
 		if err != nil {
-			return errors.Wrap(err, "failed to apply overlay to spec at path")
+			return nil, errors.Wrap(err, "failed to apply overlay to spec at path")
 		}
 	}
 
 	if err = yaml.Unmarshal(file, spec); err != nil {
-		return errors.Wrap(err, "failed to unmarshal spec at directory")
+		return nil, errors.Wrap(err, "failed to unmarshal spec at directory")
 	}
 
 	if err := validate.Validate(spec); err != nil {
-		return errors.Wrap(err, "failed to validate spec at directory")
+		return nil, errors.Wrap(err, "failed to validate spec at directory")
 	}
 
 	if spec.Params != nil {
 		if err = r.applyParams(file, spec); err != nil {
-			return errors.Wrap(err, "failed to apply params to spec")
+			return nil, errors.Wrap(err, "failed to apply params to spec")
 		}
 	}
 
-	return nil
+	return spec, nil
 }
 
 // readIndividualSpecs reads the individual specifications if a global

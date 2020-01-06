@@ -85,7 +85,7 @@ func ValidateLoginPassword(spec v1alpha1.LoginSpec) (string, error) {
 }
 
 // ValidateLogin validates the top level login specification
-func ValidateLogin(spec v1alpha1.OCIBuilderSpec) error {
+func ValidateLogin(spec *v1alpha1.OCIBuilderSpec) error {
 	if spec.Login == nil {
 		return errors.New("at least one login must be provided")
 	}

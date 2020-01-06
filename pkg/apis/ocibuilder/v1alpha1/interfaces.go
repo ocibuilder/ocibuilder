@@ -17,8 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
-	dockertypes "github.com/docker/docker/api/types"
-	"github.com/ocibuilder/ocibuilder/pkg/types"
+	"github.com/docker/docker/api/types"
 	"io"
 )
 
@@ -40,10 +39,10 @@ type SpecGenerator interface {
 
 // BuilderClient is the client interface for the ocibuilder
 type BuilderClient interface {
-	ImageBuild(options types.OCIBuildOptions) (types.OCIBuildResponse, error)
-	ImagePull(options types.OCIPullOptions) (types.OCIPullResponse, error)
-	ImagePush(options types.OCIPushOptions) (types.OCIPushResponse, error)
-	ImageRemove(options types.OCIRemoveOptions) (types.OCIRemoveResponse, error)
-	RegistryLogin(options types.OCILoginOptions) (types.OCILoginResponse, error)
-	GenerateAuthRegistryString(auth dockertypes.AuthConfig) string
+	ImageBuild(options OCIBuildOptions) (OCIBuildResponse, error)
+	ImagePull(options OCIPullOptions) (OCIPullResponse, error)
+	ImagePush(options OCIPushOptions) (OCIPushResponse, error)
+	ImageRemove(options OCIRemoveOptions) (OCIRemoveResponse, error)
+	RegistryLogin(options OCILoginOptions) (OCILoginResponse, error)
+	GenerateAuthRegistryString(auth types.AuthConfig) string
 }

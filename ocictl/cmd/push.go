@@ -17,18 +17,13 @@ limitations under the License.
 package cmd
 
 import (
-	"errors"
 	"io"
 
-	"github.com/docker/docker/client"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/ocictl/pkg/utils"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/buildah"
-	"github.com/ocibuilder/ocibuilder/pkg/docker"
 	"github.com/ocibuilder/ocibuilder/pkg/oci"
 	"github.com/ocibuilder/ocibuilder/pkg/read"
-	"github.com/ocibuilder/ocibuilder/pkg/types"
 	"github.com/spf13/cobra"
 )
 
@@ -69,58 +64,28 @@ func newPushCmd(out io.Writer) *cobra.Command {
 }
 
 func (p *pushCmd) run(args []string) error {
-	var cli v1alpha1.BuilderClient
 	logger := common.GetLogger(p.debug)
 	reader := read.Reader{Logger: logger}
-	ociBuilderSpec := v1alpha1.OCIBuilderSpec{Daemon: true}
 
-	if err := reader.Read(&ociBuilderSpec, "", p.path); err != nil {
+	ociBuilderSpec, err := reader.Read("", p.path)
+	if err != nil {
 		log.WithError(err).Errorln("failed to read spec")
 		return err
 	}
 
-	// Prioritise builder passed in as argument, default builder is docker
-	builderType := p.builder
-	if !ociBuilderSpec.Daemon {
-		builderType = "buildah"
+	client, err := utils.GetClient(p.builder, logger)
+	if err != nil {
+		return err
 	}
 
-	switch v1alpha1.Framework(builderType) {
-
-	case v1alpha1.DockerFramework:
-		{
-			apiClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-			if err != nil {
-				log.WithError(err).Errorln("failed to fetch docker api client")
-				return err
-			}
-
-			cli = docker.Client{
-				APIClient: apiClient,
-				Logger:    logger,
-			}
-		}
-
-	case v1alpha1.BuildahFramework:
-		{
-			cli = buildah.Client{
-				Logger: logger,
-			}
-		}
-
-	default:
-		{
-			return errors.New("invalid builder specified, try --builder=docker or --builder=buildah")
-		}
-
-	}
+	ociBuilderSpec.Daemon = utils.HasDaemon(p.builder)
 
 	builder := oci.Builder{
 		Logger: logger,
-		Client: cli,
+		Client: client,
 	}
 
-	res := make(chan types.OCIPushResponse)
+	res := make(chan v1alpha1.OCIPushResponse)
 	errChan := make(chan error)
 	finished := make(chan bool)
 
@@ -146,7 +111,7 @@ func (p *pushCmd) run(args []string) error {
 		case pushResponse := <-res:
 			{
 				logger.Infoln("executing push step")
-				if builderType == "docker" {
+				if p.builder == "docker" {
 					if err := utils.OutputJson(pushResponse.Body); err != nil {
 						return err
 					}
