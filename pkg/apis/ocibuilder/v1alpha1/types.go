@@ -26,9 +26,9 @@ type NodePhase string
 
 // possible types of node phases
 const (
+	NodePhaseNew       NodePhase = ""          // the node is new
 	NodePhaseRunning   NodePhase = "Running"   // the node is running
 	NodePhaseError     NodePhase = "Error"     // the node has encountered an error in processing
-	NodePhaseNew       NodePhase = ""          // the node is new
 	NodePhaseCompleted NodePhase = "Completed" // node has completed running
 )
 
@@ -65,7 +65,7 @@ type OCIBuilder struct {
 type OCIBuilderList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata" protobuf:"bytes,1,name=metadata"`
-	// +listType=map
+	// +listType=ociBuilder
 	Items []OCIBuilder `json:"items" protobuf:"bytes,2,name=items"`
 }
 
@@ -89,6 +89,12 @@ type OCIBuilderSpec struct {
 	// Defaults to docker
 	// +optional
 	Daemon bool `json:"daemon,omitempty" protobuf:"bytes,5,opt,name=daemon"`
+	// OverlayPath is the path to the overlay file
+	// +optional
+	OverlayPath string `json:"overlayPath,omitempty" protobuf:"bytes,6,opt,name=overlayPath"`
+	// JobTemplate is a template to specify job configuration for the K8s operator
+	// +optional
+	JobTemplate *JobTemplate `json:"jobTemplate,omitempty" protobuf:"bytes,7,opt,name=jobTemplate"`
 }
 
 // OCIBuilderStatus holds the status of a OCIBuilder resource
@@ -122,7 +128,7 @@ type BuildSpec struct {
 	// +listType=map
 	Templates []BuildTemplate `json:"templates" protobuf:"bytes,1,rep,name=templates"`
 	// Steps within a build
-	// +listType=map
+	// +listType=buildStep
 	Steps []BuildStep `json:"steps" protobuf:"bytes,2,rep,name=steps"`
 }
 
@@ -131,7 +137,7 @@ type BuildTemplate struct {
 	// Name of the template
 	Name string `json:"name" protobuf:"bytes,1,name=name"`
 	// List of cmds in a Dockerfile
-	// +listType=
+	// +listType=buildTemplateStep
 	Cmd []BuildTemplateStep `json:"cmd" protobuf:"bytes,2,rep,name=steps"`
 }
 
@@ -147,7 +153,7 @@ type BuildTemplateStep struct {
 type DockerStep struct {
 	// Inline Dockerfile commands
 	// +optional
-	// +listType=map
+	// +listType=inline
 	Inline []string `json:"inline,omitempty" protobuf:"bytes,1,opt,name=inline"`
 	// Path to a file that contains Dockerfile commands
 	// +optional
@@ -500,4 +506,42 @@ type ImageMetadata struct {
 	ContextDirectory string `json:"contextDirectory" protobuf:"bytes,2,opt,name=contextDirectory"`
 	// Daemon is whether the daemon was used to build or not (Docker or Buildah)
 	Daemon bool `json:"daemon" protobuf:"bytes,3,opt,name=daemon"`
+}
+
+type JobTemplate struct {
+	// Specifies the desired number of successfully finished pods the
+	// job should be run with.  Setting to nil means that the success of any
+	// pod signals the success of all pods, and allows parallelism to have any positive
+	// value.  Setting to 1 means that parallelism is limited to 1 and the success of that
+	// pod signals the success of the job.
+	// More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/
+	// +optional
+	Completions *int32 `json:"completions,omitempty" protobuf:"varint,2,opt,name=completions"`
+	// Specifies the duration in seconds relative to the startTime that the job may be active
+	// before the system tries to terminate it; value must be positive integer
+	// +optional
+	ActiveDeadlineSeconds *int64 `json:"activeDeadlineSeconds,omitempty" protobuf:"varint,3,opt,name=activeDeadlineSeconds"`
+	// Specifies the number of retries before marking this job failed.
+	// Defaults to 6
+	// +optional
+	BackoffLimit *int32 `json:"backoffLimit,omitempty" protobuf:"varint,4,opt,name=backoffLimit"`
+	// ttlSecondsAfterFinished limits the lifetime of a Job that has finished
+	// execution (either Complete or Failed). If this field is set,
+	// ttlSecondsAfterFinished after the Job finishes, it is eligible to be
+	// automatically deleted. When the Job is being deleted, its lifecycle
+	// guarantees (e.g. finalizers) will be honored. If this field is unset,
+	// the Job won't be automatically deleted. If this field is set to zero,
+	// the Job becomes eligible to be deleted immediately after it finishes.
+	// This field is alpha-level and is only honored by servers that enable the
+	// TTLAfterFinished feature.
+	// +optional
+	TTLSecondsAfterFinished *int32 `json:"ttlSecondsAfterFinished,omitempty" protobuf:"varint,6,opt,name=ttlSecondsAfterFinished"`
+	// Compute Resources required by this container.
+	// Cannot be updated.
+	// More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
+	// +optional
+	Resources corev1.ResourceRequirements `json:"resources,omitempty" protobuf:"bytes,6,opt,name=resources"`
+	// List of environment variables to set in the container.
+	// +optional
+	Env []corev1.EnvVar `json:"env,omitempty" protobuf:"bytes,7,rep,name=env"`
 }

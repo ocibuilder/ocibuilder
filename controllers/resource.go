@@ -1,18 +1,36 @@
+/*
+Copyright 2019 BlackRock, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package ocibuilder
 
 import (
 	"fmt"
 	"github.com/ghodss/yaml"
 	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/pkg/command"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"os"
-	"strconv"
+	"path"
+	"strings"
 )
 
 // parseJobConfiguration parses configuration required to manage K8s job lifecycle
-func (opctx *operationContext) parseJobConfiguration() *jobConfiguration {
+func (opctx *operationContext) readJobConfiguration() *jobConfiguration {
 	cfg := &jobConfiguration{
 		backoffLimit:            common.BackoffLimit,
 		completions:             common.Completions,
@@ -20,47 +38,20 @@ func (opctx *operationContext) parseJobConfiguration() *jobConfiguration {
 		ttlSecondsAfterFinished: int32(common.TTLSecondsAfterFinished),
 		activeDeadlineSeconds:   int64(common.ActiveDeadlineSeconds),
 	}
-
-	backoffLimitEnvVar, ok := os.LookupEnv(common.EnvVarBackoffLimit)
-	if ok {
-		backoffLimit, err := strconv.ParseInt(backoffLimitEnvVar, 10, 32)
-		if err != nil {
-			opctx.logger.WithError(err).WithField("env-var", common.EnvVarBackoffLimit).WithField("default-value", common.BackoffLimit).Warnln("failed to parse environment variable. Using the default value")
-		} else {
-			cfg.backoffLimit = int32(backoffLimit)
+	if opctx.builder.Spec.JobTemplate != nil {
+		if opctx.builder.Spec.JobTemplate.BackoffLimit != nil {
+			cfg.backoffLimit = *opctx.builder.Spec.JobTemplate.BackoffLimit
+		}
+		if opctx.builder.Spec.JobTemplate.Completions != nil {
+			cfg.completions = *opctx.builder.Spec.JobTemplate.Completions
+		}
+		if opctx.builder.Spec.JobTemplate.TTLSecondsAfterFinished != nil {
+			cfg.ttlSecondsAfterFinished = *opctx.builder.Spec.JobTemplate.TTLSecondsAfterFinished
+		}
+		if opctx.builder.Spec.JobTemplate.ActiveDeadlineSeconds != nil {
+			cfg.activeDeadlineSeconds = *opctx.builder.Spec.JobTemplate.ActiveDeadlineSeconds
 		}
 	}
-
-	completionsEnvVar, ok := os.LookupEnv(common.EnvVarCompletions)
-	if ok {
-		completions, err := strconv.ParseInt(completionsEnvVar, 10, 32)
-		if err != nil {
-			opctx.logger.WithError(err).WithField("env-var", common.EnvVarCompletions).WithField("default-value", common.Completions).Warnln("failed to parse environment variable. Using the default value")
-		} else {
-			cfg.completions = int32(completions)
-		}
-	}
-
-	ttlSecondsAfterFinishedEnvVar, ok := os.LookupEnv(common.EnvVarTTLSecondsAfterFinished)
-	if ok {
-		ttlSecondsAfterFinished, err := strconv.ParseInt(ttlSecondsAfterFinishedEnvVar, 10, 32)
-		if err != nil {
-			opctx.logger.WithError(err).WithField("env-var", common.EnvVarTTLSecondsAfterFinished).WithField("default-value", common.TTLSecondsAfterFinished).Warnln("failed to parse environment variable. Using the default value")
-		} else {
-			cfg.ttlSecondsAfterFinished = int32(ttlSecondsAfterFinished)
-		}
-	}
-
-	activeDeadlineSecondsEnvVar, ok := os.LookupEnv(common.EnvVarActiveDeadlineSeconds)
-	if ok {
-		activeDeadlineSeconds, err := strconv.ParseInt(activeDeadlineSecondsEnvVar, 10, 32)
-		if err != nil {
-			opctx.logger.WithError(err).WithField("env-var", common.EnvVarActiveDeadlineSeconds).WithField("default-value", common.ActiveDeadlineSeconds).Warnln("failed to parse environment variable. Using the default value")
-		} else {
-			cfg.activeDeadlineSeconds = activeDeadlineSeconds
-		}
-	}
-
 	return cfg
 }
 
@@ -80,9 +71,49 @@ func (opctx *operationContext) storeBuilderSpecification() error {
 	return nil
 }
 
+// generateCommands generates commands to be executed for the job
+func (opctx *operationContext) generateCommands() []command.CommandBuilder {
+	var commandBuilders []command.CommandBuilder
+	specificationFilePath := path.Clean(fmt.Sprintf("%s/%s", common.ContextDirectory, common.SpecFilePath))
+
+	flags := []command.Flag{
+		{
+			Name:  "--path",
+			Value: specificationFilePath,
+		},
+	}
+	if opctx.builder.Spec.OverlayPath == "" {
+		flags = append(flags, command.Flag{
+			Name:  "--overlay",
+			Value: path.Clean(fmt.Sprintf("%s/%s", common.ContextDirectoryUncompressed, opctx.builder.Spec.OverlayPath)),
+		})
+	}
+
+	commandBuilders = append(commandBuilders, command.CommandBuilder{
+		Command: fmt.Sprintf("%s %s", common.CmdOcictl, common.CmdLogin),
+		Name:    common.CmdLogin,
+		Flags:   flags,
+	}, command.CommandBuilder{
+		Command: fmt.Sprintf("%s %s", common.CmdOcictl, common.CmdBuild),
+		Name:    common.CmdBuild,
+		Flags:   flags,
+	}, command.CommandBuilder{
+		Name:    common.CmdPush,
+		Command: fmt.Sprintf("%s %s", common.CmdOcictl, common.CmdPush),
+		Flags:   flags,
+	})
+
+	var commands []string
+	for _, cmdBuilder := range cmdBuilders {
+		commands = append(commands, strings.Join(cmdBuilder.Build().ConstructCommand(), " "))
+	}
+
+	return commands
+}
+
 // constructBuilderJob constructs a K8s job for ocibuilder build step.
-func (opctx *operationContext) constructBuilderJob() *batchv1.Job {
-	jobCfg := opctx.parseJobConfiguration()
+func (opctx *operationContext) constructBuilderJob() (*batchv1.Job, error) {
+	cfg := opctx.readJobConfiguration()
 
 	labels := map[string]string{
 		common.LabelOwner:   opctx.builder.Name,
@@ -112,8 +143,12 @@ func (opctx *operationContext) constructBuilderJob() *batchv1.Job {
 					Namespace:    opctx.builder.Namespace,
 					Labels:       labels,
 				},
-				Spec: corev1.PodSpec{},
+				Spec: corev1.PodSpec{
+					Containers: []corev1.Container{
+						{},
+					},
+				},
 			},
 		},
-	}
+	}, nil
 }

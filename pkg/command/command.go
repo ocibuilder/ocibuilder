@@ -26,19 +26,19 @@ import (
 var executor = exec.Command
 
 type Command struct {
-	name    string
-	command string
-	flags   []Flag
-	args    []string
+	Name    string
+	Command string
+	Flags   []Flag
+	Args    []string
 
-	execCmd *exec.Cmd
+	ExecCmd *exec.Cmd
 }
 
 type CommandBuilder struct {
-	name    string
-	command string
-	flags   []Flag
-	args    []string
+	Name    string
+	Command string
+	Flags   []Flag
+	Args    []string
 }
 
 type Flag struct {
@@ -52,19 +52,19 @@ type Flag struct {
 
 func (builder *CommandBuilder) Build() Command {
 	return Command{
-		name:    builder.name,
-		command: builder.command,
-		flags:   builder.flags,
-		args:    builder.args,
+		Name:    builder.Name,
+		Command: builder.Command,
+		Flags:   builder.Flags,
+		Args:    builder.Args,
 	}
 }
 
-func (builder *CommandBuilder) Command(command string) *CommandBuilder {
-	builder.command = command
+func (builder *CommandBuilder) SetCommand(command string) *CommandBuilder {
+	builder.Command = command
 	return builder
 }
 
-func (builder *CommandBuilder) Flags(flags ...Flag) *CommandBuilder {
+func (builder *CommandBuilder) SetFlags(flags ...Flag) *CommandBuilder {
 	var builderFlags []Flag
 	for _, f := range flags {
 		if !f.OmitEmpty {
@@ -74,38 +74,38 @@ func (builder *CommandBuilder) Flags(flags ...Flag) *CommandBuilder {
 		}
 	}
 
-	builder.flags = builderFlags
+	builder.Flags = builderFlags
 	return builder
 }
 
-func (builder *CommandBuilder) Args(args ...string) *CommandBuilder {
-	builder.args = args
+func (builder *CommandBuilder) SetArgs(args ...string) *CommandBuilder {
+	builder.Args = args
 	return builder
 }
 
 func Builder(name string) *CommandBuilder {
 	cmdBuilder := new(CommandBuilder)
-	cmdBuilder.args = make([]string, 0)
-	cmdBuilder.command = ""
-	cmdBuilder.flags = make([]Flag, 0)
-	cmdBuilder.name = name
+	cmdBuilder.Args = make([]string, 0)
+	cmdBuilder.Command = ""
+	cmdBuilder.Flags = make([]Flag, 0)
+	cmdBuilder.Name = name
 	return cmdBuilder
 }
 
 func (c *Command) Exec() (stdout io.ReadCloser, stderr io.ReadCloser, err error) {
-	command := c.constructCommand()
-	cmd := executor(c.name, command...)
+	command := c.ConstructCommand()
+	cmd := executor(c.Name, command...)
 	stdout, _ = cmd.StdoutPipe()
 	stderr, _ = cmd.StderrPipe()
 	if err := cmd.Start(); err != nil {
 		return nil, nil, err
 	}
-	c.execCmd = cmd
+	c.ExecCmd = cmd
 	return stdout, stderr, nil
 }
 
 func (c Command) Wait() error {
-	if err := c.execCmd.Wait(); err != nil {
+	if err := c.ExecCmd.Wait(); err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {
 			fmt.Printf("Exit code is %d\n", exitError.ExitCode())
 			errorString := fmt.Sprintf("error in executing cmd, exited with code %d", exitError.ExitCode())
@@ -115,10 +115,10 @@ func (c Command) Wait() error {
 	return nil
 }
 
-func (c Command) constructCommand() []string {
-	var commandVector = []string{c.command}
+func (c Command) ConstructCommand() []string {
+	var commandVector = []string{c.Command}
 
-	for _, flag := range c.flags {
+	for _, flag := range c.Flags {
 		if flag.Short {
 			commandVector = append(commandVector, fmt.Sprintf("-%s", flag.Name), flag.Value)
 		} else {
@@ -126,5 +126,5 @@ func (c Command) constructCommand() []string {
 		}
 	}
 
-	return append(commandVector, c.args...)
+	return append(commandVector, c.Args...)
 }

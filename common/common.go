@@ -90,11 +90,13 @@ var (
 	ActiveDeadlineSeconds   = time.Hour.Seconds() * 24
 )
 
-// Environment variables for the Job specific variables
+// CLI commands
 const (
-	EnvVarBackoffLimit            = "JOB_BACK_OFF_LIMIT"
-	EnvVarCompletions             = "JOB_COMPLETIONS"
-	EnvVarParallelisms            = "JOB_PARALLELISMS"
-	EnvVarTTLSecondsAfterFinished = "JOB_TTL_SECONDS_AFTER_FINISHED"
-	EnvVarActiveDeadlineSeconds   = "JOB_ACTIVE_DEADLINE_SECONDS"
+	CmdInit    = "init"
+	CmdLogin   = "login"
+	CmdBuild   = "build"
+	CmdPull    = "pull"
+	CmdPush    = "push"
+	CmdVersion = "version"
+	CmdOcictl  = "ocictl"
 )
