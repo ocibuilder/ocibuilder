@@ -20,7 +20,6 @@ import (
 	ctx "context"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/artbegolli/grafeas"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
@@ -46,11 +45,10 @@ func (g *graf) Write(rec ...*store.Record) error {
 	for _, r := range rec {
 
 		occ := grafeas.V1beta1Occurrence{
-			Name:       "",
-			Resource:   nil,
-			NoteName:   "",
-			Kind:       nil,
-			CreateTime: time.Now(),
+			Resource: &grafeas.V1beta1Resource{
+				Uri: r.Resource,
+			},
+			NoteName: g.Options.NoteName,
 		}
 
 		if r.Build != nil {
@@ -92,7 +90,7 @@ func (g *graf) Write(rec ...*store.Record) error {
 			"kind":        occurrenceResponse.Kind,
 		}).Debugln("finished pushing metadata to Grafeas")
 	}
-
+	g.Logger.Infoln("metadata successfully pushed to grafeas")
 	return nil
 }
 

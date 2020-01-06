@@ -34,7 +34,9 @@ type Record struct {
 	Value  []byte
 	Expiry time.Duration
 	// Occurrence is the name of a grafeas occurrence to push to grafeas
-	Occurrence   string
+	Occurrence string
+	// Resource is the resource (e.g. fully qualified image name) of the resource metadata is for
+	Resource     string
 	Build        *grafeas.V1beta1buildDetails
 	DerivedImage *grafeas.V1beta1imageDetails
 	Attestation  *grafeas.V1beta1attestationDetails
