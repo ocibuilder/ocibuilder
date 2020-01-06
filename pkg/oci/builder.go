@@ -77,6 +77,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- types.OCIBuildR
 				Dockerfile: opt.Dockerfile,
 				Tags:       []string{imageName},
 				Context:    buildContext,
+				Labels:     opt.Labels,
 			},
 		}
 

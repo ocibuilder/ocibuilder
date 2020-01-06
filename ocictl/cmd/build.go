@@ -59,7 +59,7 @@ func newBuildCmd(out io.Writer) *cobra.Command {
 	f := cmd.Flags()
 	f.StringVarP(&bc.name, "name", "n", "", "Specify the name of your build or defined in ocibuilder.yaml")
 	f.StringVarP(&bc.path, "path", "p", "", "Path to your ocibuilder.yaml or build.yaml. By default will look in the current working directory")
-	f.StringVarP(&bc.builder, "builder", "b", "docker", "Choose either docker and buildah as the targetted image builder. By default the builder is docker.")
+	f.StringVarP(&bc.builder, "builder", "b", "docker", "Choose either docker and buildah as the targeted image builder. By default the builder is docker.")
 	f.BoolVarP(&bc.debug, "debug", "d", false, "Turn on debug logging")
 	f.StringVarP(&bc.overlay, "overlay", "o", "", "Path to your overlay.yaml file")
 	f.StringVarP(&bc.storageDriver, "storage-driver", "s", "overlay", "Storage-driver for Buildah. vfs enables the use of buildah within an unprivileged container. By default the storage driver is overlay")
@@ -142,6 +142,7 @@ func (b *buildCmd) run(args []string) error {
 			{
 				if err != nil {
 					logger.WithError(err).Errorln("error received from error channel whilst building")
+					builder.Clean()
 					return err
 				}
 			}

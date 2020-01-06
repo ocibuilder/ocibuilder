@@ -34,7 +34,9 @@ import (
 )
 
 const (
+	// DefaultRemote is the default remote
 	DefaultRemote = "origin"
+	// DefaultBranch is the default branch
 	DefaultBranch = "master"
 )
 
@@ -45,6 +47,7 @@ var (
 	}
 )
 
+// GitBuildContextReader is the context reader for pulling context from git
 type GitBuildContextReader struct {
 	k8sClient    kubernetes.Interface
 	buildContext *v1alpha1.GitContext

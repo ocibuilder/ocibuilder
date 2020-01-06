@@ -50,13 +50,20 @@ func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepath
 	if filepath != "" {
 		dir = filepath
 	}
-
-	r.Logger.WithField("filepath", dir+"/ocibuilder.yaml").Debugln("looking for spec.yaml")
+	r.Logger.WithField("filepath", dir+"/ocibuilder.yaml").Debugln("looking for ocibuilder.yaml")
 	file, err := ioutil.ReadFile(dir + "/ocibuilder.yaml")
 	if err != nil {
-		r.Logger.Infoln("spec file not found, looking for individual specifications...")
+		r.Logger.Infoln("ocibuilder.yaml file not found, looking for individual specifications...")
 		if err := r.readIndividualSpecs(spec, dir); err != nil {
 			return errors.Wrap(err, "failed to read individual specs")
+		}
+	}
+
+	if overlayPath != "" {
+		r.Logger.WithField("overlayPath", overlayPath).Debugln("overlay path not empty - looking for overlay file")
+		file, err = applyOverlay(file, overlayPath)
+		if err != nil {
+			return errors.Wrap(err, "failed to apply overlay to spec at path")
 		}
 	}
 
@@ -66,14 +73,6 @@ func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepath
 
 	if err := validate.Validate(spec); err != nil {
 		return errors.Wrap(err, "failed to validate spec at directory")
-	}
-
-	if overlayPath != "" {
-		r.Logger.WithField("overlayPath", overlayPath).Debugln("overlay path not empty - looking for overlay file")
-		file, err = applyOverlay(file, overlayPath)
-		if err != nil {
-			return errors.Wrap(err, "failed to apply overlay to spec at path")
-		}
 	}
 
 	if spec.Params != nil {
@@ -116,17 +115,10 @@ func (r Reader) readIndividualSpecs(spec *v1alpha1.OCIBuilderSpec, path string) 
 
 // applyOverlay applys a ytt overalay to the specification
 func applyOverlay(yamlTemplate []byte, overlayPath string) ([]byte, error) {
-	file, err := os.Open(overlayPath)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to read overlay file")
-	}
 
 	yttOverlay := overlay.YttOverlay{
 		Spec: yamlTemplate,
-		Overlay: overlay.OverlayFile{
-			Path: overlayPath,
-			File: file,
-		},
+		Path: overlayPath,
 	}
 
 	overlayedSpec, err := yttOverlay.Apply()

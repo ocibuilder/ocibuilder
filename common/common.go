@@ -100,3 +100,8 @@ const (
 	CmdVersion = "version"
 	CmdOcictl  = "ocictl"
 )
+
+// Remote paths
+const (
+	OverlayPath = "./overlay_DOWNLOAD.yaml"
+)

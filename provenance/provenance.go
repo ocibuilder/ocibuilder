@@ -18,9 +18,10 @@ package provenance
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"io"
 	"runtime"
+
+	"github.com/sirupsen/logrus"
 )
 
 // Version information set by link flags during build. We fall back to these sane
@@ -98,12 +99,14 @@ func GetProvenance() Provenance {
 	}
 }
 
+// Print prints the provenance of the ocibuilder
 func (v Provenance) Print(w io.Writer) {
 	if _, err := fmt.Fprintf(w, "%s\n", v.Version); err != nil {
 		logrus.WithError(err).Errorln("error printing ocictl version")
 	}
 }
 
+// PrintVerbose prints the verbose provenance of the ocibuilder
 func (v Provenance) PrintVerbose(w io.Writer) {
 	if _, err := fmt.Fprintf(w, "Version: %s, Build Date: %s, Git Commit: %s, OS: %s, arch: %s\n",
 		v.Version,

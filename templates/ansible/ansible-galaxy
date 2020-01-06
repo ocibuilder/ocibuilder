@@ -6,5 +6,5 @@ COPY files files
 COPY vars vars
 COPY tasks tasks
 ADD *.yaml ./
-RUN if [ -f {{ .Requirements }} ]; then annsible-galaxy install -r {{ .Requirements }}; fi
+RUN if [ -f {{ .Requirements }} ]; then ansible-galaxy install -r {{ .Requirements }}; fi
 RUN ansible-galaxy install {{ .Name }}

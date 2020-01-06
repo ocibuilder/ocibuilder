@@ -63,7 +63,7 @@ func newPushCmd(out io.Writer) *cobra.Command {
 	}
 	f := cmd.Flags()
 	f.StringVarP(&pc.path, "path", "p", "", "Path to your ocibuilder.yaml or push.yaml. By default will look in the current working directory")
-	f.StringVarP(&pc.builder, "builder", "b", "docker", "Choose either docker and buildah as the targetted image builder. By default the builder is docker.")
+	f.StringVarP(&pc.builder, "builder", "b", "docker", "Choose either docker and buildah as the targeted image builder. By default the builder is docker.")
 	f.BoolVarP(&pc.debug, "debug", "d", false, "Turn on debug logging")
 	return cmd
 }

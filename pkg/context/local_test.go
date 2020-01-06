@@ -62,4 +62,4 @@ var buildContext = &v1alpha1.BuildContext{
 	},
 }
 
-var expectedFileNames = []string{"main.go", "ocibuilder.yaml"}
+var expectedFileNames = []string{"Dockerfile", "main.go", "ocibuilder.yaml", "overlay.yaml"}

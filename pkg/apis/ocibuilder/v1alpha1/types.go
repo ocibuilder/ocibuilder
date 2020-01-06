@@ -344,6 +344,9 @@ type ImageBuildArgs struct {
 	// defaults to LocalContext in current working directory
 	// +optional
 	BuildContextPath string `json:"buildContextPath,omitempty" protobuf:"bytes,6,opt,name=buildContextPath"`
+	// Labels for the step
+	// +optional
+	Labels map[string]string `json:"labels,omitempty" protobuf:"bytes,7,opt,name=labels"`
 }
 
 // BuildContext stores the chosen build context for your build, this can be Local, S3 or Git
@@ -544,4 +547,26 @@ type JobTemplate struct {
 	// List of environment variables to set in the container.
 	// +optional
 	Env []corev1.EnvVar `json:"env,omitempty" protobuf:"bytes,7,rep,name=env"`
+}
+
+// GenerateTemplate is the template for a docker generate
+type GenerateTemplate struct {
+	ImageName string
+	Tag       string
+	Stages    []string
+	Templates []string
+}
+
+// StageGenTemplate is the template for a stage in docker generate
+type StageGenTemplate struct {
+	Base         string
+	BaseTag      string
+	StageName    string
+	TemplateName string
+}
+
+// BuildGenTemplate is the template for a build template in docker generate
+type BuildGenTemplate struct {
+	Name string
+	Cmds []string
 }

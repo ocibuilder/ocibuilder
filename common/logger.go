@@ -22,7 +22,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// Create a new instance of the logger. You can have any number of instances.
+// Logger is a new instance of the logger. You can have any number of instances.
 var Logger = GetLogger(false)
 
 // GetLogger returns a new logger

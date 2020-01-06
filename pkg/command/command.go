@@ -1,19 +1,3 @@
-/*
-Copyright 2019 BlackRock, Inc.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-	http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package command
 
 import (
@@ -25,24 +9,29 @@ import (
 
 var executor = exec.Command
 
+// Command is a single executable command
 type Command struct {
-	Name    string
-	Command string
-	Flags   []Flag
-	Args    []string
+	name    string
+	command string
+	flags   []Flag
+	args    []string
 
-	ExecCmd *exec.Cmd
+	execCmd *exec.Cmd
 }
 
+// CommandBuilder is a builder for a Command
 type CommandBuilder struct {
-	Name    string
-	Command string
-	Flags   []Flag
-	Args    []string
+	name    string
+	command string
+	flags   []Flag
+	args    []string
 }
 
+// Flag is a command flag
 type Flag struct {
-	Name  string
+	// Name is the name of the flag
+	Name string
+	// Value is the value of the flag
 	Value string
 	// Short determines whether the flag used is a short variation or not
 	Short bool
@@ -50,21 +39,24 @@ type Flag struct {
 	OmitEmpty bool
 }
 
+// Build builds a command from a CommandBuilder
 func (builder *CommandBuilder) Build() Command {
 	return Command{
-		Name:    builder.Name,
-		Command: builder.Command,
-		Flags:   builder.Flags,
-		Args:    builder.Args,
+		name:    builder.name,
+		command: builder.command,
+		flags:   builder.flags,
+		args:    builder.args,
 	}
 }
 
-func (builder *CommandBuilder) SetCommand(command string) *CommandBuilder {
-	builder.Command = command
+// Command specifies the command to exec for the builder
+func (builder *CommandBuilder) Command(command string) *CommandBuilder {
+	builder.command = command
 	return builder
 }
 
-func (builder *CommandBuilder) SetFlags(flags ...Flag) *CommandBuilder {
+// Flags specifies the flags to exec for the builder
+func (builder *CommandBuilder) Flags(flags ...Flag) *CommandBuilder {
 	var builderFlags []Flag
 	for _, f := range flags {
 		if !f.OmitEmpty {
@@ -74,38 +66,42 @@ func (builder *CommandBuilder) SetFlags(flags ...Flag) *CommandBuilder {
 		}
 	}
 
-	builder.Flags = builderFlags
+	builder.flags = builderFlags
 	return builder
 }
 
-func (builder *CommandBuilder) SetArgs(args ...string) *CommandBuilder {
-	builder.Args = args
+// Args specifies the args to exec for the builder
+func (builder *CommandBuilder) Args(args ...string) *CommandBuilder {
+	builder.args = args
 	return builder
 }
 
+// Builder initializes the CommandBuilder with default values
 func Builder(name string) *CommandBuilder {
 	cmdBuilder := new(CommandBuilder)
-	cmdBuilder.Args = make([]string, 0)
-	cmdBuilder.Command = ""
-	cmdBuilder.Flags = make([]Flag, 0)
-	cmdBuilder.Name = name
+	cmdBuilder.args = make([]string, 0)
+	cmdBuilder.command = ""
+	cmdBuilder.flags = make([]Flag, 0)
+	cmdBuilder.name = name
 	return cmdBuilder
 }
 
+// Exec executes a command, returning readers for both stdout and stderr pipes
 func (c *Command) Exec() (stdout io.ReadCloser, stderr io.ReadCloser, err error) {
-	command := c.ConstructCommand()
-	cmd := executor(c.Name, command...)
+	command := c.constructCommand()
+	cmd := executor(c.name, command...)
 	stdout, _ = cmd.StdoutPipe()
 	stderr, _ = cmd.StderrPipe()
 	if err := cmd.Start(); err != nil {
 		return nil, nil, err
 	}
-	c.ExecCmd = cmd
+	c.execCmd = cmd
 	return stdout, stderr, nil
 }
 
+// Wait calls wait on a started exec command
 func (c Command) Wait() error {
-	if err := c.ExecCmd.Wait(); err != nil {
+	if err := c.execCmd.Wait(); err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {
 			fmt.Printf("Exit code is %d\n", exitError.ExitCode())
 			errorString := fmt.Sprintf("error in executing cmd, exited with code %d", exitError.ExitCode())
@@ -115,10 +111,10 @@ func (c Command) Wait() error {
 	return nil
 }
 
-func (c Command) ConstructCommand() []string {
-	var commandVector = []string{c.Command}
+func (c Command) constructCommand() []string {
+	var commandVector = []string{c.command}
 
-	for _, flag := range c.Flags {
+	for _, flag := range c.flags {
 		if flag.Short {
 			commandVector = append(commandVector, fmt.Sprintf("-%s", flag.Name), flag.Value)
 		} else {
@@ -126,5 +122,5 @@ func (c Command) ConstructCommand() []string {
 		}
 	}
 
-	return append(commandVector, c.Args...)
+	return append(commandVector, c.args...)
 }

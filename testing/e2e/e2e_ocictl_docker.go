@@ -46,15 +46,27 @@ var _ = Describe("ocictl docker", func() {
 	})
 
 	It("completes a build and exits with status code 0", func() {
-		args := []string{"build", "-p", "./resources/go-test-service"}
+		args := []string{"build", "-p", utils.BuildPath}
 		session = utils.RunOcictl(ocictlPath, args)
 		Eventually(func() *gexec.Session {
 			return session
 		}, 30).Should(gexec.Exit(0))
 	}, 30)
 
+	It("completes a build with an overlay and exits with status code 0", func() {
+		args := []string{"build", "-p", utils.BuildPath, "--overlay", utils.OverlayPath}
+		session = utils.RunOcictl(ocictlPath, args)
+		Eventually(func() *gexec.Session {
+			return session
+		}, 30).Should(gexec.Exit(0))
+
+		inspectSession := utils.RunDockerInspect(utils.ImageNameOverlayed)
+		Eventually(inspectSession).Should(gexec.Exit(0))
+
+	}, 30)
+
 	It("completes a push and exits with status code 0", func() {
-		args := []string{"push", "-p", "./resources/go-test-service"}
+		args := []string{"push", "-p", utils.BuildPath}
 		session = utils.RunOcictl(ocictlPath, args)
 		Eventually(func() *gexec.Session {
 			return session
@@ -62,7 +74,7 @@ var _ = Describe("ocictl docker", func() {
 	}, 20)
 
 	It("completes a pull and exits with status code 0", func() {
-		args := []string{"pull", "-i", "ocibuildere2e/go-test-service:v0.1.0", "-p", "./resources/go-test-service"}
+		args := []string{"pull", "-i", utils.ImageName, "-p", utils.BuildPath}
 		session = utils.RunOcictl(ocictlPath, args)
 		Eventually(func() *gexec.Session {
 			return session

@@ -29,12 +29,12 @@ var log = common.GetLogger(false)
 
 // OutputJson streams and formats the output to stdout from returned ReadClosers by docker
 // commands.
-func OutputJson(ouput io.ReadCloser) error {
+func OutputJson(output io.ReadCloser) error {
 
 	termFd, isTerm := term.GetFdInfo(os.Stdout)
 
 	err := jsonmessage.DisplayJSONMessagesStream(
-		ouput,
+		output,
 		os.Stdout,
 		termFd,
 		isTerm,
@@ -54,11 +54,11 @@ func OutputJson(ouput io.ReadCloser) error {
 func Output(stdout io.ReadCloser, stderr io.ReadCloser) error {
 	//TODO: error with premature read |0: file already closed when finished reading out, investigate further
 	if _, err := io.Copy(os.Stdout, stderr); err != nil {
-		log.WithError(err).Warnln("error copying output from stderr to stdout, could impact response output")
+		log.WithError(err).Debugln("error copying output from stderr to stdout, could impact response output")
 	}
 
 	if _, err := io.Copy(os.Stdout, stdout); err != nil {
-		log.WithError(err).Warnln("error copying output from stdout to stdout, could impact response output")
+		log.WithError(err).Debugln("error copying output from stdout to stdout, could impact response output")
 	}
 	return nil
 }

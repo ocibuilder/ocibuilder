@@ -21,8 +21,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"text/template"
 
 	"github.com/gobuffalo/packr"
@@ -51,6 +53,8 @@ func ParseBuildSpec(spec *v1alpha1.BuildSpec) ([]v1alpha1.ImageBuildArgs, error)
 		if err != nil {
 			return nil, err
 		}
+		cleanOnKill(buildContextPath)
+
 		dockerfilePath, err := GenerateDockerfile(step, spec.Templates, buildContextPath+common.ContextDirectory)
 
 		if err := context.InjectDockerfile(buildContextPath, dockerfilePath); err != nil {
@@ -76,6 +80,7 @@ func ParseBuildSpec(spec *v1alpha1.BuildSpec) ([]v1alpha1.ImageBuildArgs, error)
 			Dockerfile:       filepath.Base(dockerfilePath),
 			Purge:            step.Purge,
 			BuildContextPath: buildContextPath,
+			Labels:           step.Labels,
 		}
 		imageBuilds = append(imageBuilds, imageBuild)
 	}
@@ -156,6 +161,8 @@ func ParseAnsibleCommands(ansibleStep *v1alpha1.AnsibleStep) ([]byte, error) {
 	var buf bytes.Buffer
 	var dockerfile []byte
 
+	// add newline to buffer before appending ansible commands
+	buf.WriteString("\n")
 	box := packr.NewBox("../../templates/ansible")
 
 	if ansibleStep.Local != nil {
@@ -266,4 +273,16 @@ func addCommandsToDockerfile(commands []v1alpha1.Command, dockerfile []byte) []b
 		dockerfile = append(dockerfile, line...)
 	}
 	return dockerfile
+}
+
+func cleanOnKill(contextPath string) {
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		<-sigs
+		if err := os.RemoveAll(contextPath + "/ocib"); err != nil {
+			fmt.Println("error cleaning up files", err)
+		}
+		os.Exit(1)
+	}()
 }

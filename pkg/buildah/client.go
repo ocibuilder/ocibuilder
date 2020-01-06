@@ -20,23 +20,29 @@ import (
 	"fmt"
 	"io"
 
-	dockertypes "github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/registry"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/command"
-	"github.com/ocibuilder/ocibuilder/pkg/types"
 	"github.com/sirupsen/logrus"
 )
 
+// Client is the client used for building with Buildah using the ocibuilder
 type Client struct {
 	Logger *logrus.Logger
 }
 
-func (cli Client) ImageBuild(options types.OCIBuildOptions) (types.OCIBuildResponse, error) {
+// ImageBuild conducts an image build with Buildah using the ocibuilder
+func (cli Client) ImageBuild(options v1alpha1.OCIBuildOptions) (v1alpha1.OCIBuildResponse, error) {
 
 	buildFlags := []command.Flag{
 		{Name: "f", Value: options.Dockerfile, Short: true, OmitEmpty: true},
 		{Name: "storage-driver", Value: options.StorageDriver, Short: false, OmitEmpty: true},
 		{Name: "t", Value: options.Tags[0], Short: true, OmitEmpty: true},
+	}
+
+	for _, l := range options.Labels {
+		buildFlags = append(buildFlags, command.Flag{Name: "label", Value: l, Short: false, OmitEmpty: true})
 	}
 
 	cmd := command.Builder("buildah").Command("bud").Flags(buildFlags...).Args(options.ContextPath).Build()
@@ -45,10 +51,10 @@ func (cli Client) ImageBuild(options types.OCIBuildOptions) (types.OCIBuildRespo
 	stdout, stderr, err := execute(&cmd)
 	if err != nil {
 		cli.Logger.WithError(err).Errorln("error building image...")
-		return types.OCIBuildResponse{}, err
+		return v1alpha1.OCIBuildResponse{}, err
 	}
-	return types.OCIBuildResponse{
-		ImageBuildResponse: dockertypes.ImageBuildResponse{
+	return v1alpha1.OCIBuildResponse{
+		ImageBuildResponse: types.ImageBuildResponse{
 			Body: stdout,
 		},
 		Exec:   &cmd,
@@ -56,7 +62,8 @@ func (cli Client) ImageBuild(options types.OCIBuildOptions) (types.OCIBuildRespo
 	}, nil
 }
 
-func (cli Client) ImagePull(options types.OCIPullOptions) (types.OCIPullResponse, error) {
+// ImagePull conducts an image pull with Buildah using the ocibuilder
+func (cli Client) ImagePull(options v1alpha1.OCIPullOptions) (v1alpha1.OCIPullResponse, error) {
 
 	pullFlags := []command.Flag{
 		// Buildah registry auth in format username[:password]
@@ -69,16 +76,17 @@ func (cli Client) ImagePull(options types.OCIPullOptions) (types.OCIPullResponse
 	stdout, stderr, err := execute(&cmd)
 	if err != nil {
 		cli.Logger.WithError(err).Errorln("error building image...")
-		return types.OCIPullResponse{}, err
+		return v1alpha1.OCIPullResponse{}, err
 	}
-	return types.OCIPullResponse{
+	return v1alpha1.OCIPullResponse{
 		Body:   stdout,
 		Exec:   &cmd,
 		Stderr: stderr,
 	}, nil
 }
 
-func (cli Client) ImagePush(options types.OCIPushOptions) (types.OCIPushResponse, error) {
+// ImagePush conducts an image push with Buildah using the ocibuilder
+func (cli Client) ImagePush(options v1alpha1.OCIPushOptions) (v1alpha1.OCIPushResponse, error) {
 
 	pushFlags := []command.Flag{
 		// Buildah registry auth in format username[:password]
@@ -91,16 +99,17 @@ func (cli Client) ImagePush(options types.OCIPushOptions) (types.OCIPushResponse
 	stdout, stderr, err := execute(&cmd)
 	if err != nil {
 		cli.Logger.WithError(err).Errorln("error building image...")
-		return types.OCIPushResponse{}, err
+		return v1alpha1.OCIPushResponse{}, err
 	}
-	return types.OCIPushResponse{
+	return v1alpha1.OCIPushResponse{
 		Body:   stdout,
 		Exec:   &cmd,
 		Stderr: stderr,
 	}, nil
 }
 
-func (cli Client) ImageRemove(options types.OCIRemoveOptions) (types.OCIRemoveResponse, error) {
+// ImageRemove conducts an image remove with Buildah using the ocibuilder
+func (cli Client) ImageRemove(options v1alpha1.OCIRemoveOptions) (v1alpha1.OCIRemoveResponse, error) {
 
 	cmd := command.Builder("buildah").Command("rmi").Args(options.Image).Build()
 	cli.Logger.WithField("cmd", cmd).Debugln("executing remove with command")
@@ -108,10 +117,10 @@ func (cli Client) ImageRemove(options types.OCIRemoveOptions) (types.OCIRemoveRe
 	_, _, err := execute(&cmd)
 	if err != nil {
 		cli.Logger.WithError(err).Errorln("error building image...")
-		return types.OCIRemoveResponse{}, err
+		return v1alpha1.OCIRemoveResponse{}, err
 	}
-	return types.OCIRemoveResponse{
-		Response: []dockertypes.ImageDeleteResponseItem{
+	return v1alpha1.OCIRemoveResponse{
+		Response: []types.ImageDeleteResponseItem{
 			{
 				Deleted: options.Image,
 			},
@@ -120,7 +129,8 @@ func (cli Client) ImageRemove(options types.OCIRemoveOptions) (types.OCIRemoveRe
 	}, nil
 }
 
-func (cli Client) RegistryLogin(options types.OCILoginOptions) (types.OCILoginResponse, error) {
+// RegistryLogin conducts a registry login with Buildah using the ocibuilder
+func (cli Client) RegistryLogin(options v1alpha1.OCILoginOptions) (v1alpha1.OCILoginResponse, error) {
 
 	loginFlags := []command.Flag{
 		{Name: "u", Value: options.Username, Short: true, OmitEmpty: true},
@@ -133,10 +143,10 @@ func (cli Client) RegistryLogin(options types.OCILoginOptions) (types.OCILoginRe
 	_, _, err := execute(&cmd)
 	if err != nil {
 		cli.Logger.WithError(err).Errorln("error building image...")
-		return types.OCILoginResponse{}, err
+		return v1alpha1.OCILoginResponse{}, err
 	}
 
-	return types.OCILoginResponse{
+	return v1alpha1.OCILoginResponse{
 		AuthenticateOKBody: registry.AuthenticateOKBody{
 			Status: "login completed",
 		},
@@ -144,7 +154,8 @@ func (cli Client) RegistryLogin(options types.OCILoginOptions) (types.OCILoginRe
 	}, nil
 }
 
-func (cli Client) GenerateAuthRegistryString(auth dockertypes.AuthConfig) string {
+// GenerateAuthRegistryString generates the auth registry string for pushing and pulling images targeting Buildah
+func (cli Client) GenerateAuthRegistryString(auth types.AuthConfig) string {
 	return fmt.Sprintf("%s:%s", auth.Username, auth.Password)
 }
 

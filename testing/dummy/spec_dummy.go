@@ -18,12 +18,14 @@ package dummy
 
 import "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 
+// Spec is a dummy spec
 var Spec = v1alpha1.OCIBuilderSpec{
 	Build: BuildSpec,
 	Login: LoginSpec,
 	Push:  PushSpec,
 }
 
+// BuildSpec is a dummy build spec
 var BuildSpec = &v1alpha1.BuildSpec{
 	Steps: []v1alpha1.BuildStep{
 		{
@@ -56,6 +58,7 @@ var BuildSpec = &v1alpha1.BuildSpec{
 	},
 }
 
+// LoginSpec is a dummy login spec
 var LoginSpec = []v1alpha1.LoginSpec{
 	{
 		Registry: "example-registry",
@@ -69,6 +72,7 @@ var LoginSpec = []v1alpha1.LoginSpec{
 	},
 }
 
+// PushSpec is a dummy push spec
 var PushSpec = []v1alpha1.PushSpec{
 	{
 		Registry: "example-registry",
