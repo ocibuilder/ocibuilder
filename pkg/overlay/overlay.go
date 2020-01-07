@@ -27,7 +27,7 @@ import (
 	cmdcore "github.com/k14s/ytt/pkg/cmd/core"
 	cmdtpl "github.com/k14s/ytt/pkg/cmd/template"
 	"github.com/k14s/ytt/pkg/files"
-	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/pkg/util"
 )
 
 // YttOverlay is the struct for handling overlays using ytt library https://github.com/k14s/ytt
@@ -64,10 +64,10 @@ func (y YttOverlay) Apply() ([]byte, error) {
 
 	defer func() {
 		if r := recover(); r != nil {
-			common.Logger.Warnln("panic recovered to execute final cleanup", r)
+			util.Logger.Warnln("panic recovered to execute final cleanup", r)
 		}
 		if err := y.Overlay.File.Close(); err != nil {
-			common.Logger.WithError(err).Errorln("error closing file")
+			util.Logger.WithError(err).Errorln("error closing file")
 		}
 	}()
 

@@ -8,8 +8,8 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/client"
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/util"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -44,7 +44,7 @@ func TestClient_GenerateAuthRegistryString(t *testing.T) {
 }
 
 var cli = Client{
-	Logger:    common.GetLogger(true),
+	Logger:    util.GetLogger(true),
 	APIClient: testClient{},
 }
 

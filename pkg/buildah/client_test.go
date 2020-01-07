@@ -6,9 +6,9 @@ import (
 	"testing"
 
 	"github.com/docker/docker/api/types"
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/command"
+	"github.com/ocibuilder/ocibuilder/pkg/util"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -67,7 +67,7 @@ func TestClient_GenerateAuthRegistryString(t *testing.T) {
 }
 
 var cli = Client{
-	Logger: common.GetLogger(true),
+	Logger: util.GetLogger(true),
 }
 
 var ociBuildOptions = v1alpha1.OCIBuildOptions{

@@ -19,11 +19,11 @@ package main
 import (
 	"os"
 
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/ocictl/cmd"
+	"github.com/ocibuilder/ocibuilder/pkg/util"
 )
 
-var log = common.GetLogger(false)
+var log = util.GetLogger(false)
 
 func main() {
 	cmd := cmd.NewRootCmd(os.Args[1:])

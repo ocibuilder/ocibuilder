@@ -17,8 +17,8 @@ limitations under the License.
 package ocibuilder
 
 import (
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/common"
 	"github.com/ocibuilder/ocibuilder/pkg/validate"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"

@@ -19,8 +19,8 @@ package validate
 import (
 	"os"
 
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/common"
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
 )

@@ -20,8 +20,9 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/common"
+	"github.com/ocibuilder/ocibuilder/pkg/util"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/ssh"
 	"gopkg.in/src-d/go-git.v4"
@@ -78,11 +79,11 @@ func (contextReader *GitBuildContextReader) getGitAuth() (transport.AuthMethod, 
 	if contextReader.buildContext.SSHKeyPath != "" {
 		return getSSHKeyAuth(contextReader.buildContext.SSHKeyPath)
 	}
-	username, err := common.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.Username)
+	username, err := util.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.Username)
 	if err != nil {
 		return nil, err
 	}
-	password, err := common.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.Password)
+	password, err := util.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.Password)
 	if err != nil {
 		return nil, err
 	}

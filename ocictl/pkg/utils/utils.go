@@ -22,10 +22,10 @@ import (
 
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/docker/pkg/term"
-	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/pkg/util"
 )
 
-var log = common.GetLogger(false)
+var log = util.GetLogger(false)
 
 // OutputJson streams and formats the output to stdout from returned ReadClosers by docker
 // commands.

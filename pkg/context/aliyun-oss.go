@@ -21,8 +21,9 @@ import (
 	"os"
 
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/common"
+	"github.com/ocibuilder/ocibuilder/pkg/util"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -36,11 +37,11 @@ type AliyunOSSBuildContextReader struct {
 
 // Read reads and stores build context from OSS
 func (contextReader *AliyunOSSBuildContextReader) Read() (string, error) {
-	accessId, err := common.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.AccessId)
+	accessId, err := util.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.AccessId)
 	if err != nil {
 		return "", err
 	}
-	accessSecret, err := common.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.AccessSecret)
+	accessSecret, err := util.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.AccessSecret)
 	if err != nil {
 		return "", err
 	}
@@ -62,7 +63,7 @@ func (contextReader *AliyunOSSBuildContextReader) Read() (string, error) {
 	if err := bucket.GetObjectToFile(contextReader.buildContext.Bucket.Key, contextFilePath); err != nil {
 		return "", err
 	}
-	if err := common.UntarFile(contextFilePath, common.ContextDirectoryUncompressed); err != nil {
+	if err := util.UntarFile(contextFilePath, common.ContextDirectoryUncompressed); err != nil {
 		return "", err
 	}
 	return common.ContextDirectoryUncompressed, nil

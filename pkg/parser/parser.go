@@ -29,9 +29,10 @@ import (
 
 	"github.com/gobuffalo/packr"
 	"github.com/moby/buildkit/frontend/dockerfile/parser"
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/common"
 	"github.com/ocibuilder/ocibuilder/pkg/context"
+	"github.com/ocibuilder/ocibuilder/pkg/util"
 	"github.com/ocibuilder/ocibuilder/pkg/validate"
 	"github.com/pkg/errors"
 )
@@ -65,11 +66,11 @@ func ParseBuildSpec(spec *v1alpha1.BuildSpec) ([]v1alpha1.ImageBuildArgs, error)
 		if err != nil {
 			for _, args := range imageBuilds {
 				if err := os.Remove(args.Dockerfile); err != nil {
-					common.Logger.WithError(err).Errorln("error cleaning up generated files")
+					util.Logger.WithError(err).Errorln("error cleaning up generated files")
 				}
 			}
 			if err := os.Remove(dockerfilePath); err != nil {
-				common.Logger.WithError(err).Errorln("error cleaning up generated files")
+				util.Logger.WithError(err).Errorln("error cleaning up generated files")
 			}
 			return nil, err
 		}
@@ -213,10 +214,10 @@ func ParseDockerCommands(dockerStep *v1alpha1.DockerStep) ([]byte, error) {
 		}
 		defer func() {
 			if r := recover(); r != nil {
-				common.Logger.Warnln("panic recovered to execute final cleanup", r)
+				util.Logger.Warnln("panic recovered to execute final cleanup", r)
 			}
 			if err := file.Close(); err != nil {
-				common.Logger.WithError(err).Errorln("error closing file")
+				util.Logger.WithError(err).Errorln("error closing file")
 			}
 		}()
 		res, err := parser.Parse(file)
