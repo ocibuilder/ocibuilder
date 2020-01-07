@@ -17,9 +17,12 @@ limitations under the License.
 package oci
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"os"
 
 	"github.com/docker/docker/api/types"
@@ -86,6 +89,19 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 			log.WithError(err).Errorln("error building image")
 			errChan <- err
 			return
+		}
+
+		if spec.Metadata != nil {
+			log.Debugln("metadata specification present")
+
+			mw := NewMetadataWriter(log, spec.Metadata.Store)
+
+			var buildBuffer bytes.Buffer
+			metaReader := io.TeeReader(buildResponse.Body, &buildBuffer)
+			mw.ParseResponseMetadata(ioutil.NopCloser(metaReader))
+
+			// Reassign body after being read for metadata with copied buffer
+			buildResponse.Body = ioutil.NopCloser(&buildBuffer)
 		}
 
 		res <- buildResponse

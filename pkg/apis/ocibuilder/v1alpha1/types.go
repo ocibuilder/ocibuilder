@@ -64,7 +64,7 @@ const (
 	// Attestation is attestation metadata
 	Attestation MetadataType = "attestation"
 	// DerviedImage any metadata related to the derived image
-	DerivedImaged MetadataType = "derived_image"
+	DerivedImaged MetadataType = "derived-image"
 )
 
 // OCIBuilder is the definition of a ocibuilder resource
@@ -107,6 +107,10 @@ type OCIBuilderSpec struct {
 	// Defaults to docker
 	// +optional
 	Daemon bool `json:"daemon,omitempty" protobuf:"bytes,5,opt,name=daemon"`
+	// Configuration for storing build metadata in an external Metadata store.
+	// Defaults to Grafeas as the chosen metadata store
+	// +optional
+	Metadata *BuildMetadata `json:"metadata,omitempty" protobuf:"bytes,6,opt,name=metadata"`
 }
 
 // OCIBuilderStatus holds the status of a OCIBuilder resource
@@ -648,9 +652,9 @@ type BuildGenTemplate struct {
 }
 
 // Meta is where metadata to store is defined in the ocibuilder specification
-type Meta struct {
-	// Type is the type of metadata store
-	Type MetadataStoreType `json:"type,omitempty" protobuf:"bytes,1,opt,name=type"`
+type BuildMetadata struct {
+	// MetdataStore is the metadata store to push metadata to
+	Store MetadataStore `json:"type,omitempty" protobuf:"bytes,1,opt,name=type"`
 	// Key is the key used to sign images if you require attestation
 	// +optional
 	Key string `json:"key,omitempty" protobuf:"bytes,2,opt,name=key"`
@@ -660,10 +664,10 @@ type Meta struct {
 	Data []MetadataType `json:"data,omitempty" protobuf:"bytes,4,opt,name=data"`
 }
 
-// MetadataStoreType is the type of metadata store to push metadata to
-type MetadataStoreType struct {
+// MetadataStore is the metadata store to push metadata to
+type MetadataStore struct {
 	// Grafeas is the Grafeas metadata store
-	Grafeas Grafeas `json:"grafeas,omitempty" protobuf:"bytes,1,opt,name=grafeas"`
+	Grafeas *Grafeas `json:"grafeas,omitempty" protobuf:"bytes,1,opt,name=grafeas"`
 }
 
 // Grafeas is the type defining the Grafeas metadata store

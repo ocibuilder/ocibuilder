@@ -31,7 +31,7 @@ type graf struct {
 	// Client is the grafeas API client
 	Client *grafeas.APIClient
 	// Options stores the options for pushing to Grafeas
-	Options v1alpha1.Grafeas
+	Options *v1alpha1.Grafeas
 	// Logger is the logger
 	Logger *logrus.Logger
 }
@@ -68,12 +68,14 @@ func (g *graf) Write(rec ...*store.Record) error {
 
 	}
 
+	parent := fmt.Sprintf("projects/%s", g.Options.Project)
 	req := grafeas.V1beta1BatchCreateOccurrencesRequest{
-		Parent:      "",
+		// The name of the project in the form of `projects/[PROJECT_ID]`, under which the occurrences are to be created.
+		Parent:      parent,
 		Occurrences: occurrenceRequests,
 	}
 
-	res, httpRes, err := g.Client.GrafeasV1Beta1Api.BatchCreateOccurrences(ctx.Background(), g.Options.Project, req)
+	res, httpRes, err := g.Client.GrafeasV1Beta1Api.BatchCreateOccurrences(ctx.Background(), parent, req)
 
 	if err != nil {
 		return err
@@ -94,7 +96,7 @@ func (g *graf) Write(rec ...*store.Record) error {
 	return nil
 }
 
-func NewStore(configuration *grafeas.Configuration, options v1alpha1.Grafeas, logger *logrus.Logger) store.MetaStore {
+func NewStore(configuration *grafeas.Configuration, options *v1alpha1.Grafeas, logger *logrus.Logger) store.MetaStore {
 	cli := grafeas.NewAPIClient(configuration)
 
 	return &graf{
