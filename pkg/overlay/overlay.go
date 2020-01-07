@@ -25,7 +25,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/docker/docker/api/types"
 	cmdcore "github.com/k14s/ytt/pkg/cmd/core"
 	cmdtpl "github.com/k14s/ytt/pkg/cmd/template"
 	"github.com/k14s/ytt/pkg/files"
