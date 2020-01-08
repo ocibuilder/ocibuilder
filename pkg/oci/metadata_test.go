@@ -15,3 +15,17 @@ limitations under the License.
 */
 
 package oci
+
+import "testing"
+
+func TestMetadataWriter_Write(t *testing.T) {
+
+}
+
+func TestMetadataWriter_ParseResponseMetadata(t *testing.T) {
+
+}
+
+func TestNewMetadataWriter(t *testing.T) {
+
+}

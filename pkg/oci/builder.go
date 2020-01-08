@@ -93,12 +93,15 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 
 		if spec.Metadata != nil {
 			log.Debugln("metadata specification present")
-
-			mw := NewMetadataWriter(log, spec.Metadata.Store)
-
 			var buildBuffer bytes.Buffer
 			metaReader := io.TeeReader(buildResponse.Body, &buildBuffer)
+
+			mw := NewMetadataWriter(log, spec.Metadata)
 			mw.ParseResponseMetadata(ioutil.NopCloser(metaReader))
+
+			if err := mw.Write(); err != nil {
+				errChan <- err
+			}
 
 			// Reassign body after being read for metadata with copied buffer
 			buildResponse.Body = ioutil.NopCloser(&buildBuffer)

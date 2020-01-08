@@ -33,15 +33,15 @@ type MetadataWriter struct {
 	Store    store.MetaStore
 }
 
-func (m MetadataWriter) Write() {
-
+func (m MetadataWriter) Write() error {
+	return nil
 }
 
 func (m *MetadataWriter) ParseResponseMetadata(buildResponse io.ReadCloser) {
 
 }
 
-func NewMetadataWriter(logger *logrus.Logger, metadataSpec v1alpha1.BuildMetadata) MetadataWriter {
+func NewMetadataWriter(logger *logrus.Logger, metadataSpec *v1alpha1.BuildMetadata) MetadataWriter {
 	var metaStore store.MetaStore
 
 	if metadataSpec.Store.Grafeas != nil {
