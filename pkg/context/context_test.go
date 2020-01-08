@@ -21,7 +21,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/pkg/util"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -29,7 +29,7 @@ func TestInjectDockerfile(t *testing.T) {
 	err := ioutil.WriteFile("../../testing/dummy/Dockerfile", []byte("FROM alpine\nCOPY . .\n"), 0644)
 	assert.Equal(t, nil, err)
 
-	err = common.TarFile("../../testing/e2e/resources/go-test-service", "../../testing/e2e/resources/go-test-service/ocib/context/context.tar.gz")
+	err = util.TarFile("../../testing/e2e/resources/go-test-service", "../../testing/e2e/resources/go-test-service/ocib/context/context.tar.gz")
 	assert.Equal(t, nil, err)
 
 	err = InjectDockerfile("../../testing/e2e/resources/go-test-service", "../../testing/dummy/Dockerfile")

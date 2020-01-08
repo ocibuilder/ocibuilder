@@ -29,8 +29,9 @@ import (
 	cmdcore "github.com/k14s/ytt/pkg/cmd/core"
 	cmdtpl "github.com/k14s/ytt/pkg/cmd/template"
 	"github.com/k14s/ytt/pkg/files"
-	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/pkg/common"
 	"github.com/ocibuilder/ocibuilder/pkg/request"
+	"github.com/ocibuilder/ocibuilder/pkg/util"
 	"github.com/pkg/errors"
 )
 
@@ -52,16 +53,16 @@ func (y YttOverlay) Apply() ([]byte, error) {
 
 	defer func() {
 		if r := recover(); r != nil {
-			common.Logger.Warnln("panic recovered to execute final cleanup", r)
+			util.Logger.Warnln("panic recovered to execute final cleanup", r)
 		}
 		if err := overlayFile.Close(); err != nil {
-			common.Logger.WithError(err).Errorln("error closing file")
+			util.Logger.WithError(err).Errorln("error closing file")
 		}
 		if err := os.Remove(common.OverlayPath); err != nil {
 			if os.IsNotExist(err) {
 				return
 			}
-			common.Logger.WithError(err).Errorln("error removing file")
+			util.Logger.WithError(err).Errorln("error removing file")
 		}
 	}()
 

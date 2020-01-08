@@ -21,8 +21,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/common"
+	"github.com/ocibuilder/ocibuilder/pkg/util"
 	"github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
 )
@@ -35,7 +36,7 @@ type BuildContextReader interface {
 // GetBuildContextReader returns a build context based on the store
 func GetBuildContextReader(buildContext *v1alpha1.BuildContext, k8sConfigPath string) (BuildContextReader, error) {
 	var k8sClient kubernetes.Interface
-	kubeConfig, err := common.GetClientConfig(k8sConfigPath)
+	kubeConfig, err := util.GetClientConfig(k8sConfigPath)
 	if err == nil {
 		k8sClient, err = kubernetes.NewForConfig(kubeConfig)
 		if err != nil {
@@ -70,7 +71,7 @@ func InjectDockerfile(contextPath string, dockerfilePath string) error {
 	contextDirectoryPath := fmt.Sprintf("%s%s", contextPath, common.ContextDirectory)
 	contextTar := fmt.Sprintf("%s%s", contextDirectoryPath, common.ContextFile)
 
-	if err := common.UntarFile(contextTar, contextDirectoryPath); err != nil {
+	if err := util.UntarFile(contextTar, contextDirectoryPath); err != nil {
 		return errors.Wrap(err, "error extracting original context file at: "+contextTar)
 	}
 
@@ -82,7 +83,7 @@ func InjectDockerfile(contextPath string, dockerfilePath string) error {
 		return errors.Wrap(err, "error attempting to move Dockerfile to new context directory")
 	}
 
-	if err := common.TarFile(contextDirectoryPath, contextDirectoryPath+common.ContextFile); err != nil {
+	if err := util.TarFile(contextDirectoryPath, contextDirectoryPath+common.ContextFile); err != nil {
 		return errors.Wrap(err, "error tarring new directory with injected Dockerfile")
 	}
 

@@ -23,8 +23,8 @@ import (
 	"os"
 
 	"github.com/docker/docker/api/types"
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/common"
 	"github.com/ocibuilder/ocibuilder/pkg/parser"
 	"github.com/ocibuilder/ocibuilder/pkg/validate"
 	"github.com/sirupsen/logrus"
