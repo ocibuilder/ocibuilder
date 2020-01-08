@@ -49,7 +49,7 @@ Read the full [installation guide](https://ocibuilder.github.io/docs/installatio
 
 ## Getting Started
 
-To learn more about the ocibuilder and how to get started take a look at our [quick start](https://github.com/ocibuilder/docs/blob/master/QUICKSTART.md) guide.
+To learn more about the ocibuilder and how to get started take a look at our [quick start](https://ocibuilder.github.io/docs/quickstart/) guide.
 
 ## Documentation
 
