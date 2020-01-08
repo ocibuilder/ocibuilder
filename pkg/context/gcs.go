@@ -22,8 +22,9 @@ import (
 	"os"
 
 	"cloud.google.com/go/storage"
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/common"
+	"github.com/ocibuilder/ocibuilder/pkg/util"
 	"github.com/pkg/errors"
 	"google.golang.org/api/option"
 	"k8s.io/client-go/kubernetes"
@@ -47,7 +48,7 @@ func (contextReader *GCSBuildContextReader) newClient() (*storage.Client, error)
 		return storage.NewClient(ctx, option.WithCredentialsFile(contextReader.buildContext.CredentialsFilePath), option.WithEndpoint(contextReader.buildContext.Endpoint))
 	}
 	if contextReader.buildContext.APIKey != nil {
-		apiKey, err := common.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.APIKey)
+		apiKey, err := util.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.APIKey)
 		if err != nil {
 			return nil, err
 		}
@@ -81,7 +82,7 @@ func (contextReader *GCSBuildContextReader) Read() (string, error) {
 	if _, err := contextFile.Write(contextBody); err != nil {
 		return "", nil
 	}
-	if err := common.UntarFile(contextFilePath, common.ContextDirectoryUncompressed); err != nil {
+	if err := util.UntarFile(contextFilePath, common.ContextDirectoryUncompressed); err != nil {
 		return "", err
 	}
 	return common.ContextDirectoryUncompressed, nil

@@ -20,8 +20,8 @@ import (
 	"io"
 
 	"github.com/gobuffalo/packr"
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/initialize"
+	"github.com/ocibuilder/ocibuilder/pkg/util"
 	"github.com/spf13/cobra"
 )
 
@@ -52,7 +52,7 @@ func (i *initCmd) run(args []string) error {
 	initializer := initialize.Initializer{
 		Box:    packr.NewBox("../../templates/spec"),
 		Dry:    i.dry,
-		Logger: common.GetLogger(i.debug),
+		Logger: util.GetLogger(i.debug),
 	}
 
 	if err := initializer.Basic(); err != nil {
@@ -91,7 +91,7 @@ func newFromDockerCmd(out io.Writer) *cobra.Command {
 func (i *fromDockerCmd) run(args []string) error {
 	initializer := initialize.Initializer{
 		Dry:    i.dry,
-		Logger: common.GetLogger(i.debug),
+		Logger: util.GetLogger(i.debug),
 	}
 
 	if err := initializer.FromDocker(i.imageName, i.path); err != nil {

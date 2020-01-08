@@ -24,8 +24,9 @@ import (
 	"os"
 
 	"github.com/Azure/azure-storage-blob-go/azblob"
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/common"
+	"github.com/ocibuilder/ocibuilder/pkg/util"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -39,15 +40,15 @@ type AzureBlobBuildContextReader struct {
 
 // Read reads the build context from Azure Storage Blob and stores it at a preconfigured path
 func (contextReader *AzureBlobBuildContextReader) Read() (string, error) {
-	accountName, err := common.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.Account)
+	accountName, err := util.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.Account)
 	if err != nil {
 		return "", err
 	}
-	accessKey, err := common.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.AccessKey)
+	accessKey, err := util.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.AccessKey)
 	if err != nil {
 		return "", nil
 	}
-	urlStr, err := common.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.URL)
+	urlStr, err := util.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.URL)
 	if err != nil {
 		return "", err
 	}
@@ -84,7 +85,7 @@ func (contextReader *AzureBlobBuildContextReader) Read() (string, error) {
 	if _, err := contextFile.Write(contextBody); err != nil {
 		return "", nil
 	}
-	if err := common.UntarFile(contextFilePath, common.ContextDirectoryUncompressed); err != nil {
+	if err := util.UntarFile(contextFilePath, common.ContextDirectoryUncompressed); err != nil {
 		return "", err
 	}
 	return common.ContextDirectoryUncompressed, nil

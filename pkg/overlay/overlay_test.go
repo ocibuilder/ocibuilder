@@ -21,7 +21,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/pkg/common"
 	"github.com/stretchr/testify/assert"
 )
 

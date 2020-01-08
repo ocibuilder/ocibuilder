@@ -21,9 +21,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	ociv1alpha1 "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
+	"github.com/ocibuilder/ocibuilder/pkg/common"
 	"github.com/ocibuilder/ocibuilder/provenance"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"

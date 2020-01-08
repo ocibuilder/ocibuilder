@@ -17,8 +17,8 @@ limitations under the License.
 package ocibuilder
 
 import (
-	"github.com/ocibuilder/ocibuilder/common"
 	informers "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/informers/externalversions"
+	"github.com/ocibuilder/ocibuilder/pkg/common"
 	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"

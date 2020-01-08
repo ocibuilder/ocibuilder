@@ -21,15 +21,15 @@ import (
 	"testing"
 
 	"github.com/docker/docker/api/types"
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/util"
 	"github.com/ocibuilder/ocibuilder/testing/dummy"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestBuilder_Build(t *testing.T) {
 	builder := Builder{
-		Logger:   common.GetLogger(true),
+		Logger:   util.GetLogger(true),
 		Client:   testClient{},
 		Metadata: []v1alpha1.ImageMetadata{},
 	}
