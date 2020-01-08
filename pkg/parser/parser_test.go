@@ -55,9 +55,7 @@ const expectedDockerfile = "FROM go / java / nodejs / python:ubuntu_xenial:v1.0.
 
 func TestParseDockerCommands(t *testing.T) {
 	path := "../../testing/dummy/commands_basic_parser_test.txt"
-	dockerfile, err := ParseDockerCommands(&v1alpha1.DockerStep{
-		Path: path,
-	})
+	dockerfile, err := ParseDockerCommands(path)
 	expectedDockerfile := "RUN pip install kubernetes\nCOPY app/ /bin/app\n"
 
 	assert.Equal(t, nil, err)

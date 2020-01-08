@@ -76,5 +76,6 @@ const (
 
 // Remote paths
 const (
-	OverlayPath = "./overlay_DOWNLOAD.yaml"
+	OverlayPath    = "./overlay_DOWNLOAD.yaml"
+	DockerStepPath = "./step_cmds_DOWNLOAD.yaml"
 )

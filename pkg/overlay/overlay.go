@@ -25,10 +25,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/docker/docker/api/types"
 	cmdcore "github.com/k14s/ytt/pkg/cmd/core"
 	cmdtpl "github.com/k14s/ytt/pkg/cmd/template"
 	"github.com/k14s/ytt/pkg/files"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/common"
 	"github.com/ocibuilder/ocibuilder/pkg/request"
 	"github.com/ocibuilder/ocibuilder/pkg/util"
@@ -104,7 +104,7 @@ func retrieveOverlayFile(path string) (io.ReadCloser, error) {
 		return overlayFile, nil
 	}
 
-	if err := request.RequestRemote(path, common.OverlayPath, types.AuthConfig{}); err != nil {
+	if err := request.RequestRemote(path, common.OverlayPath, v1alpha1.RemoteCreds{}); err != nil {
 		return nil, err
 	}
 	overlayFile, err := os.Open(common.OverlayPath)

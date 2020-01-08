@@ -1,17 +1,15 @@
 package request
 
 import (
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 
-	"github.com/docker/docker/api/types"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 )
 
-func RequestRemote(url string, filepath string, auth types.AuthConfig) error {
+func RequestRemote(url string, filepath string, auth v1alpha1.RemoteCreds) error {
 
 	cli := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
@@ -19,12 +17,14 @@ func RequestRemote(url string, filepath string, auth types.AuthConfig) error {
 		return err
 	}
 
-	if isAuthPresent(auth) {
-		authString, err := generateAuthRegistryString(auth)
-		if err != nil {
-			return err
+	if isRemoteAuth(auth) {
+		if auth.Plain.Username != "" {
+			req.SetBasicAuth(auth.Plain.Username, auth.Plain.Password)
 		}
-		req.Header.Set("Authorization", authString)
+
+		if auth.Env.Username != "" {
+			req.SetBasicAuth(os.Getenv(auth.Env.Username), os.Getenv(auth.Env.Password))
+		}
 	}
 
 	res, err := cli.Do(req)
@@ -54,27 +54,9 @@ func RequestRemote(url string, filepath string, auth types.AuthConfig) error {
 	return nil
 }
 
-func generateAuthRegistryString(auth types.AuthConfig) (string, error) {
-	encodedJSON, err := json.Marshal(auth)
-	if err != nil {
-		return "", err
+func isRemoteAuth(creds v1alpha1.RemoteCreds) bool {
+	if creds.Plain.Username == "" && creds.Env.Username == "" {
+		return false
 	}
-	return base64.URLEncoding.EncodeToString(encodedJSON), nil
-}
-
-func isAuthPresent(auth types.AuthConfig) bool {
-
-	if auth.Username != "" {
-		return true
-	}
-
-	if auth.Auth != "" {
-		return true
-	}
-
-	if auth.IdentityToken != "" {
-		return true
-	}
-
-	return false
+	return true
 }

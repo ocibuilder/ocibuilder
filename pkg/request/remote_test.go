@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/docker/docker/api/types"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,7 +15,7 @@ func TestRequestRemoteNoAuth(t *testing.T) {
 
 	defer os.Remove(filepath)
 
-	err := RequestRemote(url, filepath, types.AuthConfig{})
+	err := RequestRemote(url, filepath, v1alpha1.RemoteCreds{})
 	assert.Equal(t, nil, err)
 
 	actualFile, err := ioutil.ReadFile(filepath)
