@@ -19,7 +19,6 @@ package oci
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -32,16 +31,21 @@ import (
 )
 
 type MetadataWriter struct {
-	Metadata v1alpha1.BuildMetadata
+	Metadata *v1alpha1.BuildMetadata
 	Logger   *logrus.Logger
-	Store    store.MetaStore
+	Store    store.MetadataStore
+	// records holds all the records that have been parsed ready to push
+	records []*store.Record
 }
 
 func (m MetadataWriter) Write() error {
+	if err := m.Store.Write(m.records...); err != nil {
+		return err
+	}
 	return nil
 }
 
-func (m *MetadataWriter) ParseResponseMetadata(buildResponse io.ReadCloser) error {
+func (m *MetadataWriter) ParseMetadata(buildResponse io.ReadCloser) error {
 
 	buf := new(bytes.Buffer)
 	if _, err := buf.ReadFrom(buildResponse); err != nil {
@@ -49,19 +53,23 @@ func (m *MetadataWriter) ParseResponseMetadata(buildResponse io.ReadCloser) erro
 	}
 
 	responseOutput := strings.Split(buf.String(), "\n")
-	var layerDigests []string
+	var layerIds []string
 	var layerInfo []types.ImageLayer
 
 	for i, line := range responseOutput {
 
 		if (strings.Contains(line, "Step") && i != 0) || strings.Contains(line, "Successfully built") {
+			// Retrieve the layer digest from the previous line
 			sep := strings.Split(responseOutput[i-1], " ")
-			layerDigests = append(layerDigests, sep[len(sep)-1])
+			layerIds = append(layerIds, sep[len(sep)-1])
 		}
 
 		if strings.Contains(line, "Step") {
+			// Retrieve the step line including only the command and the args to the command
 			cmdLine := strings.Split(responseOutput[i], " : ")[1]
+			// Separate the specific command being executed for each layer
 			cmd := types.LayerDirective(strings.Split(cmdLine, " ")[0])
+			// Join the remaining args into a single string to be stored
 			args := strings.Join(strings.Split(cmdLine, " ")[1:], " ")
 
 			layerInfo = append(layerInfo, types.ImageLayer{
@@ -72,40 +80,49 @@ func (m *MetadataWriter) ParseResponseMetadata(buildResponse io.ReadCloser) erro
 
 	}
 
-	if len(layerDigests) == 0 {
-		return errors.New("no image digests found in image response")
+	if len(layerIds) == 0 {
+		return errors.New("no image ids found in image response")
 	}
 
-	imageMetadata := types.V1beta1imageDetails{
+	imageId := layerIds[len(layerIds)-1]
+	m.createAttestation(imageId)
+
+	imageDetailMetdata := types.V1beta1imageDetails{
 		DerivedImage: &types.ImageDerived{
 			Fingerprint: &types.ImageFingerprint{
-				V1Name: layerDigests[len(layerDigests)-1],
-				V2Blob: layerDigests[:len(layerDigests)-1],
+				V1Name: imageId,
+				V2Blob: layerIds[:len(layerIds)-1],
 			},
 			LayerInfo: layerInfo,
 		},
 	}
-	fmt.Println(imageMetadata)
+	record := store.Record{DerivedImage: &imageDetailMetdata}
+	m.records = append(m.records, &record)
 
 	return nil
 
 }
 
-func NewMetadataWriter(logger *logrus.Logger, metadataSpec *v1alpha1.BuildMetadata) MetadataWriter {
-	var metaStore store.MetaStore
+func (m *MetadataWriter) createAttestation(digest string) {
 
-	if metadataSpec.Store.Grafeas != nil {
+}
+
+func NewMetadataWriter(logger *logrus.Logger, metadataSpec *v1alpha1.BuildMetadata) MetadataWriter {
+	var metadataStore store.MetadataStore
+
+	if metadataSpec.StoreConfig.Grafeas != nil {
 
 		config := types.Configuration{
 			BasePath:   metadataSpec.Hostname,
 			HTTPClient: &http.Client{},
 		}
 
-		metaStore = grafeas.NewStore(&config, metadataSpec.Store.Grafeas, logger)
+		metadataStore = grafeas.NewStore(&config, metadataSpec.StoreConfig.Grafeas, logger)
 	}
 
 	return MetadataWriter{
-		Logger: logger,
-		Store:  metaStore,
+		Logger:   logger,
+		Store:    metadataStore,
+		Metadata: metadataSpec,
 	}
 }

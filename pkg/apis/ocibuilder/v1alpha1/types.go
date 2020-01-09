@@ -653,8 +653,8 @@ type BuildGenTemplate struct {
 
 // Meta is where metadata to store is defined in the ocibuilder specification
 type BuildMetadata struct {
-	// MetdataStore is the metadata store to push metadata to
-	Store MetadataStore `json:"type,omitempty" protobuf:"bytes,1,opt,name=type"`
+	// StoreType is the metadata store type to push metadata to
+	StoreConfig StoreConfig `json:"storeConfig,omitempty" protobuf:"bytes,1,opt,name=storeConfig"`
 	// Key is the key used to sign images if you require attestation
 	// +optional
 	Key string `json:"key,omitempty" protobuf:"bytes,2,opt,name=key"`
@@ -664,9 +664,9 @@ type BuildMetadata struct {
 	Data []MetadataType `json:"data,omitempty" protobuf:"bytes,4,opt,name=data"`
 }
 
-// MetadataStore is the metadata store to push metadata to
-type MetadataStore struct {
-	// Grafeas is the Grafeas metadata store
+// StoreConfig is the configuration of the metadata store to push metadata to
+type StoreConfig struct {
+	// Grafeas holds the config for the Grafeas metadata store
 	Grafeas *Grafeas `json:"grafeas,omitempty" protobuf:"bytes,1,opt,name=grafeas"`
 }
 

@@ -22,8 +22,8 @@ import (
 	"github.com/artbegolli/grafeas"
 )
 
-// Store is a data storage interface
-type MetaStore interface {
+// MetadataStore is a data storage interface
+type MetadataStore interface {
 	// Write records
 	Write(rec ...*Record) error
 }

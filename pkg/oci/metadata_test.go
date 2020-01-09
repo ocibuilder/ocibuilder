@@ -32,7 +32,7 @@ func TestMetadataWriter_ParseResponseMetadata(t *testing.T) {
 	assert.Equal(t, nil, err)
 
 	mw := MetadataWriter{}
-	err = mw.ParseResponseMetadata(file)
+	err = mw.ParseMetadata(file)
 	assert.Equal(t, nil, err)
 }
 

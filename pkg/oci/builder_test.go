@@ -85,19 +85,7 @@ func TestBuilder_BuildMetadata(t *testing.T) {
 		close(finished)
 	}()
 
-	metadata := v1alpha1.BuildMetadata{
-		Store: v1alpha1.MetadataStore{
-			Grafeas: &v1alpha1.Grafeas{
-				Project:  "",
-				Resource: "",
-				NoteName: "",
-				Kind:     "",
-			},
-		},
-		Key:      "",
-		Hostname: "",
-		Data:     nil,
-	}
+	metadata := v1alpha1.BuildMetadata{}
 	dummy.Spec.Metadata = &metadata
 
 	go builder.Build(dummy.Spec, res, errChan, finished)

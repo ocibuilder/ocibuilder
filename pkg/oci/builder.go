@@ -97,7 +97,9 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 			metaReader := io.TeeReader(buildResponse.Body, &buildBuffer)
 
 			mw := NewMetadataWriter(log, spec.Metadata)
-			mw.ParseResponseMetadata(ioutil.NopCloser(metaReader))
+			if err := mw.ParseMetadata(ioutil.NopCloser(metaReader)); err != nil {
+				return
+			}
 
 			if err := mw.Write(); err != nil {
 				errChan <- err
