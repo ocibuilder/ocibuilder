@@ -59,6 +59,14 @@ func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepath
 		}
 	}
 
+	if overlayPath != "" {
+		r.Logger.WithField("overlayPath", overlayPath).Debugln("overlay path not empty - looking for overlay file")
+		file, err = applyOverlay(file, overlayPath)
+		if err != nil {
+			return errors.Wrap(err, "failed to apply overlay to spec at path")
+		}
+	}
+
 	if err = yaml.Unmarshal(file, spec); err != nil {
 		return errors.Wrap(err, "failed to unmarshal spec at directory")
 	}
@@ -67,12 +75,20 @@ func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepath
 		return errors.Wrap(err, "failed to validate spec at directory")
 	}
 
-	if overlayPath != "" {
-		r.Logger.WithField("overlayPath", overlayPath).Debugln("overlay path not empty - looking for overlay file")
-		file, err = applyOverlay(file, overlayPath)
-		if err != nil {
-			return errors.Wrap(err, "failed to apply overlay to spec at path")
-		}
+	if err = yaml.Unmarshal(file, spec); err != nil {
+		return errors.Wrap(err, "failed to unmarshal spec at directory")
+	}
+
+	if err := validate.Validate(spec); err != nil {
+		return errors.Wrap(err, "failed to validate spec at directory")
+	}
+
+	if err = yaml.Unmarshal(file, spec); err != nil {
+		return errors.Wrap(err, "failed to unmarshal spec at directory")
+	}
+
+	if err := validate.Validate(spec); err != nil {
+		return errors.Wrap(err, "failed to validate spec at directory")
 	}
 
 	if spec.Params != nil {
@@ -115,17 +131,10 @@ func (r Reader) readIndividualSpecs(spec *v1alpha1.OCIBuilderSpec, path string) 
 
 // applyOverlay applys a ytt overalay to the specification
 func applyOverlay(yamlTemplate []byte, overlayPath string) ([]byte, error) {
-	file, err := os.Open(overlayPath)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to read overlay file")
-	}
 
 	yttOverlay := overlay.YttOverlay{
 		Spec: yamlTemplate,
-		Overlay: overlay.OverlayFile{
-			Path: overlayPath,
-			File: file,
-		},
+		Path: overlayPath,
 	}
 
 	overlayedSpec, err := yttOverlay.Apply()

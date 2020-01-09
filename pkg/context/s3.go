@@ -25,8 +25,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	awss3 "github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/common"
+	"github.com/ocibuilder/ocibuilder/pkg/util"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -53,11 +54,11 @@ func (contextReader *S3BuildContextReader) newSession(accessKey, secretKey strin
 
 // Read reads the context stored on S3BuildContextReader
 func (contextReader *S3BuildContextReader) Read() (string, error) {
-	accessKey, err := common.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.AccessKey)
+	accessKey, err := util.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.AccessKey)
 	if err != nil {
 		return "", err
 	}
-	secretKey, err := common.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.SecretKey)
+	secretKey, err := util.ReadCredentials(contextReader.k8sClient, contextReader.buildContext.SecretKey)
 	if err != nil {
 		return "", err
 	}
@@ -80,7 +81,7 @@ func (contextReader *S3BuildContextReader) Read() (string, error) {
 	}); err != nil {
 		return "", err
 	}
-	if err := common.UntarFile(contextFilePath, common.ContextDirectoryUncompressed); err != nil {
+	if err := util.UntarFile(contextFilePath, common.ContextDirectoryUncompressed); err != nil {
 		return "", err
 	}
 	return common.ContextDirectoryUncompressed, nil

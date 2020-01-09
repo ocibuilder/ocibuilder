@@ -73,3 +73,9 @@ const (
 	// ContextDirectoryUncompressed contains the uncompressed build context
 	ContextDirectoryUncompressed = "/ocibuilder/context/uncompressed/"
 )
+
+// Remote paths
+const (
+	OverlayPath    = "./overlay_DOWNLOAD.yaml"
+	DockerStepPath = "./step_cmds_DOWNLOAD.yaml"
+)

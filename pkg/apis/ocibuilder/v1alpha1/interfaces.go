@@ -28,6 +28,7 @@ type BuilderClient interface {
 	ImagePull(options OCIPullOptions) (OCIPullResponse, error)
 	ImagePush(options OCIPushOptions) (OCIPushResponse, error)
 	ImageRemove(options OCIRemoveOptions) (OCIRemoveResponse, error)
+	ImageInspect(imageId string) (types.ImageInspect, error)
 	RegistryLogin(options OCILoginOptions) (OCILoginResponse, error)
 	GenerateAuthRegistryString(auth types.AuthConfig) string
 }

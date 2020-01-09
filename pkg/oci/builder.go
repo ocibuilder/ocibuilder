@@ -26,8 +26,8 @@ import (
 	"os"
 
 	"github.com/docker/docker/api/types"
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/common"
 	"github.com/ocibuilder/ocibuilder/pkg/parser"
 	"github.com/ocibuilder/ocibuilder/pkg/validate"
 	"github.com/sirupsen/logrus"
@@ -307,6 +307,12 @@ func (b *Builder) Clean() {
 			if err := os.RemoveAll(m.ContextDirectory + "/ocib"); err != nil {
 				b.Logger.WithError(err).Errorln("error removing generated context")
 				continue
+			}
+			if _, err := os.Stat(common.DockerStepPath); err == nil {
+				if err := os.Remove(common.DockerStepPath); err != nil {
+					b.Logger.WithError(err).Errorln("error removing downloaded step file")
+					continue
+				}
 			}
 		}
 	}

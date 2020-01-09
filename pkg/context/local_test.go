@@ -21,8 +21,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/util"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -35,7 +35,7 @@ func TestLocalBuildContextReader_Read(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, TEST_SERVICE_PATH, path)
 
-	err = common.UntarFile(TEST_SERVICE_PATH+"/ocib/context/context.tar.gz", TEST_SERVICE_PATH+"/unpacked")
+	err = util.UntarFile(TEST_SERVICE_PATH+"/ocib/context/context.tar.gz", TEST_SERVICE_PATH+"/unpacked")
 	assert.Equal(t, nil, err)
 
 	files, err := ioutil.ReadDir(TEST_SERVICE_PATH + "/unpacked/")
@@ -62,4 +62,4 @@ var buildContext = &v1alpha1.BuildContext{
 	},
 }
 
-var expectedFileNames = []string{"Dockerfile", "main.go", "ocibuilder.yaml"}
+var expectedFileNames = []string{"Dockerfile", "main.go", "ocibuilder.yaml", "overlay.yaml"}

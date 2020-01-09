@@ -17,11 +17,11 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/pkg/util"
 	"github.com/spf13/cobra"
 )
 
-var log = common.GetLogger(false)
+var log = util.GetLogger(false)
 
 const rootDesc = `
 The ocictl is a tool offered by ocibuilder for pulling, building and
