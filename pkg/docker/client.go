@@ -17,6 +17,7 @@ limitations under the License.
 package docker
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 
@@ -79,6 +80,16 @@ func (cli Client) ImageRemove(options v1alpha1.OCIRemoveOptions) (v1alpha1.OCIRe
 	return v1alpha1.OCIRemoveResponse{
 		Response: res,
 	}, nil
+}
+
+// ImageInspect conducts an inspect of a built image with Docker using the ocibuilder
+func (cli Client) ImageInspect(imageId string) (types.ImageInspect, error) {
+	apiCli := cli.APIClient
+	res, _, err := apiCli.ImageInspectWithRaw(context.Background(), imageId)
+	if err != nil {
+		return types.ImageInspect{}, err
+	}
+	return res, nil
 }
 
 // RegistryLogin conducts a registry login with Docker using the ocibuilder

@@ -129,6 +129,12 @@ func (cli Client) ImageRemove(options v1alpha1.OCIRemoveOptions) (v1alpha1.OCIRe
 	}, nil
 }
 
+// ImageRemove conducts an inspect of a build image with Buildah using the ocibuilder
+func (cli Client) ImageInspect(imageId string) (types.ImageInspect, error) {
+
+	return types.ImageInspect{}, nil
+}
+
 // RegistryLogin conducts a registry login with Buildah using the ocibuilder
 func (cli Client) RegistryLogin(options v1alpha1.OCILoginOptions) (v1alpha1.OCILoginResponse, error) {
 
