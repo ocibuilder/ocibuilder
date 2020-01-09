@@ -1,0 +1,26 @@
+Step 1/9 : FROM golang:alpine AS build-env
+ ---> 69cf534c966a
+Step 2/9 : ADD . /src
+ ---> f9276fba14a5
+Step 3/9 : RUN cd /src && go build -o goapp
+ ---> Running in 721020d03a36
+ ---> 31984ba42ff2
+Step 4/9 : FROM alpine AS alpine-stage
+ ---> b7b28af77ffe
+Step 5/9 : WORKDIR /app
+ ---> Using cache
+ ---> 03eac0eeac66
+Step 6/9 : COPY --from=build-env /src/goapp /app/
+ ---> Using cache
+ ---> 35b7a0d42abf
+Step 7/9 : ENTRYPOINT ./goapp
+ ---> Using cache
+ ---> 234ad93b2401
+Step 8/9 : LABEL overlay=first-step
+ ---> Using cache
+ ---> 9d3c7e91f545
+Step 9/9 : LABEL type=build-1
+ ---> Using cache
+ ---> 4ffd5e714396
+Successfully built 4ffd5e714396
+Successfully tagged ocibuildere2e/go-test-service:v0.1.0

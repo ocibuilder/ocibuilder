@@ -17,10 +17,14 @@ limitations under the License.
 package oci
 
 import (
+	"bytes"
+	"errors"
+	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
-	client "github.com/artbegolli/grafeas"
+	types "github.com/artbegolli/grafeas"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/store"
 	"github.com/ocibuilder/ocibuilder/pkg/store/grafeas"
@@ -37,7 +41,53 @@ func (m MetadataWriter) Write() error {
 	return nil
 }
 
-func (m *MetadataWriter) ParseResponseMetadata(buildResponse io.ReadCloser) {
+func (m *MetadataWriter) ParseResponseMetadata(buildResponse io.ReadCloser) error {
+
+	buf := new(bytes.Buffer)
+	if _, err := buf.ReadFrom(buildResponse); err != nil {
+		return err
+	}
+
+	responseOutput := strings.Split(buf.String(), "\n")
+	var layerDigests []string
+	var layerInfo []types.ImageLayer
+
+	for i, line := range responseOutput {
+
+		if (strings.Contains(line, "Step") && i != 0) || strings.Contains(line, "Successfully built") {
+			sep := strings.Split(responseOutput[i-1], " ")
+			layerDigests = append(layerDigests, sep[len(sep)-1])
+		}
+
+		if strings.Contains(line, "Step") {
+			cmdLine := strings.Split(responseOutput[i], " : ")[1]
+			cmd := types.LayerDirective(strings.Split(cmdLine, " ")[0])
+			args := strings.Join(strings.Split(cmdLine, " ")[1:], " ")
+
+			layerInfo = append(layerInfo, types.ImageLayer{
+				Directive: &cmd,
+				Arguments: args,
+			})
+		}
+
+	}
+
+	if len(layerDigests) == 0 {
+		return errors.New("no image digests found in image response")
+	}
+
+	imageMetadata := types.V1beta1imageDetails{
+		DerivedImage: &types.ImageDerived{
+			Fingerprint: &types.ImageFingerprint{
+				V1Name: layerDigests[len(layerDigests)-1],
+				V2Blob: layerDigests[:len(layerDigests)-1],
+			},
+			LayerInfo: layerInfo,
+		},
+	}
+	fmt.Println(imageMetadata)
+
+	return nil
 
 }
 
@@ -46,7 +96,7 @@ func NewMetadataWriter(logger *logrus.Logger, metadataSpec *v1alpha1.BuildMetada
 
 	if metadataSpec.Store.Grafeas != nil {
 
-		config := client.Configuration{
+		config := types.Configuration{
 			BasePath:   metadataSpec.Hostname,
 			HTTPClient: &http.Client{},
 		}
