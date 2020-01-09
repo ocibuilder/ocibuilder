@@ -17,8 +17,10 @@ limitations under the License.
 package buildah
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/registry"
@@ -129,9 +131,33 @@ func (cli Client) ImageRemove(options v1alpha1.OCIRemoveOptions) (v1alpha1.OCIRe
 	}, nil
 }
 
-// ImageRemove conducts an inspect of a build image with Buildah using the ocibuilder
+// @TBC
+// ImageInspect conducts an inspect of a build image with Buildah using the ocibuilder
+//
+// The type currently returned by running buildah inspect varies greatly to docker image inspect
+// issues have been created to manage this and have a more representative mapping between buildah and docker
 func (cli Client) ImageInspect(imageId string) (types.ImageInspect, error) {
 
+	inspectFlag := command.Flag{
+		Name: "type", Value: "image", Short: false, OmitEmpty: false,
+	}
+
+	cmd := command.Builder("buildah").Command("inspect").Flags(inspectFlag).Args(imageId).Build()
+	cli.Logger.WithField("cmd", cmd).Debugln("executing remove with command")
+
+	stdout, _, err := execute(&cmd)
+	if err != nil {
+		cli.Logger.WithError(err).Errorln("error building image...")
+		return types.ImageInspect{}, err
+	}
+	var imageInspect types.ImageInspect
+	res, err := ioutil.ReadAll(stdout)
+	if err != nil {
+		return types.ImageInspect{}, err
+	}
+	if err := json.Unmarshal(res, imageInspect); err != nil {
+		return types.ImageInspect{}, err
+	}
 	return types.ImageInspect{}, nil
 }
 
