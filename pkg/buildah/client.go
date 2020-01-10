@@ -155,7 +155,7 @@ func (cli Client) ImageInspect(imageId string) (types.ImageInspect, error) {
 	if err != nil {
 		return types.ImageInspect{}, err
 	}
-	if err := json.Unmarshal(res, imageInspect); err != nil {
+	if err := json.Unmarshal(res, &imageInspect); err != nil {
 		return types.ImageInspect{}, err
 	}
 	return types.ImageInspect{}, nil
