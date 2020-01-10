@@ -17,14 +17,12 @@ limitations under the License.
 package oci
 
 import (
-	"bytes"
 	"errors"
-	"io"
 	"net/http"
-	"strings"
 
 	types "github.com/artbegolli/grafeas"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/docker"
 	"github.com/ocibuilder/ocibuilder/pkg/store"
 	"github.com/ocibuilder/ocibuilder/pkg/store/grafeas"
 	"github.com/sirupsen/logrus"
@@ -45,58 +43,40 @@ func (m MetadataWriter) Write() error {
 	return nil
 }
 
-func (m *MetadataWriter) ParseMetadata(buildResponse io.ReadCloser) error {
+func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderClient) error {
 
-	buf := new(bytes.Buffer)
-	if _, err := buf.ReadFrom(buildResponse); err != nil {
+	if _, ok := cli.(docker.Client); !ok {
+		return errors.New("writing metadata not currently supported for use with buildah")
+	}
+
+	inspectResponse, err := cli.ImageInspect(imageName)
+	if err != nil {
 		return err
 	}
 
-	responseOutput := strings.Split(buf.String(), "\n")
+	historyResponse, err := cli.ImageHistory(imageName)
+	if err != nil {
+		return err
+	}
+
 	var layerIds []string
 	var layerInfo []types.ImageLayer
-
-	for i, line := range responseOutput {
-
-		if (strings.Contains(line, "Step") && i != 0) || strings.Contains(line, "Successfully built") {
-			// Retrieve the layer digest from the previous line
-			sep := strings.Split(responseOutput[i-1], " ")
-			layerIds = append(layerIds, sep[len(sep)-1])
-		}
-
-		if strings.Contains(line, "Step") {
-			// Retrieve the step line including only the command and the args to the command
-			cmdLine := strings.Split(responseOutput[i], " : ")[1]
-			// Separate the specific command being executed for each layer
-			cmd := types.LayerDirective(strings.Split(cmdLine, " ")[0])
-			// Join the remaining args into a single string to be stored
-			args := strings.Join(strings.Split(cmdLine, " ")[1:], " ")
-
-			layerInfo = append(layerInfo, types.ImageLayer{
-				Directive: &cmd,
-				Arguments: args,
-			})
-		}
-
+	for _, r := range historyResponse {
+		layerIds = append(layerIds, r.ID)
+		layerInfo = append(layerInfo, types.ImageLayer{
+			Arguments: r.CreatedBy,
+		})
 	}
 
-	if len(layerIds) == 0 {
-		return errors.New("no image ids found in image response")
-	}
-
-	imageId := layerIds[len(layerIds)-1]
-	m.createAttestation(imageId)
-
-	imageDetailMetdata := types.V1beta1imageDetails{
+	record := store.Record{
 		DerivedImage: &types.ImageDerived{
 			Fingerprint: &types.ImageFingerprint{
-				V1Name: imageId,
-				V2Blob: layerIds[:len(layerIds)-1],
+				V1Name: inspectResponse.ID,
+				V2Blob: layerIds,
 			},
 			LayerInfo: layerInfo,
 		},
 	}
-	record := store.Record{DerivedImage: &imageDetailMetdata}
 	m.records = append(m.records, &record)
 
 	return nil

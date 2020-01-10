@@ -22,7 +22,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/blackrock/ocibuilder/common"
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/image"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/util"
 	"github.com/ocibuilder/ocibuilder/testing/dummy"
@@ -158,10 +160,12 @@ func (t testClient) ImageRemove(options v1alpha1.OCIRemoveOptions) (v1alpha1.OCI
 func (t testClient) ImageInspect(imageId string) (types.ImageInspect, error) {
 	return types.ImageInspect{}, nil
 }
+func (t testClient) ImageHistory(imageId string) ([]image.HistoryResponseItem, error) {
+	return nil, nil
+}
 func (t testClient) RegistryLogin(options v1alpha1.OCILoginOptions) (v1alpha1.OCILoginResponse, error) {
 	return v1alpha1.OCILoginResponse{}, nil
 }
-
 func (t testClient) GenerateAuthRegistryString(auth types.AuthConfig) string {
 	return ""
 }
