@@ -103,6 +103,9 @@ func (t testClient) ImagePush(options v1alpha1.OCIPushOptions) (v1alpha1.OCIPush
 func (t testClient) ImageRemove(options v1alpha1.OCIRemoveOptions) (v1alpha1.OCIRemoveResponse, error) {
 	return v1alpha1.OCIRemoveResponse{}, nil
 }
+func (t testClient) ImageInspect(imageId string) (types.ImageInspect, error) {
+	return types.ImageInspect{}, nil
+}
 func (t testClient) RegistryLogin(options v1alpha1.OCILoginOptions) (v1alpha1.OCILoginResponse, error) {
 	return v1alpha1.OCILoginResponse{}, nil
 }
