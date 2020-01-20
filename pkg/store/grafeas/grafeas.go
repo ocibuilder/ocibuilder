@@ -96,7 +96,7 @@ func (g *graf) Write(rec ...*store.Record) error {
 	return nil
 }
 
-func NewStore(configuration *grafeas.Configuration, options *v1alpha1.Grafeas, logger *logrus.Logger) store.MetaStore {
+func NewStore(configuration *grafeas.Configuration, options *v1alpha1.Grafeas, logger *logrus.Logger) store.MetadataStore {
 	cli := grafeas.NewAPIClient(configuration)
 
 	return &graf{
