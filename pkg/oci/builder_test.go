@@ -22,7 +22,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/blackrock/ocibuilder/common"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/image"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
@@ -72,7 +71,7 @@ func TestBuilder_Build(t *testing.T) {
 
 func TestBuilder_BuildMetadata(t *testing.T) {
 	builder := Builder{
-		Logger:   common.GetLogger(true),
+		Logger:   util.GetLogger(true),
 		Client:   testClient{},
 		Metadata: []v1alpha1.ImageMetadata{},
 	}
