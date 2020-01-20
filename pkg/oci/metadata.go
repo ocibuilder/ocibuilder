@@ -69,16 +69,18 @@ func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderCli
 	}
 
 	record := store.Record{
-		DerivedImage: &types.ImageDerived{
-			Fingerprint: &types.ImageFingerprint{
-				V1Name: inspectResponse.ID,
-				V2Blob: layerIds,
+		DerivedImage: &types.V1beta1imageDetails{
+			DerivedImage: &types.ImageDerived{
+				Fingerprint: &types.ImageFingerprint{
+					V1Name: inspectResponse.ID,
+					V2Blob: layerIds,
+				},
+				LayerInfo: layerInfo,
 			},
-			LayerInfo: layerInfo,
 		},
 	}
 	m.records = append(m.records, &record)
-	//m.createAttestation(inspectResponse.RepoDigests[0])
+	m.createAttestation(inspectResponse.RepoDigests[0])
 
 	return nil
 
