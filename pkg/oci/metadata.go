@@ -22,6 +22,7 @@ import (
 
 	types "github.com/artbegolli/grafeas"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/crypto"
 	"github.com/ocibuilder/ocibuilder/pkg/docker"
 	"github.com/ocibuilder/ocibuilder/pkg/store"
 	"github.com/ocibuilder/ocibuilder/pkg/store/grafeas"
@@ -80,14 +81,30 @@ func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderCli
 		},
 	}
 	m.records = append(m.records, &record)
-	m.createAttestation(inspectResponse.RepoDigests[0])
+	if err := m.createAttestation(inspectResponse.RepoDigests[0]); err != nil {
+		return err
+	}
 
 	return nil
 
 }
 
-func (m *MetadataWriter) createAttestation(digest string) {
+func (m *MetadataWriter) createAttestation(digest string) error {
 
+	if m.Metadata.Key == nil {
+		return errors.New("no signing key has been defined")
+	}
+
+	privKey, pubKey, err := crypto.ValidateKeysPacket(m.Metadata.Key)
+	if err != nil {
+		return err
+	}
+	e := crypto.CreateEntityFromKeys(privKey, pubKey)
+	if err := crypto.SignDigest(digest, e); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func NewMetadataWriter(logger *logrus.Logger, metadataSpec *v1alpha1.BuildMetadata) MetadataWriter {

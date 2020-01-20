@@ -670,7 +670,7 @@ type BuildMetadata struct {
 	// StoreType is the metadata store type to push metadata to
 	StoreConfig StoreConfig `json:"storeConfig,omitempty" protobuf:"bytes,1,opt,name=storeConfig"`
 	// SignKey holds the key to sign an image for attestation purposes
-	Key SignKey `json:"signKey,omitempty" protobuf:"bytes,2,opt,name=signKey"`
+	Key *SignKey `json:"signKey,omitempty" protobuf:"bytes,2,opt,name=signKey"`
 	// Hostname is the hostname of the metadatastore
 	Hostname string `json:"hostname,omitempty" protobuf:"bytes,3,opt,name=hostname"`
 	// Data is the types of metadata that you would like to push to your metadatastore
@@ -680,16 +680,22 @@ type BuildMetadata struct {
 type SignKey struct {
 	// PrivateKey is an ascii armored private key used to sign images for image attestation
 	// +optional
-	PrivateKey string `json:"privateKey,omitempty" protobuf:"bytes,1,opt,name=privateKey"`
+	PlainPrivateKey string `json:"plainPrivateKey,omitempty" protobuf:"bytes,1,opt,name=plainPrivateKey"`
 	// PublicKey is the ascii armored public key for verification in image attestation
 	// +optional
-	PublicKey string `json:"publicKey,omitempty" protobuf:"bytes,2,opt,name=publicKey"`
+	PlainPublicKey string `json:"plainPublicKey,omitempty" protobuf:"bytes,2,opt,name=plainPublicKey"`
 	// EnvPrivateKey is an env variable that holds an ascii armored private key used to sign images for image attestation
 	// +optional
 	EnvPrivateKey string `json:"envPrivateKey,omitempty" protobuf:"bytes,3,opt,name=envPrivateKey"`
 	// EnvPublicKey is an env variable that holds an ascii armored public key used to sign images for image attestation
 	// +optional
 	EnvPublicKey string `json:"envPublicKey,omitempty" protobuf:"bytes,4,opt,name=envPublicKey"`
+	// Url or a filepath to a file that contains an ascii armored private key
+	// +optional
+	Url string `json:"url,omitempty" protobuf:"bytes,5,opt,name=url"`
+	// Auth for remote access to a url
+	// +optional
+	Auth RemoteCreds `json:"auth,inline" protobuf:"bytes,6,name=auth"`
 }
 
 // StoreConfig is the configuration of the metadata store to push metadata to

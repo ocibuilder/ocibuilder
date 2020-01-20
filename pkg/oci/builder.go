@@ -88,7 +88,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 			return
 		}
 
-		if false {
+		if spec.Metadata != nil {
 			log.Debugln("metadata specification present")
 			mw := NewMetadataWriter(log, spec.Metadata)
 
