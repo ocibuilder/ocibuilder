@@ -17,7 +17,6 @@ limitations under the License.
 package oci
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -28,11 +27,9 @@ func TestMetadataWriter_Write(t *testing.T) {
 }
 
 func TestMetadataWriter_ParseResponseMetadata(t *testing.T) {
-	file, err := os.Open("../../testing/dummy/build_output")
-	assert.Equal(t, nil, err)
 
 	mw := MetadataWriter{}
-	err = mw.ParseMetadata(file)
+	err := mw.ParseMetadata("testregistry/test-image:v0.1.0", testClient{})
 	assert.Equal(t, nil, err)
 }
 

@@ -78,6 +78,7 @@ func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderCli
 		},
 	}
 	m.records = append(m.records, &record)
+	//m.createAttestation(inspectResponse.RepoDigests[0])
 
 	return nil
 

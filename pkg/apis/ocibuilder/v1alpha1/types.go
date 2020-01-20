@@ -669,13 +669,27 @@ type BuildGenTemplate struct {
 type BuildMetadata struct {
 	// StoreType is the metadata store type to push metadata to
 	StoreConfig StoreConfig `json:"storeConfig,omitempty" protobuf:"bytes,1,opt,name=storeConfig"`
-	// Key is the key used to sign images if you require attestation
-	// +optional
-	Key string `json:"key,omitempty" protobuf:"bytes,2,opt,name=key"`
+	// SignKey holds the key to sign an image for attestation purposes
+	Key SignKey `json:"signKey,omitempty" protobuf:"bytes,2,opt,name=signKey"`
 	// Hostname is the hostname of the metadatastore
 	Hostname string `json:"hostname,omitempty" protobuf:"bytes,3,opt,name=hostname"`
 	// Data is the types of metadata that you would like to push to your metadatastore
 	Data []MetadataType `json:"data,omitempty" protobuf:"bytes,4,opt,name=data"`
+}
+
+type SignKey struct {
+	// PrivateKey is an ascii armored private key used to sign images for image attestation
+	// +optional
+	PrivateKey string `json:"privateKey,omitempty" protobuf:"bytes,1,opt,name=privateKey"`
+	// PublicKey is the ascii armored public key for verification in image attestation
+	// +optional
+	PublicKey string `json:"publicKey,omitempty" protobuf:"bytes,2,opt,name=publicKey"`
+	// EnvPrivateKey is an env variable that holds an ascii armored private key used to sign images for image attestation
+	// +optional
+	EnvPrivateKey string `json:"envPrivateKey,omitempty" protobuf:"bytes,3,opt,name=envPrivateKey"`
+	// EnvPublicKey is an env variable that holds an ascii armored public key used to sign images for image attestation
+	// +optional
+	EnvPublicKey string `json:"envPublicKey,omitempty" protobuf:"bytes,4,opt,name=envPublicKey"`
 }
 
 // StoreConfig is the configuration of the metadata store to push metadata to
