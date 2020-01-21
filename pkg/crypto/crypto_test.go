@@ -38,7 +38,7 @@ func TestSignDigest(t *testing.T) {
 	assert.Equal(t, nil, err)
 	e := CreateEntityFromKeys(privKey, pubKey)
 
-	_, err = SignDigest("SHAtestDigeste3413412", e)
+	buf, err := SignDigest("SHAtestDigeste3413412", "", e)
 	assert.Equal(t, nil, err)
 }
 

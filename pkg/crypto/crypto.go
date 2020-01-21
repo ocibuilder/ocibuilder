@@ -17,9 +17,9 @@ limitations under the License.
 package crypto
 
 import (
+	"bytes"
 	"crypto"
 	"errors"
-	"io"
 	"os"
 	"strings"
 
@@ -136,15 +136,16 @@ func DecodeKey(key string) (packet.Packet, error) {
 	return pkt, nil
 }
 
-func SignDigest(digest string, signer *openpgp.Entity) (io.Writer, error) {
+func SignDigest(digest string, passphrase string, signer *openpgp.Entity) ([]byte, error) {
+	buf := new(bytes.Buffer)
 
-	if err := signer.PrivateKey.Decrypt([]byte{}); err != nil {
+	if err := signer.PrivateKey.Decrypt([]byte(passphrase)); err != nil {
 		return nil, err
 	}
 
-	if err := openpgp.ArmoredDetachSignText(os.Stdout, signer, strings.NewReader(digest), nil); err != nil {
+	if err := openpgp.ArmoredDetachSignText(buf, signer, strings.NewReader(digest), nil); err != nil {
 		return nil, err
 	}
 
-	return nil, nil
+	return buf.Bytes(), nil
 }

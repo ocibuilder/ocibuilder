@@ -690,12 +690,14 @@ type SignKey struct {
 	// EnvPublicKey is an env variable that holds an ascii armored public key used to sign images for image attestation
 	// +optional
 	EnvPublicKey string `json:"envPublicKey,omitempty" protobuf:"bytes,4,opt,name=envPublicKey"`
+	// Passphrase is the passphrase for decrypting the private key
+	Passphrase string `json:"passphrase,omitempty" protobuf:"bytes,5,opt,name=passphrase"`
 	// Url or a filepath to a file that contains an ascii armored private key
 	// +optional
-	Url string `json:"url,omitempty" protobuf:"bytes,5,opt,name=url"`
+	Url string `json:"url,omitempty" protobuf:"bytes,6,opt,name=url"`
 	// Auth for remote access to a url
 	// +optional
-	Auth RemoteCreds `json:"auth,inline" protobuf:"bytes,6,name=auth"`
+	Auth RemoteCreds `json:"auth,inline" protobuf:"bytes,7,name=auth"`
 }
 
 // StoreConfig is the configuration of the metadata store to push metadata to
