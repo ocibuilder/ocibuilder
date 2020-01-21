@@ -100,7 +100,7 @@ func (m *MetadataWriter) createAttestation(digest string) error {
 		return err
 	}
 	e := crypto.CreateEntityFromKeys(privKey, pubKey)
-	if err := crypto.SignDigest(digest, e); err != nil {
+	if _, err := crypto.SignDigest(digest, e); err != nil {
 		return err
 	}
 

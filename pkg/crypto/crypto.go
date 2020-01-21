@@ -17,14 +17,14 @@ limitations under the License.
 package crypto
 
 import (
-	"bytes"
 	"crypto"
 	"errors"
+	"io"
 	"os"
 	"strings"
 
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/sirupsen/logrus"
+	"github.com/ocibuilder/ocibuilder/pkg/util"
 	"golang.org/x/crypto/openpgp"
 	"golang.org/x/crypto/openpgp/armor"
 	"golang.org/x/crypto/openpgp/packet"
@@ -67,16 +67,17 @@ func CreateEntityFromKeys(privKey *packet.PrivateKey, pubKey *packet.PublicKey) 
 }
 
 func ValidateKeys(key *v1alpha1.SignKey) (privKey, pubKey string, err error) {
+	log := util.Logger
 
 	if key.EnvPrivateKey != "" && key.EnvPublicKey != "" {
 		privKey = os.Getenv(key.EnvPrivateKey)
 		if privKey == "" {
-			logrus.Warn("environment variable empty for private key")
+			log.Warn("environment variable empty for private key")
 		}
 
 		pubKey = os.Getenv(key.EnvPublicKey)
 		if pubKey == "" {
-			logrus.Warn("environment variable empy for public key")
+			log.Warn("environment variable empy for public key")
 		}
 
 		return privKey, pubKey, nil
@@ -102,7 +103,7 @@ func ValidateKeysPacket(key *v1alpha1.SignKey) (*packet.PrivateKey, *packet.Publ
 	}
 	privKey, ok := privPack.(*packet.PrivateKey)
 	if !ok {
-		return nil, nil, errors.New("invalid pgp private key when creating attestation")
+		return nil, nil, errors.New("invalid pgp private key when validating for signing image")
 	}
 
 	pubPack, err := DecodeKey(pubKeyStr)
@@ -111,7 +112,7 @@ func ValidateKeysPacket(key *v1alpha1.SignKey) (*packet.PrivateKey, *packet.Publ
 	}
 	pubKey, ok := pubPack.(*packet.PublicKey)
 	if !ok {
-		return nil, nil, errors.New("invalid pgp private key when creating attestation")
+		return nil, nil, errors.New("invalid pgp private key when validating for signing image")
 	}
 
 	return privKey, pubKey, nil
@@ -119,24 +120,31 @@ func ValidateKeysPacket(key *v1alpha1.SignKey) (*packet.PrivateKey, *packet.Publ
 
 func DecodeKey(key string) (packet.Packet, error) {
 	block, err := armor.Decode(strings.NewReader(key))
+	log := util.Logger
 	if err != nil {
+		log.Error("error decoding key - no block found due to invalid PGP key")
 		return nil, err
 	}
 
 	reader := packet.NewReader(block.Body)
 	pkt, err := reader.Next()
 	if err != nil {
+		log.Error("error decoding key - unknown packet due to invalid PGP key")
 		return nil, err
 	}
 
 	return pkt, nil
 }
 
-func SignDigest(digest string, signer *openpgp.Entity) error {
-	var buf *bytes.Buffer
-	if err := openpgp.DetachSignText(buf, signer, strings.NewReader(digest), nil); err != nil {
-		return err
+func SignDigest(digest string, signer *openpgp.Entity) (io.Writer, error) {
+
+	if err := signer.PrivateKey.Decrypt([]byte{}); err != nil {
+		return nil, err
 	}
 
-	return nil
+	if err := openpgp.ArmoredDetachSignText(os.Stdout, signer, strings.NewReader(digest), nil); err != nil {
+		return nil, err
+	}
+
+	return nil, nil
 }
