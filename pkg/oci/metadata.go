@@ -81,7 +81,7 @@ func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderCli
 		},
 	}
 	m.records = append(m.records, &record)
-	if err := m.createAttestation(inspectResponse.RepoDigests[0]); err != nil {
+	if _, err := m.createAttestation(inspectResponse.RepoDigests[0]); err != nil {
 		return err
 	}
 
@@ -89,23 +89,34 @@ func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderCli
 
 }
 
-func (m *MetadataWriter) createAttestation(digest string) error {
+func (m *MetadataWriter) createAttestation(digest string) (store.Record, error) {
 
 	if m.Metadata.Key == nil {
-		return errors.New("no signing key has been defined")
+		return store.Record{}, errors.New("no signing key has been defined")
 	}
 
 	privKey, pubKey, err := crypto.ValidateKeysPacket(m.Metadata.Key)
 	if err != nil {
-		return err
+		return store.Record{}, err
 	}
 	e := crypto.CreateEntityFromKeys(privKey, pubKey)
-	_, err = crypto.SignDigest(digest, m.Metadata.Key.Passphrase, e)
+	id, sig, err := crypto.SignDigest(digest, m.Metadata.Key.Passphrase, e)
 	if err != nil {
-		return err
+		return store.Record{}, err
 	}
 
-	return nil
+	record := store.Record{
+		Attestation: &types.V1beta1attestationDetails{
+			Attestation: &types.AttestationAttestation{
+				PgpSignedAttestation: &types.AttestationPgpSignedAttestation{
+					Signature: sig,
+					PgpKeyId:  id,
+				},
+			},
+		},
+	}
+
+	return record, nil
 }
 
 func NewMetadataWriter(logger *logrus.Logger, metadataSpec *v1alpha1.BuildMetadata) MetadataWriter {

@@ -136,16 +136,16 @@ func DecodeKey(key string) (packet.Packet, error) {
 	return pkt, nil
 }
 
-func SignDigest(digest string, passphrase string, signer *openpgp.Entity) ([]byte, error) {
+func SignDigest(digest string, passphrase string, signer *openpgp.Entity) (string, string, error) {
 	buf := new(bytes.Buffer)
 
 	if err := signer.PrivateKey.Decrypt([]byte(passphrase)); err != nil {
-		return nil, err
+		return "", "", err
 	}
 
 	if err := openpgp.ArmoredDetachSignText(buf, signer, strings.NewReader(digest), nil); err != nil {
-		return nil, err
+		return "", "", err
 	}
 
-	return buf.Bytes(), nil
+	return signer.PrivateKey.KeyIdString(), buf.String(), nil
 }
