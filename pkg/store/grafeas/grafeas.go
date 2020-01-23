@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/artbegolli/grafeas"
+	"github.com/ocibuilder/gofeas"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/store"
 	"github.com/sirupsen/logrus"
@@ -29,7 +29,7 @@ import (
 
 type graf struct {
 	// Client is the grafeas API client
-	Client *grafeas.APIClient
+	Client *gofeas.APIClient
 	// Options stores the options for pushing to Grafeas
 	Options *v1alpha1.Grafeas
 	// Logger is the logger
@@ -41,35 +41,39 @@ type graf struct {
 // The records are parsed as follows
 func (g *graf) Write(rec ...*store.Record) error {
 
-	var occurrenceRequests []grafeas.V1beta1Occurrence
+	var occurrenceRequests []gofeas.V1beta1Occurrence
 	for _, r := range rec {
 
-		occ := grafeas.V1beta1Occurrence{
-			Resource: &grafeas.V1beta1Resource{
+		occ := gofeas.V1beta1Occurrence{
+			Resource: &gofeas.V1beta1Resource{
 				Uri: r.Resource,
 			},
+			Name:     "projects/image-signing/occurrences/production",
 			NoteName: g.Options.NoteName,
 		}
 
-		if r.Build != nil {
-			occ.Build = r.Build
-			continue
+		switch {
+
+		case r.Build != nil:
+			{
+				occ.Build = r.Build
+			}
+		case r.DerivedImage != nil:
+			{
+				occ.DerivedImage = r.DerivedImage
+			}
+		case r.Attestation != nil:
+			{
+				occ.Attestation = r.Attestation
+			}
+
 		}
 
-		if r.DerivedImage != nil {
-			occ.DerivedImage = r.DerivedImage
-			continue
-		}
-
-		if r.Attestation != nil {
-			occ.Attestation = r.Attestation
-			continue
-		}
-
+		occurrenceRequests = append(occurrenceRequests, occ)
 	}
 
 	parent := fmt.Sprintf("projects/%s", g.Options.Project)
-	req := grafeas.V1beta1BatchCreateOccurrencesRequest{
+	req := gofeas.V1beta1BatchCreateOccurrencesRequest{
 		// The name of the project in the form of `projects/[PROJECT_ID]`, under which the occurrences are to be created.
 		Parent:      parent,
 		Occurrences: occurrenceRequests,
@@ -77,12 +81,12 @@ func (g *graf) Write(rec ...*store.Record) error {
 
 	res, httpRes, err := g.Client.GrafeasV1Beta1Api.BatchCreateOccurrences(ctx.Background(), parent, req)
 
-	if err != nil {
-		return err
-	}
-
 	if httpRes.StatusCode != http.StatusOK {
 		return fmt.Errorf("error making write request to grafeas - returned with status code %s", httpRes.Status)
+	}
+
+	if err != nil {
+		return err
 	}
 
 	for _, occurrenceResponse := range res.Occurrences {
@@ -96,8 +100,8 @@ func (g *graf) Write(rec ...*store.Record) error {
 	return nil
 }
 
-func NewStore(configuration *grafeas.Configuration, options *v1alpha1.Grafeas, logger *logrus.Logger) store.MetadataStore {
-	cli := grafeas.NewAPIClient(configuration)
+func NewStore(configuration *gofeas.Configuration, options *v1alpha1.Grafeas, logger *logrus.Logger) store.MetadataStore {
+	cli := gofeas.NewAPIClient(configuration)
 
 	return &graf{
 		Client:  cli,

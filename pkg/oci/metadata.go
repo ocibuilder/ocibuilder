@@ -20,7 +20,7 @@ import (
 	"errors"
 	"net/http"
 
-	types "github.com/artbegolli/grafeas"
+	"github.com/ocibuilder/gofeas"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/crypto"
 	"github.com/ocibuilder/ocibuilder/pkg/docker"
@@ -61,18 +61,18 @@ func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderCli
 	}
 
 	var layerIds []string
-	var layerInfo []types.ImageLayer
+	var layerInfo []gofeas.ImageLayer
 	for _, r := range historyResponse {
 		layerIds = append(layerIds, r.ID)
-		layerInfo = append(layerInfo, types.ImageLayer{
+		layerInfo = append(layerInfo, gofeas.ImageLayer{
 			Arguments: r.CreatedBy,
 		})
 	}
 
 	record := store.Record{
-		DerivedImage: &types.V1beta1imageDetails{
-			DerivedImage: &types.ImageDerived{
-				Fingerprint: &types.ImageFingerprint{
+		DerivedImage: &gofeas.V1beta1imageDetails{
+			DerivedImage: &gofeas.ImageDerived{
+				Fingerprint: &gofeas.ImageFingerprint{
 					V1Name: inspectResponse.ID,
 					V2Blob: layerIds,
 				},
@@ -81,7 +81,13 @@ func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderCli
 		},
 	}
 	m.records = append(m.records, &record)
-	if _, err := m.createAttestation(inspectResponse.RepoDigests[0]); err != nil {
+	attestationRecord, err := m.createAttestation(inspectResponse.RepoDigests[0])
+	if err != nil {
+		return err
+	}
+	m.records = append(m.records, &attestationRecord)
+
+	if err := m.Store.Write(m.records...); err != nil {
 		return err
 	}
 
@@ -106,9 +112,9 @@ func (m *MetadataWriter) createAttestation(digest string) (store.Record, error) 
 	}
 
 	record := store.Record{
-		Attestation: &types.V1beta1attestationDetails{
-			Attestation: &types.AttestationAttestation{
-				PgpSignedAttestation: &types.AttestationPgpSignedAttestation{
+		Attestation: &gofeas.V1beta1attestationDetails{
+			Attestation: &gofeas.AttestationAttestation{
+				PgpSignedAttestation: &gofeas.AttestationPgpSignedAttestation{
 					Signature: sig,
 					PgpKeyId:  id,
 				},
@@ -124,7 +130,7 @@ func NewMetadataWriter(logger *logrus.Logger, metadataSpec *v1alpha1.BuildMetada
 
 	if metadataSpec.StoreConfig.Grafeas != nil {
 
-		config := types.Configuration{
+		config := gofeas.Configuration{
 			BasePath:   metadataSpec.Hostname,
 			HTTPClient: &http.Client{},
 		}

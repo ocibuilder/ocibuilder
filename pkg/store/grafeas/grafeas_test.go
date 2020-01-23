@@ -16,24 +16,47 @@ limitations under the License.
 
 package grafeas
 
-import "testing"
+import (
+	"net/http"
+	"testing"
 
-func TestGraf_List(t *testing.T) {
-
-}
+	"github.com/ocibuilder/gofeas"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/store"
+	"github.com/ocibuilder/ocibuilder/pkg/util"
+	"github.com/stretchr/testify/assert"
+)
 
 func TestGraf_Write(t *testing.T) {
-
+	log := util.Logger
+	metaStore := NewStore(configuration, grafeasSpec, log)
+	err := metaStore.Write(record)
+	assert.Equal(t, nil, err)
 }
 
-func TestGraf_Delete(t *testing.T) {
-
+var record = &store.Record{
+	Attestation: &gofeas.V1beta1attestationDetails{
+		Attestation: &gofeas.AttestationAttestation{
+			PgpSignedAttestation: &gofeas.AttestationPgpSignedAttestation{
+				Signature: "this-is-a-signature",
+				PgpKeyId:  "1",
+			},
+		},
+	},
 }
 
-func TestGraf_Read(t *testing.T) {
-
+var configuration = &gofeas.Configuration{
+	BasePath:   "http://localhost:8080",
+	HTTPClient: &http.Client{},
 }
 
-func TestNewStore(t *testing.T) {
+var metadataSpec = &v1alpha1.BuildMetadata{
+	StoreConfig: v1alpha1.StoreConfig{},
+	Hostname:    "http://localhost:8080",
+}
 
+var grafeasSpec = &v1alpha1.Grafeas{
+	Project:  "image-signing",
+	NoteName: "production",
+	Resource: "random-resource",
 }
