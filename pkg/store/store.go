@@ -19,7 +19,7 @@ package store
 import (
 	"time"
 
-	"github.com/artbegolli/grafeas"
+	"github.com/ocibuilder/gofeas"
 )
 
 // MetadataStore is a data storage interface
@@ -37,7 +37,7 @@ type Record struct {
 	Occurrence string
 	// Resource is the resource (e.g. fully qualified image name) of the resource metadata is for
 	Resource     string
-	Build        *grafeas.V1beta1buildDetails
-	DerivedImage *grafeas.V1beta1imageDetails
-	Attestation  *grafeas.V1beta1attestationDetails
+	Build        *gofeas.V1beta1buildDetails
+	DerivedImage *gofeas.V1beta1imageDetails
+	Attestation  *gofeas.V1beta1attestationDetails
 }

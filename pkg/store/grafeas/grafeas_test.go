@@ -35,6 +35,7 @@ func TestGraf_Write(t *testing.T) {
 }
 
 var record = &store.Record{
+	Resource: "random-occ-resource",
 	Attestation: &gofeas.V1beta1attestationDetails{
 		Attestation: &gofeas.AttestationAttestation{
 			PgpSignedAttestation: &gofeas.AttestationPgpSignedAttestation{
@@ -57,6 +58,6 @@ var metadataSpec = &v1alpha1.BuildMetadata{
 
 var grafeasSpec = &v1alpha1.Grafeas{
 	Project:  "image-signing",
-	NoteName: "production",
+	NoteName: "projects/image-signing/notes/production",
 	Resource: "random-resource",
 }
