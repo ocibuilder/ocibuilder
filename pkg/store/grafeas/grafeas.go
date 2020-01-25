@@ -37,6 +37,15 @@ type graf struct {
 	Logger *logrus.Logger
 }
 
+type httpError struct {
+	// Error the error response
+	Error string `json:"error,omitempty"`
+	// Message the error message from a Grafeas client http response
+	Message string `json:"message,omitempty"`
+	// Code is the error code
+	Code int `json:"code,omitempty"`
+}
+
 // Write writes to the Grafeas metadata store. It is a variadic function
 // and takes in a number of Records.
 // The records are parsed as follows
@@ -113,10 +122,4 @@ func NewStore(configuration *gofeas.Configuration, options *v1alpha1.Grafeas, lo
 		Options: options,
 		Logger:  logger,
 	}
-}
-
-type httpError struct {
-	Error   string `json:"error,omitempty"`
-	Message string `json:"message,omitempty"`
-	Code    int    `json:"code,omitempty"`
 }
