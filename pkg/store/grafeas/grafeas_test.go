@@ -29,6 +29,12 @@ import (
 )
 
 func TestGraf_Write(t *testing.T) {
+	var testStore = graf{
+		Client:  testClient{T: t},
+		Options: options,
+		Logger:  util.Logger,
+	}
+
 	err := testStore.Write(record)
 	assert.Equal(t, nil, err)
 }
@@ -52,15 +58,24 @@ var options = &v1alpha1.Grafeas{
 }
 
 func (t testClient) BatchCreateOccurrences(ctx context.Context, parent string, body gofeas.V1beta1BatchCreateOccurrencesRequest) (gofeas.V1beta1BatchCreateOccurrencesResponse, *http.Response, error) {
+	assert.Equal(t.T, "projects/image-signing", parent)
+	assert.Equal(t.T, "random-occ-resource", body.Occurrences[0].Resource.Uri)
+	assert.Equal(t.T, body.Occurrences[0].Attestation, record.Attestation)
 	return gofeas.V1beta1BatchCreateOccurrencesResponse{}, nil, nil
 }
 
 type testClient struct {
 	gofeas.APIClient
+	T *testing.T
 }
 
-var testStore = graf{
-	Client:  testClient{},
-	Options: options,
-	Logger:  util.Logger,
+var expectedRequest = gofeas.V1beta1BatchCreateOccurrencesRequest{
+	Parent: "projects/image-signing",
+	Occurrences: []gofeas.V1beta1Occurrence{{
+		Resource: &gofeas.V1beta1Resource{
+			Uri: "random-resource",
+		},
+		NoteName:    "projects/image-signing/notes/production",
+		Attestation: record.Attestation,
+	}},
 }
