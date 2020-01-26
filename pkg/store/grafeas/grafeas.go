@@ -30,7 +30,7 @@ import (
 
 type graf struct {
 	// Client is the grafeas API client
-	Client *gofeas.APIClient
+	Client gofeas.APIClient
 	// Options stores the options for pushing to Grafeas
 	Options *v1alpha1.Grafeas
 	// Logger is the logger
@@ -87,7 +87,7 @@ func (g *graf) Write(rec ...*store.Record) error {
 		Occurrences: occurrences,
 	}
 
-	res, httpRes, err := g.Client.GrafeasV1Beta1Api.BatchCreateOccurrences(ctx.Background(), parent, req)
+	res, httpRes, err := g.Client.BatchCreateOccurrences(ctx.Background(), parent, req)
 
 	if httpRes != nil && httpRes.StatusCode != http.StatusOK {
 		httpError := httpError{}

@@ -25,12 +25,11 @@ import (
 	"github.com/ocibuilder/ocibuilder/pkg/store"
 	"github.com/ocibuilder/ocibuilder/pkg/util"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/net/context"
 )
 
 func TestGraf_Write(t *testing.T) {
-	log := util.Logger
-	metaStore := NewStore(configuration, grafeasSpec, log)
-	err := metaStore.Write(record)
+	err := testStore.Write(record)
 	assert.Equal(t, nil, err)
 }
 
@@ -46,18 +45,22 @@ var record = &store.Record{
 	},
 }
 
-var configuration = &gofeas.Configuration{
-	BasePath:   "http://localhost:8080",
-	HTTPClient: &http.Client{},
-}
-
-var metadataSpec = &v1alpha1.BuildMetadata{
-	StoreConfig: v1alpha1.StoreConfig{},
-	Hostname:    "http://localhost:8080",
-}
-
-var grafeasSpec = &v1alpha1.Grafeas{
+var options = &v1alpha1.Grafeas{
 	Project:  "image-signing",
 	NoteName: "projects/image-signing/notes/production",
 	Resource: "random-resource",
+}
+
+func (t testClient) BatchCreateOccurrences(ctx context.Context, parent string, body gofeas.V1beta1BatchCreateOccurrencesRequest) (gofeas.V1beta1BatchCreateOccurrencesResponse, *http.Response, error) {
+	return gofeas.V1beta1BatchCreateOccurrencesResponse{}, nil, nil
+}
+
+type testClient struct {
+	gofeas.APIClient
+}
+
+var testStore = graf{
+	Client:  testClient{},
+	Options: options,
+	Logger:  util.Logger,
 }
