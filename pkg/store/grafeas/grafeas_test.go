@@ -68,14 +68,3 @@ type testClient struct {
 	gofeas.APIClient
 	T *testing.T
 }
-
-var expectedRequest = gofeas.V1beta1BatchCreateOccurrencesRequest{
-	Parent: "projects/image-signing",
-	Occurrences: []gofeas.V1beta1Occurrence{{
-		Resource: &gofeas.V1beta1Resource{
-			Uri: "random-resource",
-		},
-		NoteName:    "projects/image-signing/notes/production",
-		Attestation: record.Attestation,
-	}},
-}
