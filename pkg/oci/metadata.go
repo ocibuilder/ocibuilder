@@ -22,8 +22,8 @@ import (
 
 	"github.com/ocibuilder/gofeas"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/ocibuilder/ocibuilder/pkg/buildah"
 	"github.com/ocibuilder/ocibuilder/pkg/crypto"
-	"github.com/ocibuilder/ocibuilder/pkg/docker"
 	"github.com/ocibuilder/ocibuilder/pkg/store"
 	"github.com/ocibuilder/ocibuilder/pkg/store/grafeas"
 	"github.com/sirupsen/logrus"
@@ -46,8 +46,8 @@ func (m MetadataWriter) Write() error {
 
 func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderClient) error {
 
-	if _, ok := cli.(docker.Client); !ok {
-		return errors.New("writing metadata not currently supported for use with buildah")
+	if _, ok := cli.(buildah.Client); ok {
+		return errors.New("writing metadata is currently only supported for use with docker")
 	}
 
 	inspectResponse, err := cli.ImageInspect(imageName)
@@ -69,6 +69,7 @@ func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderCli
 		})
 	}
 
+	layerIds = append(layerIds, inspectResponse.ID)
 	record := store.Record{
 		DerivedImage: &gofeas.V1beta1imageDetails{
 			DerivedImage: &gofeas.ImageDerived{
@@ -81,14 +82,13 @@ func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderCli
 		},
 	}
 	m.records = append(m.records, &record)
-	attestationRecord, err := m.createAttestation(inspectResponse.RepoDigests[0])
-	if err != nil {
-		return err
-	}
-	m.records = append(m.records, &attestationRecord)
 
-	if err := m.Store.Write(m.records...); err != nil {
-		return err
+	if m.Metadata.Key != nil {
+		attestationRecord, err := m.createAttestation(inspectResponse.RepoDigests[0])
+		if err != nil {
+			return err
+		}
+		m.records = append(m.records, &attestationRecord)
 	}
 
 	return nil
