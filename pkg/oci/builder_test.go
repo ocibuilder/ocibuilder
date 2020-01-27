@@ -69,50 +69,6 @@ func TestBuilder_Build(t *testing.T) {
 
 }
 
-func TestBuilder_BuildMetadata(t *testing.T) {
-	builder := Builder{
-		Logger:   util.GetLogger(true),
-		Client:   testClient{},
-		Metadata: []v1alpha1.ImageMetadata{},
-	}
-
-	res := make(chan v1alpha1.OCIBuildResponse)
-	errChan := make(chan error)
-	finished := make(chan bool)
-
-	defer func() {
-		close(res)
-		close(errChan)
-		close(finished)
-	}()
-
-	metadata := v1alpha1.BuildMetadata{}
-	dummy.Spec.Metadata = &metadata
-
-	go builder.Build(dummy.Spec, res, errChan, finished)
-
-	for {
-		select {
-		case err := <-errChan:
-			{
-				assert.Equal(t, nil, err)
-				return
-			}
-		case out := <-res:
-			{
-				b, _ := ioutil.ReadAll(out.Body)
-				assert.Equal(t, "image build response", string(b))
-			}
-		case fin := <-finished:
-			{
-				assert.True(t, fin, "expecting finished to be reached without an error on the error channel")
-				return
-			}
-		}
-	}
-
-}
-
 func TestBuilder_Build2(t *testing.T) {
 	exists := true
 	if _, err := os.Stat("./ocib"); os.IsNotExist(err) {
@@ -170,4 +126,7 @@ func (t testClient) GenerateAuthRegistryString(auth types.AuthConfig) string {
 }
 
 type testClient struct {
+}
+
+type testStore struct {
 }
