@@ -127,6 +127,3 @@ func (t testClient) GenerateAuthRegistryString(auth types.AuthConfig) string {
 
 type testClient struct {
 }
-
-type testStore struct {
-}
