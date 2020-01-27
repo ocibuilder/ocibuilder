@@ -18,8 +18,6 @@ package oci
 
 import (
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestMetadataWriter_Write(t *testing.T) {
@@ -28,9 +26,6 @@ func TestMetadataWriter_Write(t *testing.T) {
 
 func TestMetadataWriter_ParseResponseMetadata(t *testing.T) {
 
-	mw := MetadataWriter{}
-	err := mw.ParseMetadata("testregistry/test-image:v0.1.0", testClient{})
-	assert.Equal(t, nil, err)
 }
 
 func TestNewMetadataWriter(t *testing.T) {
