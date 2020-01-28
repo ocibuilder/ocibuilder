@@ -32,14 +32,14 @@ import (
 
 func TestMetadataWriter_ParseResponseMetadata(t *testing.T) {
 	mw := MetadataWriter{
-		Metadata: &v1alpha1.BuildMetadata{
+		Metadata: &v1alpha1.Metadata{
 			StoreConfig: v1alpha1.StoreConfig{},
 			Key:         nil,
 			Hostname:    "",
 			Data:        nil,
 		},
 	}
-	err := mw.ParseMetadata("test-image", testClientMetadata{})
+	err := mw.ParseMetadata("test-image", testClientMetadata{}, v1alpha1.BuildProvenance{})
 	assert.Equal(t, nil, err)
 
 	record := mw.records[0]
@@ -51,7 +51,7 @@ func TestMetadataWriter_ParseResponseMetadata(t *testing.T) {
 
 func TestCreateAttestation(t *testing.T) {
 	mw := MetadataWriter{
-		Metadata: &v1alpha1.BuildMetadata{
+		Metadata: &v1alpha1.Metadata{
 			StoreConfig: v1alpha1.StoreConfig{},
 			Key: &v1alpha1.SignKey{
 				PlainPrivateKey: dummy.TestPrivKey,
@@ -61,7 +61,7 @@ func TestCreateAttestation(t *testing.T) {
 		},
 		Logger: util.Logger,
 	}
-	record, err := mw.createAttestation("image-digest")
+	record, err := mw.createAttestationRecord("image-digest")
 	assert.Equal(t, nil, err)
 	assert.True(t, strings.HasPrefix(record.Attestation.Attestation.PgpSignedAttestation.Signature, expectedPrefix))
 }

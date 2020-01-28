@@ -32,9 +32,9 @@ import (
 
 func TestBuilder_Build(t *testing.T) {
 	builder := Builder{
-		Logger:   util.GetLogger(true),
-		Client:   testClient{},
-		Metadata: []v1alpha1.ImageMetadata{},
+		Logger:     util.GetLogger(true),
+		Client:     testClient{},
+		Provenance: []v1alpha1.BuildProvenance{},
 	}
 
 	res := make(chan v1alpha1.OCIBuildResponse)

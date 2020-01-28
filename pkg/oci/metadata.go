@@ -18,7 +18,10 @@ package oci
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
+
+	"github.com/google/uuid"
 
 	"github.com/ocibuilder/gofeas"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
@@ -30,7 +33,7 @@ import (
 )
 
 type MetadataWriter struct {
-	Metadata *v1alpha1.BuildMetadata
+	Metadata *v1alpha1.Metadata
 	Logger   *logrus.Logger
 	Store    store.MetadataStore
 	// records holds all the records that have been parsed ready to push
@@ -44,7 +47,7 @@ func (m MetadataWriter) Write() error {
 	return nil
 }
 
-func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderClient) error {
+func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderClient, provenance v1alpha1.BuildProvenance) error {
 
 	if _, ok := cli.(buildah.Client); ok {
 		return errors.New("writing metadata is currently only supported for use with docker")
@@ -69,22 +72,17 @@ func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderCli
 		})
 	}
 
+	digest := inspectResponse.RepoDigests[0]
 	layerIds = append(layerIds, inspectResponse.ID)
-	record := store.Record{
-		DerivedImage: &gofeas.V1beta1imageDetails{
-			DerivedImage: &gofeas.ImageDerived{
-				Fingerprint: &gofeas.ImageFingerprint{
-					V1Name: inspectResponse.ID,
-					V2Blob: layerIds,
-				},
-				LayerInfo: layerInfo,
-			},
-		},
-	}
-	m.records = append(m.records, &record)
+
+	derivedImageRecord := m.createDerivedImageRecord(inspectResponse.ID, layerIds, layerInfo)
+	m.records = append(m.records, &derivedImageRecord)
+
+	buildRecord := m.createBuildRecord(digest, provenance)
+	m.records = append(m.records, &buildRecord)
 
 	if m.Metadata.Key != nil {
-		attestationRecord, err := m.createAttestation(inspectResponse.RepoDigests[0])
+		attestationRecord, err := m.createAttestationRecord(digest)
 		if err != nil {
 			return err
 		}
@@ -95,7 +93,46 @@ func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderCli
 
 }
 
-func (m *MetadataWriter) createAttestation(digest string) (store.Record, error) {
+func (m *MetadataWriter) createBuildRecord(digest string, buildProvenance v1alpha1.BuildProvenance) store.Record {
+	derivedBuildRecord := store.Record{
+		Build: &gofeas.V1beta1buildDetails{
+			Provenance: &gofeas.ProvenanceBuildProvenance{
+				Id:        uuid.New().String(),
+				ProjectId: m.Metadata.StoreConfig.Grafeas.Project,
+				BuiltArtifacts: []gofeas.ProvenanceArtifact{{
+					Checksum: digest,
+					Id:       fmt.Sprintf("%s@%s", buildProvenance.Name, digest),
+					Names:    []string{fmt.Sprintf("%s:%s", buildProvenance.Name, buildProvenance.Tag)},
+				}},
+				StartTime:  buildProvenance.StartTime,
+				EndTime:    buildProvenance.EndTime,
+				CreateTime: buildProvenance.EndTime,
+				Creator:    buildProvenance.Creator,
+				SourceProvenance: &gofeas.ProvenanceSource{
+					ArtifactStorageSourceUri: buildProvenance.Source,
+				},
+			},
+		},
+	}
+	return derivedBuildRecord
+}
+
+func (m *MetadataWriter) createDerivedImageRecord(imageId string, layerIds []string, layerInfo []gofeas.ImageLayer) store.Record {
+	derivedImageRecord := store.Record{
+		DerivedImage: &gofeas.V1beta1imageDetails{
+			DerivedImage: &gofeas.ImageDerived{
+				Fingerprint: &gofeas.ImageFingerprint{
+					V1Name: imageId,
+					V2Blob: layerIds,
+				},
+				LayerInfo: layerInfo,
+			},
+		},
+	}
+	return derivedImageRecord
+}
+
+func (m *MetadataWriter) createAttestationRecord(digest string) (store.Record, error) {
 
 	if m.Metadata.Key == nil {
 		return store.Record{}, errors.New("no signing key has been defined")
@@ -125,7 +162,7 @@ func (m *MetadataWriter) createAttestation(digest string) (store.Record, error) 
 	return record, nil
 }
 
-func NewMetadataWriter(logger *logrus.Logger, metadataSpec *v1alpha1.BuildMetadata) MetadataWriter {
+func NewMetadataWriter(logger *logrus.Logger, metadataSpec *v1alpha1.Metadata) MetadataWriter {
 	var metadataStore store.MetadataStore
 
 	if metadataSpec.StoreConfig.Grafeas != nil {

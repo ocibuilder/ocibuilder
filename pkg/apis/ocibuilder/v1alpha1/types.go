@@ -19,6 +19,7 @@ package v1alpha1
 import (
 	ctx "context"
 	"io"
+	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/registry"
@@ -64,7 +65,7 @@ const (
 	// Attestation is attestation metadata
 	Attestation MetadataType = "attestation"
 	// DerviedImage any metadata related to the derived image
-	DerivedImaged MetadataType = "derived-image"
+	DerivedImage MetadataType = "derived-image"
 )
 
 // OCIBuilder is the definition of a ocibuilder resource
@@ -110,7 +111,7 @@ type OCIBuilderSpec struct {
 	// Configuration for storing build metadata in an external Metadata store.
 	// Defaults to Grafeas as the chosen metadata store
 	// +optional
-	Metadata *BuildMetadata `json:"metadata,omitempty" protobuf:"bytes,6,opt,name=metadata"`
+	Metadata *Metadata `json:"metadata,omitempty" protobuf:"bytes,6,opt,name=metadata"`
 }
 
 // OCIBuilderStatus holds the status of a OCIBuilder resource
@@ -208,7 +209,7 @@ type AnsibleGalaxy struct {
 // BuildStep represents a step within the build
 type BuildStep struct {
 	// Metadata about the build step.
-	*Metadata `json:"metadata,inline" protobuf:"bytes,1,name=metadata"`
+	*ImageMetadata `json:"metadata,inline" protobuf:"bytes,1,name=metadata"`
 	// Stages of the build
 	// +listType=map
 	Stages []Stage `json:"stages" protobuf:"bytes,3,opt,name=purge"`
@@ -237,7 +238,7 @@ type BuildStep struct {
 // Stage represents a stage within the build
 type Stage struct {
 	// Metadata refers to metadata of the build stage
-	*Metadata `json:"metadata,inline" protobuf:"bytes,1,name=metadata"`
+	*ImageMetadata `json:"metadata,inline" protobuf:"bytes,1,name=metadata"`
 	// BaseImage refers to parent image for given build stage.
 	Base Base `json:"base" protobuf:"bytes,2,name=base"`
 	// Template refers to one of the build templates.
@@ -258,8 +259,8 @@ type Base struct {
 	Platform string `json:"platform,omitempty" protobuf:"bytes,3,name=platform"`
 }
 
-// Metadata represents data about a build step
-type Metadata struct {
+// ImageMetadata represents data about a build step
+type ImageMetadata struct {
 	// Name of the build step
 	Name string `json:"name" protobuf:"bytes,1,name=name"`
 	// Labels for the step
@@ -268,6 +269,10 @@ type Metadata struct {
 	// Annotations for the step
 	// +optional
 	Annotations map[string]string `json:"annotations,omitempty" protobuf:"bytes,3,opt,name=annotations"`
+	// Creator is the creator of the build
+	Creator string `json:"creator,omitempty" protobuf:"bytes,4,opt,name=creator"`
+	// Source is the URI to the source code of the image build
+	Source string `json:"source,omitempty" protobuf:"bytes,5,opt,name=source"`
 }
 
 // LoginSpec holds the information to log into a registry.
@@ -377,6 +382,10 @@ type ImageBuildArgs struct {
 	// Labels for the step
 	// +optional
 	Labels map[string]string `json:"labels,omitempty" protobuf:"bytes,7,opt,name=labels"`
+	// Creator is the email of the build creator
+	Creator string `json:"creator,omitempty"`
+	// Source is the URI of the source code for the build
+	Source string `json:"source,omitempty"`
 }
 
 // BuildContext stores the chosen build context for your build, this can be Local, S3 or Git
@@ -531,14 +540,30 @@ type Command struct {
 	Value []string `json:"value" protobuf:"bytes,7,opt,name=value"`
 }
 
-// ImageMetadata represents build image metadata
-type ImageMetadata struct {
+// BuildProvenance represents build image metadata
+type BuildProvenance struct {
 	// BuildFile is the path to the buildfile that was used for the image build
 	BuildFile string `json:"buildFile" protobuf:"bytes,1,opt,name=buildFile"`
 	// ContextDirectory is the path to the build context
 	ContextDirectory string `json:"contextDirectory" protobuf:"bytes,2,opt,name=contextDirectory"`
 	// Daemon is whether the daemon was used to build or not (Docker or Buildah)
 	Daemon bool `json:"daemon" protobuf:"bytes,3,opt,name=daemon"`
+	// Time at which the build was created.
+	CreateTime time.Time `json:"createTime,omitempty"`
+	// Time at which execution of the build was started.
+	StartTime time.Time `json:"startTime,omitempty"`
+	// Time at which execution of the build was finished.
+	EndTime time.Time `json:"endTime,omitempty"`
+	// Creator is the email of the build creator
+	Creator string `json:"creator,omitempty"`
+	// Source is the URI of the source code for the build
+	Source string `json:"source,omitempty"`
+	// Name is the image name
+	Name string `json:"name,omitempty"`
+	// Tag is the image tag
+	Tag string `json:"tag,omitempty"`
+	// ID is the ID of the image
+	ID string `json:"id,omitempty"`
 }
 
 // OCIBuildOptions are the build options for an ocibuilder build
@@ -665,8 +690,8 @@ type BuildGenTemplate struct {
 	Cmds []string
 }
 
-// Meta is where metadata to store is defined in the ocibuilder specification
-type BuildMetadata struct {
+// Metadata is where metadata to store is defined in the ocibuilder specification
+type Metadata struct {
 	// StoreType is the metadata store type to push metadata to
 	StoreConfig StoreConfig `json:"storeConfig,omitempty" protobuf:"bytes,1,opt,name=storeConfig"`
 	// SignKey holds the key to sign an image for attestation purposes
@@ -675,6 +700,9 @@ type BuildMetadata struct {
 	Hostname string `json:"hostname,omitempty" protobuf:"bytes,3,opt,name=hostname"`
 	// Data is the types of metadata that you would like to push to your metadatastore
 	Data []MetadataType `json:"data,omitempty" protobuf:"bytes,4,opt,name=data"`
+	// Creator is the email of the build creator
+	Creator string `json:"creator,omitempty" protobuf:"bytes,5,opt,name=creator"`
+	// Source
 }
 
 type SignKey struct {
