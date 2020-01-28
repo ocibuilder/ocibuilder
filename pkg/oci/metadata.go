@@ -38,6 +38,8 @@ type MetadataWriter struct {
 	Store    store.MetadataStore
 	// records holds all the records that have been parsed ready to push
 	records []*store.Record
+	// resource holds the resource ID
+	resource string
 }
 
 func (m MetadataWriter) Write() error {
@@ -48,6 +50,7 @@ func (m MetadataWriter) Write() error {
 }
 
 func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderClient, provenance v1alpha1.BuildProvenance) error {
+	log := m.Logger
 
 	if _, ok := cli.(buildah.Client); ok {
 		return errors.New("writing metadata is currently only supported for use with docker")
@@ -73,20 +76,46 @@ func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderCli
 	}
 
 	digest := inspectResponse.RepoDigests[0]
+	m.resource = fmt.Sprintf("%s@%s", provenance.Name, digest)
+
 	layerIds = append(layerIds, inspectResponse.ID)
 
-	derivedImageRecord := m.createDerivedImageRecord(inspectResponse.ID, layerIds, layerInfo)
-	m.records = append(m.records, &derivedImageRecord)
+	if len(m.Metadata.Data) == 0 {
+		log.Errorln("no requested metadata types defined in the specification - ensure that metadata types are defined in the data field")
+		return errors.New("no requested metadata types found")
+	}
 
-	buildRecord := m.createBuildRecord(digest, provenance)
-	m.records = append(m.records, &buildRecord)
+	for _, requestedMetadata := range m.Metadata.Data {
 
-	if m.Metadata.Key != nil {
-		attestationRecord, err := m.createAttestationRecord(digest)
-		if err != nil {
-			return err
+		switch v1alpha1.MetadataType(requestedMetadata) {
+
+		case v1alpha1.Build:
+			{
+				log.Debugln("found request for build metadata, creating build record")
+				buildRecord := m.createBuildRecord(digest, provenance)
+				m.records = append(m.records, &buildRecord)
+			}
+		case v1alpha1.Attestation:
+			{
+				log.Debugln("found request for attestation metadata, creating attestation record")
+				attestationRecord, err := m.createAttestationRecord(digest)
+				if err != nil {
+					return err
+				}
+				m.records = append(m.records, &attestationRecord)
+			}
+		case v1alpha1.Image:
+			{
+				log.Debugln("found request for image metadata, creating image record")
+				derivedImageRecord := m.createDerivedImageRecord(inspectResponse.ID, layerIds, layerInfo)
+				m.records = append(m.records, &derivedImageRecord)
+			}
+		default:
+			{
+				log.Warnf("the metadata type %s defined is not valid\n", requestedMetadata)
+			}
 		}
-		m.records = append(m.records, &attestationRecord)
+
 	}
 
 	return nil
@@ -95,13 +124,14 @@ func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderCli
 
 func (m *MetadataWriter) createBuildRecord(digest string, buildProvenance v1alpha1.BuildProvenance) store.Record {
 	derivedBuildRecord := store.Record{
+		Resource: m.resource,
 		Build: &gofeas.V1beta1buildDetails{
 			Provenance: &gofeas.ProvenanceBuildProvenance{
 				Id:        uuid.New().String(),
 				ProjectId: m.Metadata.StoreConfig.Grafeas.Project,
 				BuiltArtifacts: []gofeas.ProvenanceArtifact{{
 					Checksum: digest,
-					Id:       fmt.Sprintf("%s@%s", buildProvenance.Name, digest),
+					Id:       m.resource,
 					Names:    []string{fmt.Sprintf("%s:%s", buildProvenance.Name, buildProvenance.Tag)},
 				}},
 				StartTime:  buildProvenance.StartTime,
@@ -119,6 +149,7 @@ func (m *MetadataWriter) createBuildRecord(digest string, buildProvenance v1alph
 
 func (m *MetadataWriter) createDerivedImageRecord(imageId string, layerIds []string, layerInfo []gofeas.ImageLayer) store.Record {
 	derivedImageRecord := store.Record{
+		Resource: m.resource,
 		DerivedImage: &gofeas.V1beta1imageDetails{
 			DerivedImage: &gofeas.ImageDerived{
 				Fingerprint: &gofeas.ImageFingerprint{
@@ -135,7 +166,7 @@ func (m *MetadataWriter) createDerivedImageRecord(imageId string, layerIds []str
 func (m *MetadataWriter) createAttestationRecord(digest string) (store.Record, error) {
 
 	if m.Metadata.Key == nil {
-		return store.Record{}, errors.New("no signing key has been defined")
+		return store.Record{}, errors.New("no signing key has been defined for image attestation")
 	}
 
 	privKey, pubKey, err := crypto.ValidateKeysPacket(m.Metadata.Key)
@@ -149,6 +180,7 @@ func (m *MetadataWriter) createAttestationRecord(digest string) (store.Record, e
 	}
 
 	record := store.Record{
+		Resource: m.resource,
 		Attestation: &gofeas.V1beta1attestationDetails{
 			Attestation: &gofeas.AttestationAttestation{
 				PgpSignedAttestation: &gofeas.AttestationPgpSignedAttestation{

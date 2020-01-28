@@ -65,7 +65,7 @@ const (
 	// Attestation is attestation metadata
 	Attestation MetadataType = "attestation"
 	// DerviedImage any metadata related to the derived image
-	DerivedImage MetadataType = "derived-image"
+	Image MetadataType = "image"
 )
 
 // OCIBuilder is the definition of a ocibuilder resource
@@ -702,7 +702,6 @@ type Metadata struct {
 	Data []MetadataType `json:"data,omitempty" protobuf:"bytes,4,opt,name=data"`
 	// Creator is the email of the build creator
 	Creator string `json:"creator,omitempty" protobuf:"bytes,5,opt,name=creator"`
-	// Source
 }
 
 type SignKey struct {
@@ -738,10 +737,15 @@ type StoreConfig struct {
 type Grafeas struct {
 	// Project is the name of the project ID to store the occurrence
 	Project string `json:"project,omitempty" protobuf:"bytes,1,opt,name=project"`
-	// Resource Required. Immutable. The resource for which the occurrence applies.
-	Resource string `json:"resource,omitempty" protobuf:"bytes,2,opt,name=resource"`
-	// NoteName Required. Immutable. The analysis note associated with this occurrence, in the form of `projects/[PROVIDER_ID]/notes/[NOTE_ID]`. This field can be used as a filter in list requests.
-	NoteName string `json:"noteName,omitempty" protobuf:"bytes,3,opt,name=noteName"`
-	// Output only. This explicitly denotes which of the occurrence details are specified. This field can be used as a filter in list requests.
-	Kind string `json:"kind,omitempty" protobuf:"bytes,4,opt,name=kind"`
+	// Notes holds the notes for the three occurrence types
+	Notes Notes `json:"notes,omitempty" protobuf:"bytes,3,opt,name=notes"`
+}
+
+type Notes struct {
+	// BuildNoteName Required. Immutable. The analysis note associated with build occurrence, in the form of `projects/[PROVIDER_ID]/notes/[NOTE_ID]`. This field can be used as a filter in list requests.
+	BuildNoteName string `json:"buildNoteName,omitempty" protobuf:"bytes,1,opt,name=buildNoteName"`
+	// AttestationNoteName Required. Immutable. The analysis note associated with attestation occurrence, in the form of `projects/[PROVIDER_ID]/notes/[NOTE_ID]`. This field can be used as a filter in list requests.
+	AttestationNoteName string `json:"attestationNoteName,omitempty" protobuf:"bytes,2,opt,name=attestationNoteName"`
+	// DerivedImageNoteName Required. Immutable. The analysis note associated with image derived occurrence, in the form of `projects/[PROVIDER_ID]/notes/[NOTE_ID]`. This field can be used as a filter in list requests.
+	DerivedImageNoteName string `json:"derivedImageNoteName,omitempty" protobuf:"bytes,3,opt,name=derivedImageNoteName"`
 }

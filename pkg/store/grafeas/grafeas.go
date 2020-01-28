@@ -58,7 +58,6 @@ func (g *graf) Write(rec ...*store.Record) error {
 			Resource: &gofeas.V1beta1Resource{
 				Uri: r.Resource,
 			},
-			NoteName: g.Options.NoteName,
 		}
 
 		switch {
@@ -66,14 +65,17 @@ func (g *graf) Write(rec ...*store.Record) error {
 		case r.Build != nil:
 			{
 				occ.Build = r.Build
+				occ.NoteName = g.Options.Notes.BuildNoteName
 			}
 		case r.DerivedImage != nil:
 			{
 				occ.DerivedImage = r.DerivedImage
+				occ.NoteName = g.Options.Notes.DerivedImageNoteName
 			}
 		case r.Attestation != nil:
 			{
 				occ.Attestation = r.Attestation
+				occ.NoteName = g.Options.Notes.AttestationNoteName
 			}
 
 		}
