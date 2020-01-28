@@ -52,14 +52,14 @@ var record = &store.Record{
 }
 
 var options = &v1alpha1.Grafeas{
-	Project:  "image-signing",
-	NoteName: "projects/image-signing/notes/production",
-	Resource: "random-resource",
+	Project: "image-signing",
+	Notes: v1alpha1.Notes{
+		AttestationNoteName: "projects/image-signing/notes/production",
+	},
 }
 
 func (t testClient) BatchCreateOccurrences(ctx context.Context, parent string, body gofeas.V1beta1BatchCreateOccurrencesRequest) (gofeas.V1beta1BatchCreateOccurrencesResponse, *http.Response, error) {
 	assert.Equal(t.T, "projects/image-signing", parent)
-	assert.Equal(t.T, "random-occ-resource", body.Occurrences[0].Resource.Uri)
 	assert.Equal(t.T, body.Occurrences[0].Attestation, record.Attestation)
 	return gofeas.V1beta1BatchCreateOccurrencesResponse{}, nil, nil
 }
