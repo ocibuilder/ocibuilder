@@ -29,7 +29,7 @@ var Spec = v1alpha1.OCIBuilderSpec{
 var BuildSpec = &v1alpha1.BuildSpec{
 	Steps: []v1alpha1.BuildStep{
 		{
-			Metadata: &v1alpha1.Metadata{
+			ImageMetadata: &v1alpha1.ImageMetadata{
 				Name: "test-build",
 			},
 			Stages: []v1alpha1.Stage{
@@ -37,7 +37,7 @@ var BuildSpec = &v1alpha1.BuildSpec{
 					Base: v1alpha1.Base{
 						Image: "alpine",
 					},
-					Metadata: &v1alpha1.Metadata{
+					ImageMetadata: &v1alpha1.ImageMetadata{
 						Name: "stage-one",
 					},
 					Cmd: []v1alpha1.BuildTemplateStep{
