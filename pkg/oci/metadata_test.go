@@ -31,13 +31,18 @@ import (
 )
 
 func TestMetadataWriter_ParseResponseMetadata(t *testing.T) {
+	dataTypes := []v1alpha1.MetadataType{
+		v1alpha1.MetadataType("image"),
+	}
+
 	mw := MetadataWriter{
 		Metadata: &v1alpha1.Metadata{
 			StoreConfig: v1alpha1.StoreConfig{},
 			Key:         nil,
 			Hostname:    "",
-			Data:        nil,
+			Data:        dataTypes,
 		},
+		Logger: util.Logger,
 	}
 	err := mw.ParseMetadata("test-image", testClientMetadata{}, v1alpha1.BuildProvenance{})
 	assert.Equal(t, nil, err)
