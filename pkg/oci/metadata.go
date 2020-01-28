@@ -56,15 +56,21 @@ func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderCli
 		return errors.New("writing metadata is currently only supported for use with docker")
 	}
 
+	log.Debugln("conducting image inspect")
 	inspectResponse, err := cli.ImageInspect(imageName)
-	if err != nil {
+	if err != nil || inspectResponse.ID == "" {
+		log.Errorln("error in inspecting image or no response ID returned - cannot push metadata")
 		return err
 	}
+	log.WithField("response", inspectResponse).Debugln("inspect response")
 
+	log.Debugln("conducting image history")
 	historyResponse, err := cli.ImageHistory(imageName)
-	if err != nil {
+	if err != nil || historyResponse[0].ID == "" {
+		log.Errorln("error in request image history or no history ID response returned - cannot push metadata")
 		return err
 	}
+	log.WithField("response", historyResponse).Debugln("history response")
 
 	var layerIds []string
 	var layerInfo []gofeas.ImageLayer
@@ -75,7 +81,8 @@ func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderCli
 		})
 	}
 
-	digest := inspectResponse.RepoDigests[0]
+	// Currently we are signing ImageID instead of digests - digests are generated when a local manifest is created pre-push
+	digest := inspectResponse.ID
 	m.resource = fmt.Sprintf("%s@%s", provenance.Name, digest)
 
 	layerIds = append(layerIds, inspectResponse.ID)

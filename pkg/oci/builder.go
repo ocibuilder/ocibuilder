@@ -93,8 +93,17 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 			errChan <- err
 			return
 		}
-		buildProvenance.EndTime = time.Now()
 
+		res <- buildResponse
+		if buildResponse.Exec != nil {
+			log.Debugln("executing wait on build response")
+			if err := buildResponse.Exec.Wait(); err != nil {
+				errChan <- err
+				return
+			}
+		}
+
+		buildProvenance.EndTime = time.Now()
 		if spec.Metadata != nil {
 			log.Debugln("metadata specification present")
 			mw := NewMetadataWriter(log, spec.Metadata)
@@ -107,15 +116,6 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 				errChan <- err
 			}
 
-		}
-
-		res <- buildResponse
-		if buildResponse.Exec != nil {
-			log.Debugln("executing wait on build response")
-			if err := buildResponse.Exec.Wait(); err != nil {
-				errChan <- err
-				return
-			}
 		}
 
 		if opt.Purge {

@@ -743,9 +743,9 @@ type Grafeas struct {
 
 type Notes struct {
 	// BuildNoteName Required. Immutable. The analysis note associated with build occurrence, in the form of `projects/[PROVIDER_ID]/notes/[NOTE_ID]`. This field can be used as a filter in list requests.
-	BuildNoteName string `json:"buildNoteName,omitempty" protobuf:"bytes,1,opt,name=buildNoteName"`
+	BuildNoteName string `json:"build,omitempty" protobuf:"bytes,1,opt,name=build"`
 	// AttestationNoteName Required. Immutable. The analysis note associated with attestation occurrence, in the form of `projects/[PROVIDER_ID]/notes/[NOTE_ID]`. This field can be used as a filter in list requests.
-	AttestationNoteName string `json:"attestationNoteName,omitempty" protobuf:"bytes,2,opt,name=attestationNoteName"`
+	AttestationNoteName string `json:"attestation,omitempty" protobuf:"bytes,2,opt,name=attestation"`
 	// DerivedImageNoteName Required. Immutable. The analysis note associated with image derived occurrence, in the form of `projects/[PROVIDER_ID]/notes/[NOTE_ID]`. This field can be used as a filter in list requests.
-	DerivedImageNoteName string `json:"derivedImageNoteName,omitempty" protobuf:"bytes,3,opt,name=derivedImageNoteName"`
+	DerivedImageNoteName string `json:"image,omitempty" protobuf:"bytes,3,opt,name=image"`
 }
