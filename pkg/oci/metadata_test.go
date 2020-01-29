@@ -49,9 +49,12 @@ func TestMetadataWriter_ParseResponseMetadata(t *testing.T) {
 
 	record := mw.records[0]
 	fingerprint := record.DerivedImage.DerivedImage.Fingerprint
-	layerInfo := record.DerivedImage.DerivedImage.LayerInfo
+	args := record.DerivedImage.DerivedImage.LayerInfo[0].Arguments
+	cmd := *record.DerivedImage.DerivedImage.LayerInfo[0].Directive
+
 	assert.Equal(t, expectedRecord.DerivedImage.DerivedImage.Fingerprint, fingerprint)
-	assert.Equal(t, expectedRecord.DerivedImage.DerivedImage.LayerInfo, layerInfo)
+	assert.Equal(t, gofeas.ADD_LayerDirective, cmd)
+	assert.Equal(t, "file:0eb5ea35741d23fe39cbac245b3a5d84856ed6384f4ff07d496369ee6d960bad", args)
 }
 
 func TestCreateAttestation(t *testing.T) {
@@ -126,7 +129,7 @@ func (t testClientMetadata) ImageInspect(imageId string) (types.ImageInspect, er
 
 func (t testClientMetadata) ImageHistory(imageId string) ([]image.HistoryResponseItem, error) {
 	return []image.HistoryResponseItem{{
-		CreatedBy: "ADD ./test .",
+		CreatedBy: "/bin/sh -c #(nop) ADD file:0eb5ea35741d23fe39cbac245b3a5d84856ed6384f4ff07d496369ee6d960bad",
 		ID:        "sha256-imageid2",
 	}}, nil
 }
