@@ -77,7 +77,7 @@ func ValidateKeys(key *v1alpha1.SignKey) (privKey, pubKey string, err error) {
 
 		pubKey = os.Getenv(key.EnvPublicKey)
 		if pubKey == "" {
-			log.Warn("environment variable empy for public key")
+			log.Warn("environment variable empty for public key")
 		}
 
 		return privKey, pubKey, nil

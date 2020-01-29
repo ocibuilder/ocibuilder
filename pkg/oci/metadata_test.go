@@ -71,6 +71,19 @@ func TestCreateAttestation(t *testing.T) {
 	assert.True(t, strings.HasPrefix(record.Attestation.Attestation.PgpSignedAttestation.Signature, expectedPrefix))
 }
 
+func TestParseCreatedBy(t *testing.T) {
+	testRunCmd := "/bin/sh -c mkdir /certs /certs/client && chmod 1777 /certs /certs/client"
+	testStdCmd := "/bin/sh -c #(nop)  ENV _BUILDAH_STARTED_IN_USERNS= BUILDAH_ISOLATION=chroot"
+
+	runLayer := parseCreatedBy(testRunCmd)
+	assert.Equal(t, gofeas.RUN_LayerDirective, *runLayer.Directive)
+	assert.Equal(t, "mkdir /certs /certs/client && chmod 1777 /certs /certs/client", runLayer.Arguments)
+
+	envLayer := parseCreatedBy(testStdCmd)
+	assert.Equal(t, gofeas.ENV_LayerDirective, *envLayer.Directive)
+	assert.Equal(t, "_BUILDAH_STARTED_IN_USERNS= BUILDAH_ISOLATION=chroot", envLayer.Arguments)
+}
+
 var expectedRecord = store.Record{
 	DerivedImage: &gofeas.V1beta1imageDetails{
 		DerivedImage: &gofeas.ImageDerived{

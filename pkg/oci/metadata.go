@@ -20,9 +20,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/google/uuid"
-
 	"github.com/ocibuilder/gofeas"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/buildah"
@@ -62,7 +62,7 @@ func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderCli
 		log.Errorln("error in inspecting image or no response ID returned - cannot push metadata")
 		return err
 	}
-	log.WithField("response", inspectResponse).Debugln("inspect response")
+	log.WithField("responseId", inspectResponse.ID).Debugln("inspect response ID")
 
 	log.Debugln("conducting image history")
 	historyResponse, err := cli.ImageHistory(imageName)
@@ -70,15 +70,12 @@ func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderCli
 		log.Errorln("error in request image history or no history ID response returned - cannot push metadata")
 		return err
 	}
-	log.WithField("response", historyResponse).Debugln("history response")
 
 	var layerIds []string
 	var layerInfo []gofeas.ImageLayer
 	for _, r := range historyResponse {
 		layerIds = append(layerIds, r.ID)
-		layerInfo = append(layerInfo, gofeas.ImageLayer{
-			Arguments: r.CreatedBy,
-		})
+		layerInfo = append(layerInfo, parseCreatedBy(r.CreatedBy))
 	}
 
 	// Currently we are signing ImageID instead of digests - digests are generated when a local manifest is created pre-push
@@ -94,7 +91,7 @@ func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderCli
 
 	for _, requestedMetadata := range m.Metadata.Data {
 
-		switch v1alpha1.MetadataType(requestedMetadata) {
+		switch requestedMetadata {
 
 		case v1alpha1.Build:
 			{
@@ -107,6 +104,7 @@ func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderCli
 				log.Debugln("found request for attestation metadata, creating attestation record")
 				attestationRecord, err := m.createAttestationRecord(digest)
 				if err != nil {
+					log.Errorln("error creating attestation record")
 					return err
 				}
 				m.records = append(m.records, &attestationRecord)
@@ -218,5 +216,25 @@ func NewMetadataWriter(logger *logrus.Logger, metadataSpec *v1alpha1.Metadata) M
 		Logger:   logger,
 		Store:    metadataStore,
 		Metadata: metadataSpec,
+	}
+}
+
+func parseCreatedBy(createdBy string) gofeas.ImageLayer {
+	createdBy = strings.TrimPrefix(createdBy, "/bin/sh -c ")
+
+	if strings.HasPrefix(createdBy, "#(nop)") {
+		createdBySplit := strings.Fields(createdBy)
+
+		directive := gofeas.LayerDirective(createdBySplit[1])
+		return gofeas.ImageLayer{
+			Directive: &directive,
+			Arguments: strings.Join(createdBySplit[2:], " "),
+		}
+	}
+
+	directive := gofeas.RUN_LayerDirective
+	return gofeas.ImageLayer{
+		Directive: &directive,
+		Arguments: createdBy,
 	}
 }

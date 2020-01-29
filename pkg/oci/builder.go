@@ -109,7 +109,8 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 			mw := NewMetadataWriter(log, spec.Metadata)
 
 			if err := mw.ParseMetadata(imageName, b.Client, buildProvenance); err != nil {
-				return
+				log.Errorln("error parsing image metadata to push to store")
+				errChan <- err
 			}
 
 			if err := mw.Write(); err != nil {
