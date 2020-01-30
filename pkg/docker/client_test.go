@@ -44,6 +44,7 @@ func TestClient_GenerateAuthRegistryString(t *testing.T) {
 }
 
 var cli = Client{
+
 	Logger:    util.GetLogger(true),
 	APIClient: testClient{},
 }

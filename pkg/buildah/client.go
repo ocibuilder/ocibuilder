@@ -23,6 +23,7 @@ import (
 	"io/ioutil"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/registry"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/command"
@@ -159,6 +160,11 @@ func (cli Client) ImageInspect(imageId string) (types.ImageInspect, error) {
 		return types.ImageInspect{}, err
 	}
 	return types.ImageInspect{}, nil
+}
+
+// ImageHistory is TBC for buildah client
+func (cli Client) ImageHistory(imageId string) ([]image.HistoryResponseItem, error) {
+	return nil, nil
 }
 
 // RegistryLogin conducts a registry login with Buildah using the ocibuilder

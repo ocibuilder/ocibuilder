@@ -17,10 +17,13 @@ limitations under the License.
 package oci
 
 import (
+	"io/ioutil"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/image"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/util"
 	"github.com/ocibuilder/ocibuilder/testing/dummy"
@@ -29,9 +32,9 @@ import (
 
 func TestBuilder_Build(t *testing.T) {
 	builder := Builder{
-		Logger:   util.GetLogger(true),
-		Client:   testClient{},
-		Metadata: []v1alpha1.ImageMetadata{},
+		Logger:     util.GetLogger(true),
+		Client:     testClient{},
+		Provenance: []v1alpha1.BuildProvenance{},
 	}
 
 	res := make(chan v1alpha1.OCIBuildResponse)
@@ -91,7 +94,13 @@ func TestBuilder_Purge(t *testing.T) {
 }
 
 func (t testClient) ImageBuild(options v1alpha1.OCIBuildOptions) (v1alpha1.OCIBuildResponse, error) {
-	return v1alpha1.OCIBuildResponse{}, nil
+	body := ioutil.NopCloser(strings.NewReader("image build response"))
+	return v1alpha1.OCIBuildResponse{
+		ImageBuildResponse: types.ImageBuildResponse{
+			Body:   body,
+			OSType: "",
+		},
+	}, nil
 }
 
 func (t testClient) ImagePull(options v1alpha1.OCIPullOptions) (v1alpha1.OCIPullResponse, error) {
@@ -106,10 +115,12 @@ func (t testClient) ImageRemove(options v1alpha1.OCIRemoveOptions) (v1alpha1.OCI
 func (t testClient) ImageInspect(imageId string) (types.ImageInspect, error) {
 	return types.ImageInspect{}, nil
 }
+func (t testClient) ImageHistory(imageId string) ([]image.HistoryResponseItem, error) {
+	return nil, nil
+}
 func (t testClient) RegistryLogin(options v1alpha1.OCILoginOptions) (v1alpha1.OCILoginResponse, error) {
 	return v1alpha1.OCILoginResponse{}, nil
 }
-
 func (t testClient) GenerateAuthRegistryString(auth types.AuthConfig) string {
 	return ""
 }

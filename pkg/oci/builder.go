@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
@@ -31,9 +32,9 @@ import (
 )
 
 type Builder struct {
-	Logger   *logrus.Logger
-	Client   v1alpha1.BuilderClient
-	Metadata []v1alpha1.ImageMetadata
+	Logger     *logrus.Logger
+	Client     v1alpha1.BuilderClient
+	Provenance []v1alpha1.BuildProvenance
 }
 
 func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBuildResponse, errChan chan<- error, finished chan<- bool) {
@@ -52,10 +53,14 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 	}
 
 	for idx, opt := range buildOpts {
-		b.Metadata = append(b.Metadata, v1alpha1.ImageMetadata{
+		buildProvenance := v1alpha1.BuildProvenance{
 			BuildFile:        opt.Dockerfile,
 			ContextDirectory: opt.BuildContextPath,
-		})
+			Creator:          opt.Creator,
+			Source:           opt.Source,
+			Name:             opt.Name,
+			Tag:              opt.Tag,
+		}
 
 		log.WithField("step: ", idx).Debugln("running build step")
 		log.WithField("path", opt.BuildContextPath).Debugln("building with build context at path")
@@ -80,6 +85,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 			},
 		}
 
+		buildProvenance.StartTime = time.Now()
 		log.WithField("imageName", imageName).Debugln("building image with name")
 		buildResponse, err := cli.ImageBuild(builderOptions)
 		if err != nil {
@@ -97,6 +103,22 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 			}
 		}
 
+		buildProvenance.EndTime = time.Now()
+		if spec.Metadata != nil {
+			log.Debugln("metadata specification present")
+			mw := NewMetadataWriter(log, spec.Metadata)
+
+			if err := mw.ParseMetadata(imageName, b.Client, buildProvenance); err != nil {
+				log.Errorln("error parsing image metadata to push to store")
+				errChan <- err
+			}
+
+			if err := mw.Write(); err != nil {
+				errChan <- err
+			}
+
+		}
+
 		if opt.Purge {
 			if err := b.Purge(imageName); err != nil {
 				log.WithError(err).Errorln("unable to complete image purge")
@@ -104,6 +126,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 				return
 			}
 		}
+		b.Provenance = append(b.Provenance, buildProvenance)
 		log.WithField("step", idx).Debugln("build step has finished excuting")
 	}
 }
@@ -279,8 +302,8 @@ func (b *Builder) Purge(imageName string) error {
 
 func (b *Builder) Clean() {
 	log := b.Logger
-	log.WithField("metadata", b.Metadata).Debugln("attempting to cleanup files listed in metadata")
-	for _, m := range b.Metadata {
+	log.WithField("metadata", b.Provenance).Debugln("attempting to cleanup files listed in metadata")
+	for _, m := range b.Provenance {
 		if m.ContextDirectory != "" {
 			log.WithField("filepath", m.ContextDirectory).Debugln("attempting to cleanup context")
 			if err := os.RemoveAll(m.ContextDirectory + "/ocib"); err != nil {

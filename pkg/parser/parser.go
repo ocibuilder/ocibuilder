@@ -82,6 +82,8 @@ func ParseBuildSpec(spec *v1alpha1.BuildSpec) ([]v1alpha1.ImageBuildArgs, error)
 			Purge:            step.Purge,
 			BuildContextPath: buildContextPath,
 			Labels:           step.Labels,
+			Creator:          step.Creator,
+			Source:           step.Source,
 		}
 		imageBuilds = append(imageBuilds, imageBuild)
 	}

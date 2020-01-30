@@ -21,6 +21,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 
+	"github.com/docker/docker/api/types/image"
 	"github.com/sirupsen/logrus"
 
 	"github.com/docker/docker/api/types"
@@ -88,6 +89,16 @@ func (cli Client) ImageInspect(imageId string) (types.ImageInspect, error) {
 	res, _, err := apiCli.ImageInspectWithRaw(context.Background(), imageId)
 	if err != nil {
 		return types.ImageInspect{}, err
+	}
+	return res, nil
+}
+
+// ImageHistory conducts an image history call of a built image with Docker using the ocibuilder
+func (cli Client) ImageHistory(imageId string) ([]image.HistoryResponseItem, error) {
+	apiCli := cli.APIClient
+	res, err := apiCli.ImageHistory(context.Background(), imageId)
+	if err != nil {
+		return nil, err
 	}
 	return res, nil
 }
