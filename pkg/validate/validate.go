@@ -121,3 +121,16 @@ func ValidateParams(specJSON []byte, src string) error {
 	}
 	return nil
 }
+
+func ValidateContext(spec *v1alpha1.BuildContext) error {
+
+	if spec == nil {
+		return errors.New("no build context has been specified in the build configuration")
+	}
+
+	if spec.AliyunOSSContext == nil && spec.AzureBlobContext == nil && spec.GCSContext == nil && spec.GitContext == nil && spec.LocalContext == nil && spec.S3Context == nil {
+		return errors.New("no build context has been specified in the build configuration")
+	}
+
+	return nil
+}
