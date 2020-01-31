@@ -27,6 +27,8 @@ var log = util.GetLogger(false)
 
 func main() {
 	cmd := cmd.NewRootCmd(os.Args[1:])
+
+	os.Setenv("", "")
 	if err := cmd.Execute(); err != nil {
 		log.WithError(err).Errorln("error in executing ocictl root command...")
 		os.Exit(1)
