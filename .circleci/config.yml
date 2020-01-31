@@ -123,7 +123,7 @@ jobs:
   # push_container pushes the ocictl container to the ocibuilder docker registry when a new tag is added to ocibuilder
   push_container:
     docker:
-      - image: ocibuilder/ocictl:0.1.0
+      - image: ocibuilder/ocictl:0.1.1
     steps:
       - setup_remote_docker
       - checkout
