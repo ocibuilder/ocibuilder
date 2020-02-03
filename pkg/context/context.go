@@ -17,6 +17,7 @@ limitations under the License.
 package context
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -88,4 +89,22 @@ func InjectDockerfile(contextPath string, dockerfilePath string) error {
 	}
 
 	return nil
+}
+
+func ExcludeIgnored(filepath string) ([]string, error) {
+
+	file, err := os.Open(filepath + "/.dockerignore")
+	if err != nil {
+		return nil, err
+	}
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		fmt.Println(scanner.Text())
+		if _, err := os.Stat(filepath + scanner.Text()); os.IsNotExist(err) {
+			// path/to/whatever does not exist
+		}
+	}
+
+	return nil, nil
 }
