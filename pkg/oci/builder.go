@@ -150,7 +150,24 @@ func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPush
 
 		pushImageName := fmt.Sprintf("%s/%s/%s:%s", pushSpec.Registry, pushSpec.User, pushSpec.Image, pushSpec.Tag)
 		builtImageName := fmt.Sprintf("%s:%s", buildSpec[idx].Name, buildSpec[idx].Tag)
-		err := cli.ImageTag(context.Background(), builtImageName, pushImageName)
+
+		authString, err := b.generateAuthRegistryString(pushSpec.Registry, spec)
+		if err != nil {
+			log.WithError(err).Errorln("unable to find login spec")
+			errChan <- err
+			return
+		}
+
+		// err := cli.ImageTag(context.Background(), builtImageName, pushImageName)
+		pushOptions := v1alpha1.OCIPushOptions{
+			Ctx: context.Background(),
+			Ref: pushImageName,
+			ImagePushOptions: types.ImagePushOptions{
+				RegistryAuth: authString,
+			},
+		}
+
+		err = cli.ImageTag(pushOptions, builtImageName, pushImageName)
 		if err != nil {
 			log.WithError(err).Errorln("failed to tag image before pushing")
 			errChan <- err
@@ -160,14 +177,7 @@ func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPush
 		pushFullImageName := fmt.Sprintf("%s/%s/%s:%s", pushSpec.Registry, pushSpec.User, pushSpec.Image, pushSpec.Tag)
 		log.WithField("name", pushFullImageName).Infoln("pushing image with name")
 
-		authString, err := b.generateAuthRegistryString(pushSpec.Registry, spec)
-		if err != nil {
-			log.WithError(err).Errorln("unable to find login spec")
-			errChan <- err
-			return
-		}
-
-		pushOptions := v1alpha1.OCIPushOptions{
+		pushOptions = v1alpha1.OCIPushOptions{
 			Ctx: context.Background(),
 			Ref: pushFullImageName,
 			ImagePushOptions: types.ImagePushOptions{

@@ -71,6 +71,16 @@ func (cli Client) ImagePush(options v1alpha1.OCIPushOptions) (v1alpha1.OCIPushRe
 	}, nil
 }
 
+// ImageTag tags an image
+func (cli Client) ImageTag(options v1alpha1.OCIPushOptions, source string, target string) error {
+	apiCli := cli.APIClient
+	err := apiCli.ImageTag(options.Ctx, source, target)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // ImageRemove conducts an image remove with Docker using the ocibuilder
 func (cli Client) ImageRemove(options v1alpha1.OCIRemoveOptions) (v1alpha1.OCIRemoveResponse, error) {
 	apiCli := cli.APIClient

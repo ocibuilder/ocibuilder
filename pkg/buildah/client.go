@@ -17,7 +17,6 @@ limitations under the License.
 package buildah
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -113,7 +112,7 @@ func (cli Client) ImagePush(options v1alpha1.OCIPushOptions) (v1alpha1.OCIPushRe
 }
 
 // ImageTag represents a docker client function which tags image
-func (cli Client) ImageTag(ctx context.Context, source string, target string) error {
+func (cli Client) ImageTag(options v1alpha1.OCIPushOptions, source string, target string) error {
 	cmd := command.Builder("buildah").Command("tag").Args(source, target).Build()
 	cli.Logger.WithField("cmd", cmd).Debugln("executing tag with command")
 	_, _, err := execute(&cmd)
