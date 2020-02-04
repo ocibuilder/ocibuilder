@@ -101,7 +101,13 @@ func ExcludeIgnored(directory string) ([]string, error) {
 		return nil, err
 	}
 
-	ignored, err := ioutil.ReadFile(directory + "/.dockerignore")
+	ignorePath := directory + "/.dockerignore"
+
+	if _, err := os.Stat(ignorePath); os.IsNotExist(err) {
+		return []string{directory}, nil
+	}
+
+	ignored, err := ioutil.ReadFile(ignorePath)
 	if err != nil {
 		return nil, err
 	}
