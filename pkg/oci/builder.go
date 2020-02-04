@@ -135,13 +135,29 @@ func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPush
 	log := b.Logger
 	cli := b.Client
 
+	buildSpec, err := parser.ParseBuildSpec(spec.Build)
+	if err != nil {
+		log.WithError(err).Errorln("error in parsing build spec...")
+		errChan <- err
+		return
+	}
+
 	for idx, pushSpec := range spec.Push {
 		log.WithField("step: ", idx).Debugln("running push step")
 		if err := validate.ValidatePushSpec(&pushSpec); err != nil {
 			errChan <- err
 		}
 
-		pushFullImageName := fmt.Sprintf("%s/%s:%s", pushSpec.Registry, pushSpec.Image, pushSpec.Tag)
+		pushImageName := fmt.Sprintf("%s/%s/%s:%s", pushSpec.Registry, pushSpec.User, pushSpec.Image, pushSpec.Tag)
+		builtImageName := fmt.Sprintf("%s:%s", buildSpec[idx].Name, buildSpec[idx].Tag)
+		err := cli.ImageTag(context.Background(), builtImageName, pushImageName)
+		if err != nil {
+			log.WithError(err).Errorln("failed to tag image before pushing")
+			errChan <- err
+			return
+		}
+
+		pushFullImageName := fmt.Sprintf("%s/%s/%s:%s", pushSpec.Registry, pushSpec.User, pushSpec.Image, pushSpec.Tag)
 		log.WithField("name", pushFullImageName).Infoln("pushing image with name")
 
 		authString, err := b.generateAuthRegistryString(pushSpec.Registry, spec)

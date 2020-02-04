@@ -17,6 +17,7 @@ limitations under the License.
 package buildah
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -109,6 +110,18 @@ func (cli Client) ImagePush(options v1alpha1.OCIPushOptions) (v1alpha1.OCIPushRe
 		Exec:   &cmd,
 		Stderr: stderr,
 	}, nil
+}
+
+// ImageTag represents a docker client function which tags image
+func (cli Client) ImageTag(ctx context.Context, source string, target string) error {
+	cmd := command.Builder("buildah").Command("tag").Args(source, target).Build()
+	cli.Logger.WithField("cmd", cmd).Debugln("executing tag with command")
+	_, _, err := execute(&cmd)
+	if err != nil {
+		cli.Logger.WithError(err).Errorln("error tagging image...")
+		return err
+	}
+	return nil
 }
 
 // ImageRemove conducts an image remove with Buildah using the ocibuilder

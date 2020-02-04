@@ -17,6 +17,7 @@ limitations under the License.
 package oci
 
 import (
+	"context"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -108,6 +109,9 @@ func (t testClient) ImagePull(options v1alpha1.OCIPullOptions) (v1alpha1.OCIPull
 }
 func (t testClient) ImagePush(options v1alpha1.OCIPushOptions) (v1alpha1.OCIPushResponse, error) {
 	return v1alpha1.OCIPushResponse{}, nil
+}
+func (t testClient) ImageTag(ctx context.Context, source string, target string) error {
+	return nil
 }
 func (t testClient) ImageRemove(options v1alpha1.OCIRemoveOptions) (v1alpha1.OCIRemoveResponse, error) {
 	return v1alpha1.OCIRemoveResponse{}, nil

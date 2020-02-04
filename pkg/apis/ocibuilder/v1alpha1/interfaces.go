@@ -1,6 +1,7 @@
 package v1alpha1
 
 import (
+	"context"
 	"io"
 
 	"github.com/docker/docker/api/types"
@@ -28,6 +29,7 @@ type BuilderClient interface {
 	ImageBuild(options OCIBuildOptions) (OCIBuildResponse, error)
 	ImagePull(options OCIPullOptions) (OCIPullResponse, error)
 	ImagePush(options OCIPushOptions) (OCIPushResponse, error)
+	ImageTag(ctx context.Context, source string, target string) error
 	ImageRemove(options OCIRemoveOptions) (OCIRemoveResponse, error)
 	ImageInspect(imageId string) (types.ImageInspect, error)
 	ImageHistory(imageId string) ([]image.HistoryResponseItem, error)
