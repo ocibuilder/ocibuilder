@@ -40,7 +40,9 @@ func TestInjectDockerfile(t *testing.T) {
 }
 
 func TestExcludeIgnored(t *testing.T) {
+	const DIR = "../../testing/e2e/resources/go-test-service/"
+
 	files, err := ExcludeIgnored("../../testing/e2e/resources/go-test-service")
 	assert.Equal(t, nil, err)
-	assert.Equal(t, []string{".dockerignore", "main.go", "ocibuilder.yaml", "overlay.yaml"}, files)
+	assert.Equal(t, []string{DIR + ".dockerignore", DIR + "main.go", DIR + "ocibuilder.yaml", DIR + "overlay.yaml"}, files)
 }
