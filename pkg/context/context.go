@@ -110,7 +110,7 @@ func ExcludeIgnored(directory string) ([]string, error) {
 	var contextPaths []string
 	for _, f := range files {
 		if !utils.Exists(f.Name(), ignoredPaths) {
-			contextPaths = append(contextPaths, f.Name())
+			contextPaths = append(contextPaths, fmt.Sprintf("%s/%s", directory, f.Name()))
 		}
 	}
 
