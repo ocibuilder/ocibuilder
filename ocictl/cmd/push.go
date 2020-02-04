@@ -127,7 +127,6 @@ func (p *pushCmd) run(args []string) error {
 	defer func() {
 		close(res)
 		close(errChan)
-		close(finished)
 	}()
 
 	go builder.Push(ociBuilderSpec, res, errChan, finished)
@@ -160,7 +159,8 @@ func (p *pushCmd) run(args []string) error {
 
 		case <-finished:
 			{
-				logger.Infoln("all push steps complete successfully")
+				logger.Infoln("all push steps complete")
+				close(finished)
 				return nil
 			}
 

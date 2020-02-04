@@ -127,7 +127,6 @@ func (p *pullCmd) run(args []string) error {
 	defer func() {
 		close(res)
 		close(errChan)
-		close(finished)
 	}()
 
 	go builder.Pull(ociBuilderSpec, p.name, res, errChan, finished)
@@ -160,7 +159,8 @@ func (p *pullCmd) run(args []string) error {
 
 		case <-finished:
 			{
-				logger.Infoln("all pull steps complete successfully")
+				logger.Infoln("all pull steps complete")
+				close(finished)
 				return nil
 			}
 

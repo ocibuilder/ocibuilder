@@ -119,7 +119,6 @@ func (l *loginCmd) run(args []string) error {
 	defer func() {
 		close(res)
 		close(errChan)
-		close(finished)
 	}()
 
 	go builder.Login(ociBuilderSpec, res, errChan, finished)
@@ -142,7 +141,8 @@ func (l *loginCmd) run(args []string) error {
 
 		case <-finished:
 			{
-				logger.Infoln("all login steps complete successfully")
+				logger.Infoln("all login steps complete")
+				close(finished)
 				return nil
 			}
 		}

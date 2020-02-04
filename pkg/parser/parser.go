@@ -47,6 +47,11 @@ func ParseBuildSpec(spec *v1alpha1.BuildSpec) ([]v1alpha1.ImageBuildArgs, error)
 		kubeConfig = ""
 	}
 	for _, step := range spec.Steps {
+
+		if err := validate.ValidateContext(step.BuildContext); err != nil {
+			return nil, err
+		}
+
 		buildContext, err := context.GetBuildContextReader(step.BuildContext, kubeConfig)
 		if err != nil {
 			return nil, err
