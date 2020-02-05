@@ -29,7 +29,7 @@ func TestInjectDockerfile(t *testing.T) {
 	err := ioutil.WriteFile("../../testing/dummy/Dockerfile", []byte("FROM alpine\nCOPY . .\n"), 0644)
 	assert.Equal(t, nil, err)
 
-	err = util.TarFile("../../testing/e2e/resources/go-test-service", "../../testing/e2e/resources/go-test-service/ocib/context/context.tar.gz")
+	err = util.TarFile([]string{"../../testing/e2e/resources/go-test-service"}, "../../testing/e2e/resources/go-test-service/ocib/context/context.tar.gz")
 	assert.Equal(t, nil, err)
 
 	err = InjectDockerfile("../../testing/e2e/resources/go-test-service", "../../testing/dummy/Dockerfile")
@@ -37,4 +37,12 @@ func TestInjectDockerfile(t *testing.T) {
 
 	err = os.RemoveAll("../../testing/e2e/resources/go-test-service/ocib")
 	assert.Equal(t, nil, err)
+}
+
+func TestExcludeIgnored(t *testing.T) {
+	const DIR = "../../testing/e2e/resources/go-test-service/"
+
+	files, err := ExcludeIgnored("../../testing/e2e/resources/go-test-service")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, []string{DIR + ".dockerignore", DIR + "main.go", DIR + "ocibuilder.yaml", DIR + "overlay.yaml"}, files)
 }

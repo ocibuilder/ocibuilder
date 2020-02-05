@@ -55,9 +55,9 @@ func UntarFile(source string, destination string) error {
 }
 
 // TarFile zips/tars a file
-func TarFile(source string, destination string) error {
+func TarFile(source []string, destination string) error {
 
-	if source == "" {
+	if source == nil {
 		return errors.New("cannot have empty source")
 	}
 
@@ -65,7 +65,7 @@ func TarFile(source string, destination string) error {
 		return errors.New("cannot have empty destination")
 	}
 
-	if err := archiver.Archive([]string{source}, destination); err != nil {
+	if err := archiver.Archive(source, destination); err != nil {
 		return err
 	}
 

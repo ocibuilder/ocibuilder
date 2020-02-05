@@ -18,9 +18,12 @@ package context
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
+	"github.com/ocibuilder/ocibuilder/ocictl/pkg/utils"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/common"
 	"github.com/ocibuilder/ocibuilder/pkg/util"
@@ -83,9 +86,39 @@ func InjectDockerfile(contextPath string, dockerfilePath string) error {
 		return errors.Wrap(err, "error attempting to move Dockerfile to new context directory")
 	}
 
-	if err := util.TarFile(contextDirectoryPath, contextDirectoryPath+common.ContextFile); err != nil {
+	if err := util.TarFile([]string{contextDirectoryPath}, contextDirectoryPath+common.ContextFile); err != nil {
 		return errors.Wrap(err, "error tarring new directory with injected Dockerfile")
 	}
 
 	return nil
+}
+
+// ExcludeIgnored excludes any explicitly ignored files or directories from the
+// build context
+func ExcludeIgnored(directory string) ([]string, error) {
+	files, err := ioutil.ReadDir(directory)
+	if err != nil {
+		return nil, err
+	}
+
+	ignorePath := directory + "/.dockerignore"
+
+	if _, err := os.Stat(ignorePath); os.IsNotExist(err) {
+		return []string{directory}, nil
+	}
+
+	ignored, err := ioutil.ReadFile(ignorePath)
+	if err != nil {
+		return nil, err
+	}
+
+	ignoredPaths := strings.Split(string(ignored), "\n")
+	var contextPaths []string
+	for _, f := range files {
+		if !utils.Exists(f.Name(), ignoredPaths) {
+			contextPaths = append(contextPaths, fmt.Sprintf("%s/%s", directory, f.Name()))
+		}
+	}
+
+	return contextPaths, nil
 }

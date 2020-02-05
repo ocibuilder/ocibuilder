@@ -62,3 +62,13 @@ func Output(stdout io.ReadCloser, stderr io.ReadCloser) error {
 	}
 	return nil
 }
+
+// Exists is a simple function to check if a string exists in an array
+func Exists(a string, list []string) bool {
+	for _, el := range list {
+		if el == a {
+			return true
+		}
+	}
+	return false
+}
