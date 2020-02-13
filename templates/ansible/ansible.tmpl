@@ -8,3 +8,6 @@ ADD *.yaml ./
 RUN ansible-playbook {{ .Playbook }}
 RUN if [ -f {{ .Requirements }} ]; then ansible-galaxy install -r {{ .Requirements }}; fi{{ newLine }}
 RUN ansible-playbook {{ .Playbook }}{{ newLine }}
+SHELL ["/bin/sh", "-l", "-c"]{{ newLine }}
+ENTRYPOINT ["/usr/local/bin/dumb-init", "-c", "--"]{{ newLine }}
+CMD ["/bin/sh", "-l"]{{ newLine }}
