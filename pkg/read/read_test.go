@@ -53,9 +53,13 @@ func TestApplyParams(t *testing.T) {
 		Password: "my-real-password",
 	}
 
+	err = os.Setenv("USERNAME", "REPLACED_USER")
+	assert.Equal(t, nil, err)
+
 	err = reader.applyParams(file, &spec)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedLogin, spec.Login[0].Creds.Env)
+	assert.Equal(t, "REPLACED_USER", spec.Push[0].User)
 }
 
 func TestApplyInvalidParams(t *testing.T) {
