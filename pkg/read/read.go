@@ -151,6 +151,9 @@ func (r Reader) applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error
 
 	// Yenv applies all environment variables in the form ${ENV_VARIABLE_HERE}
 	yamlObj, err := yenv.ApplyEnvValues(yamlObj)
+	if err != nil {
+		return err
+	}
 
 	specJSON, err := yaml.YAMLToJSON(yamlObj)
 	if err != nil {
