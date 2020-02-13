@@ -26,16 +26,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const expectedAnsibleLocalCommands = `
-ENV PLAYBOOK_DIR /etc/ansible/
-RUN mkdir -p $PLAYBOOK_DIR
-WORKDIR $PLAYBOOK_DIR
-COPY templates templates
-COPY files files
-COPY vars vars
-COPY tasks tasks
+const expectedAnsibleCommands = `RUN mkdir -p /etc/ansible/my-workspace
+WORKDIR /etc/ansible/my-workspace
 ADD *.yaml ./
-RUN ansible-playbook /playbook.yaml`
+RUN ansible-playbook playbook.yaml
+RUN if [ -f requirements.yaml ]; then ansible-galaxy install -r requirements.yaml; fi
+RUN ansible-playbook playbook.yaml
+SHELL ["/bin/sh", "-l", "-c"]
+ENTRYPOINT ["/usr/local/bin/dumb-init", "-c", "--"]
+CMD ["/bin/sh", "-l"]`
 
 const expectedInlineDockerfile = "FROM go / java / nodejs / python:ubuntu_xenial:v1.0.0 AS first-stage\nADD ./ /test-path\nWORKDIR /test-dir\nENV PORT=3001\nCMD [\"go\", \"run\", \"main.go\"]\n\nFROM alpine:latest AS second-stage\nCMD [\"echo\", \"done\"]"
 
@@ -120,8 +119,11 @@ func TestGenerateDockerfileInline(t *testing.T) {
 }
 
 func TestParseAnsibleCommands(t *testing.T) {
-	ansibleStep := &v1alpha1.AnsibleStep{}
-	_, err := ParseAnsibleCommands(ansibleStep)
+	ansibleStep := &v1alpha1.AnsibleStep{
+		Workspace: "my-workspace",
+	}
+	dockerfile, err := ParseAnsibleCommands(ansibleStep)
+
 	assert.Equal(t, nil, err)
-	//assert.Equal(t, expectedAnsibleLocalCommands, string(dockerfile), "The generated ansible local commands must match expected")
+	assert.Equal(t, expectedAnsibleCommands, string(dockerfile))
 }

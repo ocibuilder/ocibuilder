@@ -55,7 +55,7 @@ const (
 	// AnsibleTemplate is the path for ansible template
 	AnsibleTemplate string = "ansible.tmpl"
 	// AnsibleBase is the ansible base directory
-	AnsibleBase string = "/etc/ansible/"
+	AnsibleBase string = "/etc/ansible"
 )
 
 // MetadataType is the type of metadata that you want to store

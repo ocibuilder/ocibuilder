@@ -1,13 +1,13 @@
-RUN mkdir -p {{ .AnsiblePath }}
-WORKDIR {{ .AnsiblePath }}
-{{if DirExists "templates" }}COPY templates templates{{ newLine }}{{end}}
-{{if DirExists "files" }}COPY files files{{ newLine }}{{end}}
-{{if DirExists "vars" }}COPY vars vars{{ newLine }}{{end}}
-{{if DirExists "tasks" }}COPY tasks tasks{{ newLine }}{{end}}
+RUN mkdir -p {{ .Workspace }}
+WORKDIR {{ .Workspace }}
+{{- if DirExists "templates" }}{{ newLine }}COPY templates templates{{end}}
+{{- if DirExists "files" }}{{ newLine }}COPY files files{{end}}
+{{- if DirExists "vars" }}{{ newLine }}COPY vars vars{{end}}
+{{- if DirExists "tasks" }}{{ newLine }}COPY tasks tasks{{end}}
 ADD *.yaml ./
 RUN ansible-playbook {{ .Playbook }}
-RUN if [ -f {{ .Requirements }} ]; then ansible-galaxy install -r {{ .Requirements }}; fi{{ newLine }}
-RUN ansible-playbook {{ .Playbook }}{{ newLine }}
-SHELL ["/bin/sh", "-l", "-c"]{{ newLine }}
-ENTRYPOINT ["/usr/local/bin/dumb-init", "-c", "--"]{{ newLine }}
-CMD ["/bin/sh", "-l"]{{ newLine }}
+RUN if [ -f {{ .Requirements }} ]; then ansible-galaxy install -r {{ .Requirements }}; fi
+RUN ansible-playbook {{ .Playbook }}
+SHELL ["/bin/sh", "-l", "-c"]
+ENTRYPOINT ["/usr/local/bin/dumb-init", "-c", "--"]
+CMD ["/bin/sh", "-l"]

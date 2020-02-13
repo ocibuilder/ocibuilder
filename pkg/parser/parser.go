@@ -189,7 +189,7 @@ func parseCmdType(cmds []v1alpha1.BuildTemplateStep) ([]byte, error) {
 // ParseAnsibleCommands is used to parse ansible commands from the ansible step
 // and append the parsed template to Dockerfile
 func ParseAnsibleCommands(ansibleStep *v1alpha1.AnsibleStep) ([]byte, error) {
-	var buf bytes.Buffer
+	buf := &bytes.Buffer{}
 	var dockerfile []byte
 
 	ansibleTemplateFunc := template.FuncMap{
@@ -198,7 +198,7 @@ func ParseAnsibleCommands(ansibleStep *v1alpha1.AnsibleStep) ([]byte, error) {
 	}
 
 	// add newline to buffer before appending ansible commands
-	buf.WriteString("\n")
+	//buf.WriteString("\n")
 	box := packr.NewBox(v1alpha1.AnsibleTemplateDir)
 	file, err := box.Find(v1alpha1.AnsibleTemplate)
 	if err != nil {
@@ -215,7 +215,7 @@ func ParseAnsibleCommands(ansibleStep *v1alpha1.AnsibleStep) ([]byte, error) {
 	}
 
 	ansibleStep.Workspace = fmt.Sprintf("%s/%s", v1alpha1.AnsibleBase, ansibleStep.Workspace)
-	if err := ansibleTemplate.Execute(&buf, ansibleStep); err != nil {
+	if err := ansibleTemplate.Execute(buf, ansibleStep); err != nil {
 		return nil, err
 	}
 	dockerfileBytes := buf.Bytes()
