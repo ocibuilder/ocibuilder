@@ -29,6 +29,7 @@ import (
 
 	"github.com/gobuffalo/packr"
 	"github.com/moby/buildkit/frontend/dockerfile/parser"
+	"github.com/ocibuilder/ocibuilder/ocictl/pkg/utils"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/common"
 	"github.com/ocibuilder/ocibuilder/pkg/context"
@@ -191,43 +192,33 @@ func ParseAnsibleCommands(ansibleStep *v1alpha1.AnsibleStep) ([]byte, error) {
 	var buf bytes.Buffer
 	var dockerfile []byte
 
+	ansibleTemplateFunc := template.FuncMap{
+		"DirExists": utils.DirExists,
+		"newLine":   func() string { return "\n" },
+	}
+
 	// add newline to buffer before appending ansible commands
 	buf.WriteString("\n")
-	box := packr.NewBox("../../templates/ansible")
+	box := packr.NewBox(v1alpha1.AnsibleTemplateDir)
+	file, err := box.Find(v1alpha1.AnsibleTemplate)
 
-	if ansibleStep.Local != nil {
-		file, err := box.Find(v1alpha1.AnsiblePath)
-		if err != nil {
-			return nil, err
-		}
-		tmpl, err := template.New("ansibleLocal").Parse(string(file))
-		if err != nil {
-			return nil, err
-		}
-		if err = tmpl.Execute(&buf, ansibleStep.Local); err != nil {
-			return nil, err
-		}
-		dockerfileBytes := buf.Bytes()
-		dockerfile = append(dockerfile, dockerfileBytes...)
-		return dockerfile, nil
+	ansibleTemplate, err := template.New("Ansible").Funcs(ansibleTemplateFunc).Parse(string(file))
+	if err != nil {
+		return nil, err
 	}
-	if ansibleStep.Galaxy != nil {
-		file, err := box.Find(v1alpha1.AnsibleGalaxyPath)
-		if err != nil {
-			return nil, err
-		}
-		tmpl, err := template.New("ansibleGalaxy").Parse(string(file))
-		if err != nil {
-			return nil, err
-		}
-		if err = tmpl.Execute(&buf, ansibleStep.Galaxy); err != nil {
-			return nil, err
-		}
-		dockerfileBytes := buf.Bytes()
-		dockerfile = append(dockerfile, dockerfileBytes...)
-		return dockerfile, nil
+
+	if err := validate.SetAnsibleDefaultIfNotPresent(ansibleStep); err != nil {
+		return nil, err
 	}
-	return nil, errors.New("no ansible galaxy or local definitions found")
+
+	ansibleStep.Workspace = fmt.Sprintf("%s/%s", v1alpha1.AnsibleBase, ansibleStep.Workspace)
+	if err := ansibleTemplate.Execute(&buf, ansibleStep); err != nil {
+		return nil, err
+	}
+	dockerfileBytes := buf.Bytes()
+	dockerfile = append(dockerfile, dockerfileBytes...)
+	return dockerfile, nil
+
 }
 
 // ParseDockerCommands parses the inputted docker commands and adds to dockerfile

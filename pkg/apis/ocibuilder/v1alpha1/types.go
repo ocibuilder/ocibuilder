@@ -50,10 +50,12 @@ const (
 )
 
 const (
-	// AnsiblePath is the path for ansible module
-	AnsiblePath string = "ansible"
-	// AnsibleGalaxyPath is the path of ansible galaxy
-	AnsibleGalaxyPath string = "ansible-galaxy"
+	// AnsibleTemplateDir is the path for ansible template
+	AnsibleTemplateDir string = "../../templates/ansible"
+	// AnsibleTemplate is the path for ansible template
+	AnsibleTemplate string = "ansible.tmpl"
+	// AnsibleBase is the ansible base directory
+	AnsibleBase string = "/etc/ansible/"
 )
 
 // MetadataType is the type of metadata that you want to store
@@ -185,25 +187,13 @@ type DockerStep struct {
 
 // AnsibleStep represents an ansible install  within a build
 type AnsibleStep struct {
-	// Local contains information to install a ansible role through local playbook
-	Local *AnsibleLocal `json:"local,omitempty" protobuf:"bytes,1,opt,name=local"`
-	// Galaxy contains information to install a ansible role through ansible-galaxy
-	Galaxy *AnsibleGalaxy `json:"galaxy,omitempty" protobuf:"bytes,2,opt,name=galaxy"`
-}
-
-// AnsibleLocal contains information to install a ansible role through local playbook
-type AnsibleLocal struct {
 	// Playbook refers to playbook.yaml file
-	Playbook string `json:"playbook" protobuf:"bytes,2,name=playbook"`
-}
-
-// AnsibleGalaxy contains the information about the role to install through galaxy
-type AnsibleGalaxy struct {
+	Playbook string `json:"playbook" protobuf:"bytes,1,name=playbook"`
 	// Requirements refer to the requirements.yaml file
 	// +optional
-	Requirements string `json:"requirements,omitempty" protobuf:"bytes,1,opt,name=requirements"`
-	// Name of the galaxy role
-	Name string `json:"name" protobuf:"bytes,2,name=name"`
+	Requirements string `json:"requirements,omitempty" protobuf:"bytes,2,opt,name=requirements"`
+	// Workspace is the name of your ansible workspce NOT including /etc/ansible/ ansible path
+	Workspace string `json:"workspace" protobuf:"bytes,3,name=workspace"`
 }
 
 // BuildStep represents a step within the build
