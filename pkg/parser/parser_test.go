@@ -34,7 +34,8 @@ RUN if [ -f requirements.yaml ]; then ansible-galaxy install -r requirements.yam
 RUN ansible-playbook playbook.yaml
 SHELL ["/bin/sh", "-l", "-c"]
 ENTRYPOINT ["/usr/local/bin/dumb-init", "-c", "--"]
-CMD ["/bin/sh", "-l"]`
+CMD ["/bin/sh", "-l"]
+`
 
 const expectedInlineDockerfile = "FROM go / java / nodejs / python:ubuntu_xenial:v1.0.0 AS first-stage\nADD ./ /test-path\nWORKDIR /test-dir\nENV PORT=3001\nCMD [\"go\", \"run\", \"main.go\"]\n\nFROM alpine:latest AS second-stage\nCMD [\"echo\", \"done\"]"
 
