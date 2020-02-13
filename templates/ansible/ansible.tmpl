@@ -1,0 +1,13 @@
+RUN mkdir -p {{ .Workspace }}
+WORKDIR {{ .Workspace }}
+{{- if DirExists "templates" }}{{ newLine }}COPY templates templates{{end}}
+{{- if DirExists "files" }}{{ newLine }}COPY files files{{end}}
+{{- if DirExists "vars" }}{{ newLine }}COPY vars vars{{end}}
+{{- if DirExists "tasks" }}{{ newLine }}COPY tasks tasks{{end}}
+ADD *.yaml ./
+RUN ansible-playbook {{ .Playbook }}
+RUN if [ -f {{ .Requirements }} ]; then ansible-galaxy install -r {{ .Requirements }}; fi
+RUN ansible-playbook {{ .Playbook }}
+SHELL ["/bin/sh", "-l", "-c"]
+ENTRYPOINT ["/usr/local/bin/dumb-init", "-c", "--"]
+CMD ["/bin/sh", "-l"]

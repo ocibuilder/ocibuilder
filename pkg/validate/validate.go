@@ -44,9 +44,6 @@ func ValidateBuildTemplateStep(step v1alpha1.BuildTemplateStep) error {
 	if step.Ansible == nil && step.Docker == nil {
 		return errors.New("at least one step type should be defined")
 	}
-	if step.Ansible != nil && step.Ansible.Galaxy == nil && step.Ansible.Local == nil {
-		return errors.New("at least one ansible role location should be defined")
-	}
 	if step.Docker != nil && step.Docker.Inline == nil && step.Docker.Path == "" && step.Docker.Url == "" {
 		return errors.New("at least one docker cmd location should be defined")
 	}
@@ -122,6 +119,7 @@ func ValidateParams(specJSON []byte, src string) error {
 	return nil
 }
 
+// ValidateContext validates the build context
 func ValidateContext(spec *v1alpha1.BuildContext) error {
 
 	if spec == nil {
@@ -130,6 +128,23 @@ func ValidateContext(spec *v1alpha1.BuildContext) error {
 
 	if spec.AliyunOSSContext == nil && spec.AzureBlobContext == nil && spec.GCSContext == nil && spec.GitContext == nil && spec.LocalContext == nil && spec.S3Context == nil {
 		return errors.New("no build context has been specified in the build configuration")
+	}
+
+	return nil
+}
+
+// SetAnsibleDefaultIfNotPresent updates default values if not present
+func SetAnsibleDefaultIfNotPresent(spec *v1alpha1.AnsibleStep) error {
+	if spec.Playbook == "" {
+		spec.Playbook = "playbook.yaml"
+	}
+
+	if spec.Requirements == "" {
+		spec.Requirements = "requirements.yaml"
+	}
+
+	if spec.Workspace == "" {
+		return errors.New("ansible workspace name has not been set in ansible step")
 	}
 
 	return nil

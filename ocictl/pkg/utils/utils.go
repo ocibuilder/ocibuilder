@@ -72,3 +72,15 @@ func Exists(a string, list []string) bool {
 	}
 	return false
 }
+
+// DirExists is a simple function to check if a directory exists
+func DirExists(dirName string) bool {
+	var exists bool
+	if info, err := os.Stat(dirName); err != nil && os.IsNotExist(err) {
+		exists = false
+	} else {
+		exists = info != nil && info.IsDir()
+	}
+	log.Debugf("Directory [ %s ] exists=%t", dirName, exists)
+	return exists
+}
