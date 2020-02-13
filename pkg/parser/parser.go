@@ -201,6 +201,9 @@ func ParseAnsibleCommands(ansibleStep *v1alpha1.AnsibleStep) ([]byte, error) {
 	buf.WriteString("\n")
 	box := packr.NewBox(v1alpha1.AnsibleTemplateDir)
 	file, err := box.Find(v1alpha1.AnsibleTemplate)
+	if err != nil {
+		return nil, err
+	}
 
 	ansibleTemplate, err := template.New("Ansible").Funcs(ansibleTemplateFunc).Parse(string(file))
 	if err != nil {
