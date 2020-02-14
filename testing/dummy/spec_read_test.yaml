@@ -13,8 +13,8 @@ login:
         username: user
         password: pass
       env:
-        username: $USER
-        password: $PASS
+        username: THIS_IS_REPLACED
+        password: THIS_IS_REPLACED
   - registry: url-of-the-registry
     creds:
       k8s:
@@ -27,12 +27,12 @@ login:
   - registry: url-of-the-registry
     creds:
       env:
-        username: $USER
-        password: $PASS
+        username: THIS_IS_REPLACED
+        password: THIS_IS_REPLACED
 
 push:
   - registry: abc.com
-    user: art
+    user: ${USERNAME}
     image: my-awesome-build-ubuntu-xenial
     tag: v0.1.0
     login:
@@ -47,16 +47,16 @@ push:
         username: user
         password: pass
       env:
-        username: $USER
-        password: $PASS
+        username: THIS_IS_REPLACED
+        password: THIS_IS_REPLACED
   - registry: abc.com
     user: art
     image: my-awesome-build-2-ubuntu-xenial
     tag: v0.1.0
     login:
       env:
-        username: $USER
-        password: $PASS
+        username: THIS_IS_REPLACED
+        password: THIS_IS_REPLACED
 
 parameters:
   - dest: push.0.login.inline.username

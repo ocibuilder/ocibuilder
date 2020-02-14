@@ -97,6 +97,22 @@
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:3d3da1dd49a4492069391f9ae0c3e39a8b6e96fb5e8b3e5bbfb8d4820e8d4c36"
+  name = "github.com/antihax/optional"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "c3f0ba9c1a592b971d66b2787679af55b5c58f21"
+  version = "v1.0.0"
+
+[[projects]]
+  digest = "1:698120f01c1fbcc05cd195e90c688a7ddbd066171442170f3761e8e4f84326e6"
+  name = "github.com/artbegolli/yenv"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "8f99318bdf9fd37ff1607a0d0fae962a7cfc0f8d"
+  version = "v0.2.0"
+
+[[projects]]
   digest = "1:73343a53e276052ba74ce1dbb652c728ba5b3321c91021a1f39113cfc5d33f4e"
   name = "github.com/aws/aws-sdk-go"
   packages = [
@@ -434,6 +450,14 @@
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:582b704bebaa06b48c29b0cec224a6058a09c86883aaddabde889cd1a5f73e1b"
+  name = "github.com/google/uuid"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "0cd6bf5da1e1c83f8b45653022c74f71af0538a4"
+  version = "v1.1.1"
+
+[[projects]]
   digest = "1:766102087520f9d54f2acc72bd6637045900ac735b4a419b128d216f0c5c4876"
   name = "github.com/googleapis/gax-go"
   packages = ["v2"]
@@ -686,6 +710,14 @@
   pruneopts = "UT"
   revision = "cc3e4b2381762c56dbcdf9f93be03349a1dc1c14"
   version = "v1.0.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:6731f7fc74a840bd497ec8c9bbd2f1055af7c231451e33ed92dd68bca9995085"
+  name = "github.com/ocibuilder/gofeas"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "2b67ed27b87f0ef6d50e25b5d645310dfa802873"
 
 [[projects]]
   digest = "1:51766ddcba65b7f0eece2906249d7603970959ba0f1011b72037485044339ece"
@@ -1672,13 +1704,14 @@
     "cloud.google.com/go/storage",
     "github.com/Azure/azure-storage-blob-go/azblob",
     "github.com/aliyun/aliyun-oss-go-sdk/oss",
+    "github.com/artbegolli/yenv",
     "github.com/aws/aws-sdk-go/aws",
     "github.com/aws/aws-sdk-go/aws/credentials",
     "github.com/aws/aws-sdk-go/aws/session",
     "github.com/aws/aws-sdk-go/service/s3",
     "github.com/aws/aws-sdk-go/service/s3/s3manager",
-    "github.com/creack/pty",
     "github.com/docker/docker/api/types",
+    "github.com/docker/docker/api/types/image",
     "github.com/docker/docker/api/types/registry",
     "github.com/docker/docker/client",
     "github.com/docker/docker/pkg/jsonmessage",
@@ -1689,11 +1722,13 @@
     "github.com/gogo/protobuf/protoc-gen-gofast",
     "github.com/gogo/protobuf/protoc-gen-gogofast",
     "github.com/golang/protobuf/protoc-gen-go",
+    "github.com/google/uuid",
     "github.com/k14s/ytt/pkg/cmd/core",
     "github.com/k14s/ytt/pkg/cmd/template",
     "github.com/k14s/ytt/pkg/files",
     "github.com/mholt/archiver",
     "github.com/moby/buildkit/frontend/dockerfile/parser",
+    "github.com/ocibuilder/gofeas",
     "github.com/onsi/ginkgo",
     "github.com/onsi/gomega",
     "github.com/onsi/gomega/gexec",
@@ -1704,6 +1739,9 @@
     "github.com/stretchr/testify/assert",
     "github.com/tidwall/gjson",
     "github.com/tidwall/sjson",
+    "golang.org/x/crypto/openpgp",
+    "golang.org/x/crypto/openpgp/armor",
+    "golang.org/x/crypto/openpgp/packet",
     "golang.org/x/crypto/ssh",
     "golang.org/x/net/context",
     "google.golang.org/api/option",

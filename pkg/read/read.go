@@ -22,6 +22,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/artbegolli/yenv"
 	"github.com/ghodss/yaml"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/overlay"
@@ -147,6 +148,13 @@ func applyOverlay(yamlTemplate []byte, overlayPath string) ([]byte, error) {
 
 func (r Reader) applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error {
 	log := r.Logger
+
+	// Yenv applies all environment variables in the form ${ENV_VARIABLE_HERE}
+	yamlObj, err := yenv.ApplyEnvValues(yamlObj)
+	if err != nil {
+		return err
+	}
+
 	specJSON, err := yaml.YAMLToJSON(yamlObj)
 	if err != nil {
 		return err
