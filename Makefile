@@ -71,7 +71,7 @@ test:
 
 .PHONY: lint
 lint:
-	golangci-lint run
+	golangci-lint run --modules-download-mode vendor
 
 .PHONY: e2e
 e2e:
