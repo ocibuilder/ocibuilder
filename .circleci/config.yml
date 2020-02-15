@@ -22,7 +22,7 @@ jobs:
   # lint is the initial job which lints the codebase using standard golangci-lint linter
   lint:
     docker:
-      - image: golang:1.13.1
+      - image: golang:1.13.1-alpine
         environment:
           GO111MODULE: "on"
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
