@@ -44,6 +44,7 @@ type buildCmd struct {
 	overlay       string
 	storageDriver string
 	debug         bool
+	cache         bool
 }
 
 func newBuildCmd(out io.Writer) *cobra.Command {
