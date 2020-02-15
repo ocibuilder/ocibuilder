@@ -33,14 +33,14 @@ require (
 	github.com/go-openapi/swag v0.19.5
 	github.com/gobuffalo/envy v1.7.1
 	github.com/gobuffalo/packd v0.3.0
-	github.com/gobuffalo/packr v2.7.1+incompatible
+	github.com/gobuffalo/packr/v2 v2.7.1
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/groupcache v0.0.0-20191027212112-611e8accdfc9
 	github.com/golang/protobuf v1.3.2
 	github.com/golang/snappy v0.0.1
 	github.com/google/go-cmp v0.3.1
 	github.com/google/gofuzz v1.0.0
-	github.com/googleapis/gax-go v2.0.5+incompatible
+	github.com/googleapis/gax-go/v2 v2.0.5
 	github.com/googleapis/gnostic v0.3.1
 	github.com/gopherjs/gopherjs v0.0.0-20191106031601-ce3c9ade29de
 	github.com/hashicorp/golang-lru v0.5.3
@@ -60,7 +60,7 @@ require (
 	github.com/klauspost/pgzip v1.2.1
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2
 	github.com/mailru/easyjson v0.7.0
-	github.com/mholt/archiver v3.2.0+incompatible
+	github.com/mholt/archiver/v3 v3.3.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/moby/buildkit v0.6.3
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
@@ -112,9 +112,9 @@ require (
 	gopkg.in/warnings.v0 v0.1.2
 	gopkg.in/yaml.v2 v2.2.5
 	honnef.co/go/tools v0.0.1-2019.2.3
-	k8s.io/api v0.0.0-20191004120003-3a12735a829a
-	k8s.io/apimachinery v0.15.8-beta.1
-	k8s.io/client-go v12.0.0+incompatible
+	k8s.io/api v0.17.0
+	k8s.io/apimachinery v0.17.0
+	k8s.io/client-go v0.17.0
 	k8s.io/code-generator v0.15.8-beta.1
 	k8s.io/gengo v0.0.0-20190308184658-b90029ef6cd8
 	k8s.io/klog v1.0.0
