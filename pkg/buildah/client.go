@@ -44,6 +44,10 @@ func (cli Client) ImageBuild(options v1alpha1.OCIBuildOptions) (v1alpha1.OCIBuil
 		{Name: "t", Value: options.Tags[0], Short: true, OmitEmpty: true},
 	}
 
+	if options.NoCache {
+		buildFlags = append(buildFlags, command.Flag{Name: "no-cache", Value: "", Short: false, OmitEmpty: true})
+	}
+
 	for _, l := range options.Labels {
 		buildFlags = append(buildFlags, command.Flag{Name: "label", Value: l, Short: false, OmitEmpty: true})
 	}

@@ -90,6 +90,7 @@ func ParseBuildSpec(spec *v1alpha1.BuildSpec) ([]v1alpha1.ImageBuildArgs, error)
 			Labels:           step.Labels,
 			Creator:          step.Creator,
 			Source:           step.Source,
+			Cache:            step.Cache,
 		}
 		imageBuilds = append(imageBuilds, imageBuild)
 	}

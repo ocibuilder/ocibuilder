@@ -376,6 +376,10 @@ type ImageBuildArgs struct {
 	Creator string `json:"creator,omitempty"`
 	// Source is the URI of the source code for the build
 	Source string `json:"source,omitempty"`
+	// Cache for build
+	// Set to false by default
+	// +optional
+	Cache bool `json:"cache,omitempty" protobuf:"bytes,8,opt,name=cache"`
 }
 
 // BuildContext stores the chosen build context for your build, this can be Local, S3 or Git
