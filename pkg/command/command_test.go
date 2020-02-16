@@ -27,7 +27,7 @@ import (
 var builder = Builder("buildah")
 
 func TestCommand_constructCommand(t *testing.T) {
-	constructedCmd := cmd.ConstructCommand()
+	constructedCmd := cmd.constructCommand()
 
 	assert.Equal(t, []string{"build", "-f", "./Dockerfile", "--storage-driver", "vfs", ".", "one", "two"}, constructedCmd)
 }
@@ -48,12 +48,12 @@ func TestCommandBuilder_Flags(t *testing.T) {
 		{"t", "image:tag", true, true},
 	}
 
-	builder := Builder("test").SetFlags(flags...)
+	builder := Builder("test").Flags(flags...)
 	assert.Equal(t, Command{
-		Name:    "test",
-		Command: "",
-		Flags:   expectedFlags,
-		Args:    []string{},
+		name:    "test",
+		command: "",
+		flags:   expectedFlags,
+		args:    []string{},
 	}, builder.Build())
 }
 
@@ -62,7 +62,7 @@ var expectedFlags = []Flag{
 	{"t", "image:tag", true, true},
 }
 
-var cmd = builder.SetCommand("build").SetFlags([]Flag{
+var cmd = builder.Command("build").Flags([]Flag{
 	{
 		Name:  "f",
 		Value: "./Dockerfile",
@@ -73,7 +73,7 @@ var cmd = builder.SetCommand("build").SetFlags([]Flag{
 		Value: "vfs",
 		Short: false,
 	},
-}...).SetArgs(".", "one", "two").Build()
+}...).Args(".", "one", "two").Build()
 
 // enabling the mocking of exec commands as in https://npf.io/2015/06/testing-exec-command/
 func fakeExecCommand(command string, args ...string) *exec.Cmd {
