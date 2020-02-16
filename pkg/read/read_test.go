@@ -27,11 +27,10 @@ import (
 )
 
 func TestReadLogin(t *testing.T) {
-	spec := v1alpha1.OCIBuilderSpec{}
 	reader := Reader{
 		Logger: common.GetLogger(true),
 	}
-	err := reader.Read(&spec, "", "../../testing/dummy")
+	spec, err := reader.Read("", "../../testing/dummy")
 
 	assert.Equal(t, nil, err)
 	assert.Equal(t, spec.Login, loginSpec, "the login spec to match the expected")
