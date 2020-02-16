@@ -269,9 +269,11 @@ type ImageMetadata struct {
 type LoginSpec struct {
 	// Registry refers to a OCI image registry
 	Registry string `json:"registry" protobuf:"bytes,1,name=registry"`
-	Token    string `json:"token" protobuf:"bytes,1,name=token"`
+	Token    string `json:"token" protobuf:"bytes,2,name=token"`
 	// Creds refer to credentials required to log into the registry
-	Creds RegistryCreds `json:"creds" protobuf:"bytes,2,name=creds"`
+	Creds RegistryCreds `json:"creds" protobuf:"bytes,3,name=creds"`
+	// Overlay is the name which will be referred to by an overlay file
+	Overlay string `json:"overlay" protobuf:"bytes,4,name=overlay"`
 }
 
 // RegistryCreds holds the credentials to login into a registry
@@ -330,6 +332,8 @@ type PushSpec struct {
 	// defaults to false
 	// +optional
 	Purge bool `json:"purge,omitempty" protobuf:"bytes,6,opt,name=purge"`
+	// Overlay is the name which will be referred to by an overlay file
+	Overlay string `json:"overlay" protobuf:"bytes,7,name=overlay"`
 }
 
 // NodeStatus describes the status for an individual node in the ocibuilder configurations.
