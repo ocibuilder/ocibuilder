@@ -45,7 +45,7 @@ func TestBuilder_Build(t *testing.T) {
 		close(finished)
 	}()
 
-	go builder.Build(dummy.Spec, res, errChan, finished)
+	go builder.Build(&dummy.Spec, res, errChan, finished)
 
 	for {
 		select {
