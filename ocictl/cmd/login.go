@@ -18,13 +18,14 @@ package cmd
 
 import (
 	"fmt"
+	"io"
+
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/ocictl/pkg/utils"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/oci"
 	"github.com/ocibuilder/ocibuilder/pkg/read"
+	"github.com/ocibuilder/ocibuilder/pkg/types"
 	"github.com/spf13/cobra"
-	"io"
 )
 
 const loginDesc = `
@@ -77,7 +78,7 @@ func (l *loginCmd) run(args []string) error {
 		Client: client,
 	}
 
-	res := make(chan v1alpha1.OCILoginResponse)
+	res := make(chan types.OCILoginResponse)
 	errChan := make(chan error)
 	finished := make(chan bool)
 

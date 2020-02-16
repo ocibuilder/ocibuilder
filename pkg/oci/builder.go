@@ -22,7 +22,9 @@ import (
 	"fmt"
 	"os"
 
-	dockertypes "github.com/docker/docker/api/types"
+	"github.com/ocibuilder/ocibuilder/pkg/types"
+
+	docker "github.com/docker/docker/api/types"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/parser"
@@ -36,7 +38,7 @@ type Builder struct {
 	Metadata []v1alpha1.ImageMetadata
 }
 
-func (b *Builder) Build(spec *v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBuildResponse, errChan chan<- error, finished chan<- bool) {
+func (b *Builder) Build(spec *v1alpha1.OCIBuilderSpec, res chan<- types.OCIBuildResponse, errChan chan<- error, finished chan<- bool) {
 	log := b.Logger
 	cli := b.Client
 
@@ -68,11 +70,11 @@ func (b *Builder) Build(spec *v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBu
 
 		imageName := fmt.Sprintf("%s:%s", opt.Name, opt.Tag)
 
-		builderOptions := v1alpha1.OCIBuildOptions{
+		builderOptions := types.OCIBuildOptions{
 			Ctx:         context.Background(),
 			ContextPath: opt.BuildContextPath + common.ContextDirectory,
 			Context:     buildContext,
-			ImageBuildOptions: dockertypes.ImageBuildOptions{
+			ImageBuildOptions: docker.ImageBuildOptions{
 				Dockerfile: opt.Dockerfile,
 				Tags:       []string{imageName},
 				Context:    buildContext,
@@ -108,7 +110,7 @@ func (b *Builder) Build(spec *v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBu
 	}
 }
 
-func (b *Builder) Push(spec *v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPushResponse, errChan chan<- error, finished chan<- bool) {
+func (b *Builder) Push(spec *v1alpha1.OCIBuilderSpec, res chan<- types.OCIPushResponse, errChan chan<- error, finished chan<- bool) {
 	log := b.Logger
 	cli := b.Client
 
@@ -128,10 +130,10 @@ func (b *Builder) Push(spec *v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPus
 			return
 		}
 
-		pushOptions := v1alpha1.OCIPushOptions{
+		pushOptions := types.OCIPushOptions{
 			Ctx: context.Background(),
 			Ref: pushFullImageName,
-			ImagePushOptions: dockertypes.ImagePushOptions{
+			ImagePushOptions: docker.ImagePushOptions{
 				RegistryAuth: authString,
 			},
 		}
@@ -164,7 +166,7 @@ func (b *Builder) Push(spec *v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPus
 	finished <- true
 }
 
-func (b *Builder) Pull(spec *v1alpha1.OCIBuilderSpec, imageName string, res chan<- v1alpha1.OCIPullResponse, errChan chan<- error, finished chan<- bool) {
+func (b *Builder) Pull(spec *v1alpha1.OCIBuilderSpec, imageName string, res chan<- types.OCIPullResponse, errChan chan<- error, finished chan<- bool) {
 	log := b.Logger
 	cli := b.Client
 
@@ -182,10 +184,10 @@ func (b *Builder) Pull(spec *v1alpha1.OCIBuilderSpec, imageName string, res chan
 			return
 		}
 
-		pullOptions := v1alpha1.OCIPullOptions{
+		pullOptions := types.OCIPullOptions{
 			Ctx: context.Background(),
 			Ref: registry + imageName,
-			ImagePullOptions: dockertypes.ImagePullOptions{
+			ImagePullOptions: docker.ImagePullOptions{
 				RegistryAuth: authString,
 			},
 		}
@@ -211,7 +213,7 @@ func (b *Builder) Pull(spec *v1alpha1.OCIBuilderSpec, imageName string, res chan
 	finished <- true
 }
 
-func (b *Builder) Login(spec *v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCILoginResponse, errChan chan<- error, finished chan<- bool) {
+func (b *Builder) Login(spec *v1alpha1.OCIBuilderSpec, res chan<- types.OCILoginResponse, errChan chan<- error, finished chan<- bool) {
 	log := b.Logger
 	cli := b.Client
 
@@ -233,9 +235,9 @@ func (b *Builder) Login(spec *v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCILo
 			errChan <- err
 			return
 		}
-		loginOptions := v1alpha1.OCILoginOptions{
+		loginOptions := types.OCILoginOptions{
 			Ctx: context.Background(),
-			AuthConfig: dockertypes.AuthConfig{
+			AuthConfig: docker.AuthConfig{
 				Username:      username,
 				Password:      password,
 				ServerAddress: loginSpec.Registry,
@@ -261,10 +263,10 @@ func (b *Builder) Purge(imageName string) error {
 
 	log.WithField("image", imageName).Debugln("attempting to purge image")
 
-	removeOptions := v1alpha1.OCIRemoveOptions{
+	removeOptions := types.OCIRemoveOptions{
 		Image:              imageName,
 		Ctx:                context.Background(),
-		ImageRemoveOptions: dockertypes.ImageRemoveOptions{},
+		ImageRemoveOptions: docker.ImageRemoveOptions{},
 	}
 
 	res, err := cli.ImageRemove(removeOptions)
@@ -306,7 +308,7 @@ func (b Builder) generateAuthRegistryString(registry string, spec *v1alpha1.OCIB
 			if err != nil {
 				return "", err
 			}
-			return b.Client.GenerateAuthRegistryString(dockertypes.AuthConfig{
+			return b.Client.GenerateAuthRegistryString(docker.AuthConfig{
 				Username: user,
 				Password: pass,
 			}), nil

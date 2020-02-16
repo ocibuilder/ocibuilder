@@ -19,9 +19,10 @@ package cmd
 import (
 	"io"
 
+	"github.com/ocibuilder/ocibuilder/pkg/types"
+
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/ocictl/pkg/utils"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/ocibuilder/ocibuilder/pkg/oci"
 	"github.com/ocibuilder/ocibuilder/pkg/read"
 	"github.com/spf13/cobra"
@@ -85,7 +86,7 @@ func (b *buildCmd) run(args []string) error {
 		Client: client,
 	}
 
-	res := make(chan v1alpha1.OCIBuildResponse)
+	res := make(chan types.OCIBuildResponse)
 	errChan := make(chan error)
 	finished := make(chan bool)
 

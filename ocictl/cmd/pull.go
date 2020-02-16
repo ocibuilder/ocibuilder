@@ -17,13 +17,13 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"io"
 
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/ocictl/pkg/utils"
 	"github.com/ocibuilder/ocibuilder/pkg/oci"
 	"github.com/ocibuilder/ocibuilder/pkg/read"
+	"github.com/ocibuilder/ocibuilder/pkg/types"
 	"github.com/spf13/cobra"
 )
 
@@ -84,7 +84,7 @@ func (p *pullCmd) run(args []string) error {
 		Client: client,
 	}
 
-	res := make(chan v1alpha1.OCIPullResponse)
+	res := make(chan types.OCIPullResponse)
 	errChan := make(chan error)
 	finished := make(chan bool)
 
