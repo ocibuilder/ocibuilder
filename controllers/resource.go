@@ -18,15 +18,15 @@ package ocibuilder
 
 import (
 	"fmt"
+	"os"
+	"path"
+
 	"github.com/ghodss/yaml"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/command"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"os"
-	"path"
-	"strings"
 )
 
 // parseJobConfiguration parses configuration required to manage K8s job lifecycle
@@ -72,8 +72,7 @@ func (opctx *operationContext) storeBuilderSpecification() error {
 }
 
 // generateCommands generates commands to be executed for the job
-func (opctx *operationContext) generateCommands() []command.CommandBuilder {
-	var commandBuilders []command.CommandBuilder
+func (opctx *operationContext) generateCommands() []command.Command {
 	specificationFilePath := path.Clean(fmt.Sprintf("%s/%s", common.ContextDirectory, common.SpecFilePath))
 
 	flags := []command.Flag{
@@ -89,26 +88,10 @@ func (opctx *operationContext) generateCommands() []command.CommandBuilder {
 		})
 	}
 
-	commandBuilders = append(commandBuilders, command.CommandBuilder{
-		Command: fmt.Sprintf("%s %s", common.CmdOcictl, common.CmdLogin),
-		Name:    common.CmdLogin,
-		Flags:   flags,
-	}, command.CommandBuilder{
-		Command: fmt.Sprintf("%s %s", common.CmdOcictl, common.CmdBuild),
-		Name:    common.CmdBuild,
-		Flags:   flags,
-	}, command.CommandBuilder{
-		Name:    common.CmdPush,
-		Command: fmt.Sprintf("%s %s", common.CmdOcictl, common.CmdPush),
-		Flags:   flags,
-	})
+	buildCmd := command.Builder(common.CmdOcictl).Command(common.CmdBuild).Flags(flags...).Build()
+	pushCmd := command.Builder(common.CmdOcictl).Command(common.CmdPush).Flags(flags...).Build()
 
-	var commands []string
-	for _, cmdBuilder := range cmdBuilders {
-		commands = append(commands, strings.Join(cmdBuilder.Build().ConstructCommand(), " "))
-	}
-
-	return commands
+	return []command.Command{buildCmd, pushCmd}
 }
 
 // constructBuilderJob constructs a K8s job for ocibuilder build step.
