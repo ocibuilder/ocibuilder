@@ -130,17 +130,33 @@ func addYttAnnotations(overlay io.ReadCloser) []byte {
 	}
 	scanner := bufio.NewScanner(overlay)
 	for idx := 0; scanner.Scan(); {
+
 		if idx == 0 && strings.TrimSpace(scanner.Text()) == yttOverlayIdentifier {
 			return nil
 		}
+
+		// Resets temp when any top level field is hit e.g. build, push, login
+		if len(strings.TrimSpace(scanner.Text())) == len(scanner.Text()) {
+			tempSegment = nil
+		}
+
 		if strings.TrimSpace(scanner.Text()) == "- metadata:" {
 			addTempToAnnotate()
 			tempSegment = nil
 		}
-		if strings.Contains(scanner.Text(), "overlay:") {
-			annotation := retrieveAnnotation(scanner.Text())
 
-			tempSegment = append([]string{annotation}, tempSegment...)
+		if strings.Contains(scanner.Text(), "overlay:") {
+
+			annotation := ""
+			if t := tempSegment[0]; t == "login:" || t == "push:" {
+				annotation = retrieveAnnotation(scanner.Text(), false)
+				tmp := append([]string{annotation}, tempSegment[1:]...)
+				tempSegment = append(tempSegment[:1], tmp...)
+			} else {
+				annotation = retrieveAnnotation(scanner.Text(), true)
+				tempSegment = append([]string{annotation}, tempSegment...)
+			}
+
 			addTempToAnnotate()
 			tempSegment = nil
 		}
@@ -151,8 +167,15 @@ func addYttAnnotations(overlay io.ReadCloser) []byte {
 	return []byte(annotatedOverlay)
 }
 
-func retrieveAnnotation(overlayLine string) string {
+func retrieveAnnotation(overlayLine string, isBuildSpec bool) string {
 	overlayLabel := strings.TrimPrefix(strings.TrimSpace(overlayLine), "overlay:")
-	annotationTemplate := "#@overlay/match by=overlay.subset({\"metadata\":{\"labels\":{\"overlay\":\"%s\"}}})"
+	annotationTemplate := ""
+
+	if isBuildSpec {
+		annotationTemplate = "#@overlay/match by=overlay.subset({\"metadata\":{\"labels\":{\"overlay\":\"%s\"}}})"
+	} else {
+		annotationTemplate = "#@overlay/match by=overlay.subset({\"overlay\":\"%s\"})"
+	}
+
 	return fmt.Sprintf(annotationTemplate, strings.TrimSpace(overlayLabel))
 }

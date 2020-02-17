@@ -56,6 +56,14 @@ func TestAddYttAnnotations(t *testing.T) {
 	assert.Equal(t, expectedAnnotatedOverlay, annotatedOverlay)
 }
 
+func TestAddYttAnnotations_Login(t *testing.T) {
+	file, err := os.Open("../../testing/dummy/overlay_overlay_login_test.yaml")
+	assert.Equal(t, nil, err)
+
+	annotatedOverlay := addYttAnnotations(file)
+	assert.Equal(t, expectedAnnotatedOverlayLogin, annotatedOverlay)
+}
+
 func TestRetrieveOverlayFile(t *testing.T) {
 
 	defer os.Remove(common.OverlayPath)
@@ -151,6 +159,19 @@ build:
             labels:
               overlay: stage-1
       tag: v0.2.0`)
+
+var expectedAnnotatedOverlayLogin = []byte(`#@ load("@ytt:overlay", "overlay")
+
+#@overlay/match by=overlay.all
+---
+login:
+#@overlay/match by=overlay.subset({"overlay":"login-overlay"})
+  - registry: dockerhub.io
+    overlay: login-overlay
+    token: example-token
+    creds:
+      plain:
+        username: example-user`)
 
 var expectedOverlayedSpec = []byte(`build:
   templates:

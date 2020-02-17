@@ -1,0 +1,7 @@
+login:
+  - registry: dockerhub.io
+    overlay: login-overlay
+    token: example-token
+    creds:
+      plain:
+        username: example-user

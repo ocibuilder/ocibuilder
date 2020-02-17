@@ -130,7 +130,7 @@ func (r Reader) readIndividualSpecs(spec *v1alpha1.OCIBuilderSpec, path string) 
 	return nil
 }
 
-// applyOverlay applys a ytt overalay to the specification
+// applyOverlay applys a ytt overlay to the specification
 func applyOverlay(yamlTemplate []byte, overlayPath string) ([]byte, error) {
 
 	yttOverlay := overlay.YttOverlay{
