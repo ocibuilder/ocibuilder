@@ -93,8 +93,5 @@ func GetClient(builderType string, logger *logrus.Logger) (v1alpha1.BuilderClien
 
 // HasDaemon determines if docker daemon is required for given OCIBuilder type
 func HasDaemon(builderType string) bool {
-	if v1alpha1.Framework(builderType) == v1alpha1.DockerFramework {
-		return true
-	}
-	return false
+	return v1alpha1.Framework(builderType) == v1alpha1.DockerFramework
 }

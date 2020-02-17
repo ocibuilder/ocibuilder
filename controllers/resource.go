@@ -17,13 +17,7 @@ limitations under the License.
 package ocibuilder
 
 import (
-	"fmt"
-	"os"
-	"path"
-
-	"github.com/ghodss/yaml"
 	"github.com/ocibuilder/ocibuilder/common"
-	"github.com/ocibuilder/ocibuilder/pkg/command"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -55,7 +49,9 @@ func (opctx *operationContext) readJobConfiguration() *jobConfiguration {
 	return cfg
 }
 
+// UNUSED
 // storeBuilderSpecification stores the builder specification in a file
+/*
 func (opctx *operationContext) storeBuilderSpecification() error {
 	file, err := os.Create(fmt.Sprintf("%s/%s", common.ContextDirectory, common.SpecFilePath))
 	if err != nil {
@@ -70,8 +66,11 @@ func (opctx *operationContext) storeBuilderSpecification() error {
 	}
 	return nil
 }
+*/
 
+// UNUSED
 // generateCommands generates commands to be executed for the job
+/*
 func (opctx *operationContext) generateCommands() []command.Command {
 	specificationFilePath := path.Clean(fmt.Sprintf("%s/%s", common.ContextDirectory, common.SpecFilePath))
 
@@ -93,6 +92,7 @@ func (opctx *operationContext) generateCommands() []command.Command {
 
 	return []command.Command{buildCmd, pushCmd}
 }
+*/
 
 // constructBuilderJob constructs a K8s job for ocibuilder build step.
 func (opctx *operationContext) constructBuilderJob() (*batchv1.Job, error) {
