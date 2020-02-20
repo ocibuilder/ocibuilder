@@ -24,6 +24,13 @@ import (
 var log = util.GetLogger(false)
 
 const rootDesc = `
+              _      __  __
+  ____  _____(_)____/ /_/ /
+ / __ \/ ___/ / ___/ __/ / 
+/ /_/ / /__/ / /__/ /_/ /  
+\____/\___/_/\___/\__/_/   
+                           
+                         
 The ocictl is a tool offered by ocibuilder for pulling, building and
 pushing your images using your specified build framework.
 `
