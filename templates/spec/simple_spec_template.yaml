@@ -28,6 +28,9 @@ build:
                   - <DOCKER_COMMAND>
       tag: <IMAGE_TAG>
       purge: <PURGE_SETTING>
+      context:
+        localContext:
+          contextPath: .
 
 login:
   - registry: <REGISTRY_ONE>
