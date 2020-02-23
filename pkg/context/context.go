@@ -67,7 +67,7 @@ func GetBuildContextReader(buildContext *v1alpha1.BuildContext, k8sConfigPath st
 // looking in /ocib/context/context.tar.gz
 func InjectDockerfile(contextPath string, dockerfilePath string) error {
 
-	contextDirectoryPath := fmt.Sprintf("%s%s", contextPath, common.ContextDirectory)
+	contextDirectoryPath := fmt.Sprintf("%s%s/", contextPath, common.ContextDirectory)
 	contextTar := fmt.Sprintf("%s%s", contextDirectoryPath, common.ContextFile)
 
 	if err := common.UntarFile(contextTar, contextDirectoryPath); err != nil {
