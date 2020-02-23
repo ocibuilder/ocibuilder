@@ -52,6 +52,7 @@ func NewRootCmd(args []string) *cobra.Command {
 		newPushCmd(out),
 		newVersionCmd(out),
 		newInitCmd(out),
+		newSignCmd(out),
 	)
 
 	flags.Parse(args) //nolint
