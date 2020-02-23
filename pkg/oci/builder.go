@@ -61,7 +61,8 @@ func (b *Builder) Build(spec *v1alpha1.OCIBuilderSpec, res chan<- types.OCIBuild
 
 		log.WithField("step: ", idx).Debugln("running build step")
 		log.WithField("path", opt.BuildContextPath).Debugln("building with build context at path")
-		buildContext, err := os.Open(opt.BuildContextPath + common.ContextDirectory + common.ContextFile)
+		path := fmt.Sprintf("%s%s/%s", opt.BuildContextPath, common.ContextDirectory, common.ContextFile)
+		buildContext, err := os.Open(path)
 		if err != nil {
 			log.WithError(err).Errorln("error reading image build context")
 			errChan <- err
