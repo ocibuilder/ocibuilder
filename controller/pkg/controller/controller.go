@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package ocibuilder
+package controller
 
 import (
 	"context"
@@ -56,8 +56,6 @@ type Controller struct {
 	namespace string
 	// config is the controller's configuration
 	config *ControllerConfig
-	// logger is the logger for a controller
-	logger *logrus.Logger
 	// kubernetes config and apis
 	kubeConfig *rest.Config
 	// kubeClient communicates with Kubernetes API server
@@ -68,6 +66,8 @@ type Controller struct {
 	informer cache.SharedIndexInformer
 	// queue is an interface that rate limits items being added to the queue.
 	queue workqueue.RateLimitingInterface
+	// logger is the logger for a controller
+	logger *logrus.Logger
 }
 
 // NewController creates a new controller
@@ -77,11 +77,11 @@ func NewController(rest *rest.Config, config *ControllerConfig, logger *logrus.L
 		namespace:  namespace,
 		configmap:  configmap,
 		config:     config,
-		logger:     logger,
 		kubeConfig: rest,
 		kubeClient: kubernetes.NewForConfigOrDie(rest),
 		ociClient:  ociv1alpha1.NewForConfigOrDie(rest),
 		queue:      workqueue.NewRateLimitingQueue(rateLimiter),
+		logger:     logger,
 	}
 }
 
@@ -112,7 +112,7 @@ func (ctrl *Controller) processNextItem() bool {
 
 	ctx := newOperationContext(builder, ctrl)
 
-	err = ctx.operate()
+	err = ctx.Operate()
 	if err != nil {
 		ctrl.logger.WithError(err).WithField(common.LabelOCIBuilderName, builder.Name).Errorln("failed to operate on the ocibuilder obejct")
 	}

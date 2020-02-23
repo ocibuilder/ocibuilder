@@ -27,6 +27,10 @@ const (
 	// EnvVarControllerConfigMap is the name of the configmap to use for the controller
 	EnvVarControllerConfigMap = "CONTROLLER_CONFIG_MAP"
 	EnvVarKubeConfig          = "KUBE_CONFIG"
+	// EnvVarNamespace refers to a K8s namespace
+	EnvVarNamespace = "NAMESPACE"
+	// EnvVarControllerInstanceID is used to get controller instance id
+	EnvVarControllerInstanceID = "CONTROLLER_INSTANCE_ID"
 )
 
 // Controller labels

@@ -1,6 +1,6 @@
 ocibuilder.iml
 .idea
-dist/
+**/dist/
 vendor/
 */.DS_Store
 *.swp

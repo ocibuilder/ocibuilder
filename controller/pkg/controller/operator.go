@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package ocibuilder
+package controller
 
 import (
 	"github.com/ocibuilder/ocibuilder/common"
@@ -60,7 +60,7 @@ func newOperationContext(builder *v1alpha1.OCIBuilder, controller *Controller) *
 }
 
 // operate operate on an ocibuilder object and manages its lifecycle
-func (opctx *operationContext) operate() error {
+func (opctx *operationContext) Operate() error {
 	log := opctx.logger.WithFields(map[string]interface{}{
 		common.LabelName:      opctx.builder.Name,
 		common.LabelNamespace: opctx.builder.Namespace,

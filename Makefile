@@ -13,7 +13,7 @@ CLIENTSET_GEN          = pkg/client/ocibuilder/clientset
 CLIENTSET_SRC          = $(shell egrep -l -R "^\/\/\s\+genclient" 2>/dev/null | grep -v vendor)
 INFORMERS_GEN          = pkg/client/ocibuilder/informers
 LISTERS_GEN            = pkg/client/ocibuilder/listers
-HEADER_FILE            = hack/custom-boilerplate.go.txt
+HEADER_FILE            = controller/hack/custom-boilerplate.go.txt
 OCIBUILDER             = github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder
 OCIBUILDER_APIS        = github.com/ocibuilder/ocibuilder/pkg/apis
 
@@ -65,6 +65,11 @@ ocictl-package-mac:
 	cp LICENSE ./dist/ocictl
 	cd dist; tar -czvf ocictl-mac-amd64.tar.gz ./ocictl
 
+.PHONY: controller
+controller:
+	make clean
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -o ${CURRENT_DIR}/controller/dist/ociop ${CURRENT_DIR}/controller/main.go
+
 .PHONY: codegen
 test:
 	go test $(shell go list ./... | grep -v /vendor/ | grep -v /testing/) -race -short -v -coverprofile=coverage.text
@@ -95,14 +100,14 @@ dep:
 
 .PHONY: openapigen
 openapigen:
-	hack/update-openapigen.sh
+	controller/hack/update-openapigen.sh
 
 .PHONY: codegen
 codegen: generate-deepcopy generate-client generate-lister generate-informer
 
 .PHONY: verify-codegen
 verify-codegen: codegen
-	hack/verify-codegen.sh
+	controller/hack/verify-codegen.sh
 
 .PHONY: generate-deepcopy
 generate-deepcopy: $(DEEPCOPY_GEN)
