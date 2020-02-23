@@ -74,7 +74,9 @@ func (opctx *operationContext) operate() error {
 
 	switch opctx.builder.Status.Phase {
 	case v1alpha1.NodePhaseNew:
-		opctx.constructBuilderJob()
+		if _, err := opctx.constructBuilderJob(); err != nil {
+			return err
+		}
 	case v1alpha1.NodePhaseRunning:
 	case v1alpha1.NodePhaseCompleted:
 	case v1alpha1.NodePhaseError:
