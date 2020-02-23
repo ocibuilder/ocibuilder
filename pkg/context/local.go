@@ -37,7 +37,7 @@ func NewLocalBuildContextReader(buildContext *v1alpha1.LocalContext) *LocalBuild
 
 // Read reads the build context from the local
 func (contextReader *LocalBuildContextReader) Read() (string, error) {
-	contextFilePath := fmt.Sprintf("%s%s%s", contextReader.buildContext.ContextPath, common.ContextDirectory, common.ContextFile)
+	contextFilePath := fmt.Sprintf("%s%s/%s", contextReader.buildContext.ContextPath, common.ContextDirectory, common.ContextFile)
 	if err := common.TarFile(contextReader.buildContext.ContextPath+"/.", contextFilePath); err != nil {
 		return "", err
 	}

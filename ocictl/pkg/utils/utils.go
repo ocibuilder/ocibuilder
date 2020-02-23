@@ -71,8 +71,11 @@ func Output(stdout io.ReadCloser, stderr io.ReadCloser) error {
 
 // GetClient returns a OCIBuilder client
 func GetClient(builderType string, logger *logrus.Logger) (v1alpha1.BuilderClient, error) {
+
 	switch v1alpha1.Framework(builderType) {
+
 	case v1alpha1.DockerFramework:
+
 		apiClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to create a docker client")
@@ -83,12 +86,15 @@ func GetClient(builderType string, logger *logrus.Logger) (v1alpha1.BuilderClien
 		}, nil
 
 	case v1alpha1.BuildahFramework:
+
 		return buildah.Client{
 			Logger: logger,
 		}, nil
+
 	default:
 		return nil, errors.Errorf("invalid builder %s, try --builder=docker or --builder=buildah", builderType)
 	}
+
 }
 
 // HasDaemon determines if docker daemon is required for given OCIBuilder type
