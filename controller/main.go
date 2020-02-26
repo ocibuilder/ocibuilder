@@ -44,17 +44,6 @@ func main() {
 		return
 	}
 
-	instanceId, ok := os.LookupEnv(common.EnvVarControllerInstanceID)
-	if !ok {
-		logger.Infoln("instanceID not found")
-		return
-	}
-
-	ctrlConfig := &controller.ControllerConfig{
-		InstanceID: instanceId,
-		Namespace:  namespace,
-	}
-
 	configMap, ok := os.LookupEnv(common.EnvVarControllerConfigMap)
 	if !ok {
 		panic("controller configmap is not provided")
