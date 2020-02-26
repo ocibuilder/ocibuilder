@@ -86,6 +86,13 @@ const (
 	ContextDirectoryUncompressed = "/ocibuilder/context/uncompressed"
 )
 
+// Container image constants
+const (
+	Name  = "ocictl"
+	Image = "ocibuilder/ocictl"
+	Tag   = "latest"
+)
+
 // Default values of K8s Job specific variables
 var (
 	BackoffLimit            = int32(2)

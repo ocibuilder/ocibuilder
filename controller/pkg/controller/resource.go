@@ -17,7 +17,11 @@ limitations under the License.
 package controller
 
 import (
+	"fmt"
+	"path"
+
 	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/pkg/command"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -49,29 +53,24 @@ func (opctx *operationContext) readJobConfiguration() *jobConfiguration {
 	return cfg
 }
 
-// UNUSED
 // storeBuilderSpecification stores the builder specification in a file
-/*
-func (opctx *operationContext) storeBuilderSpecification() error {
-	file, err := os.Create(fmt.Sprintf("%s/%s", common.ContextDirectory, common.SpecFilePath))
-	if err != nil {
-		return err
-	}
-	body, err := yaml.Marshal(opctx.builder)
-	if err != nil {
-		return err
-	}
-	if _, err := file.Write(body); err != nil {
-		return err
-	}
-	return nil
-}
-*/
+//func (opctx *operationContext) storeBuilderSpecification() error {
+//	file, err := os.Create(fmt.Sprintf("%s/%s", common.ContextDirectory, common.SpecFilePath))
+//	if err != nil {
+//		return err
+//	}
+//	body, err := yaml.Marshal(opctx.builder)
+//	if err != nil {
+//		return err
+//	}
+//	if _, err := file.Write(body); err != nil {
+//		return err
+//	}
+//	return nil
+//}
 
-// UNUSED
 // generateCommands generates commands to be executed for the job
-/*
-func (opctx *operationContext) generateCommands() []command.Command {
+func (opctx *operationContext) generateCommands() []string {
 	specificationFilePath := path.Clean(fmt.Sprintf("%s/%s", common.ContextDirectory, common.SpecFilePath))
 
 	flags := []command.Flag{
@@ -90,9 +89,10 @@ func (opctx *operationContext) generateCommands() []command.Command {
 	buildCmd := command.Builder(common.CmdOcictl).Command(common.CmdBuild).Flags(flags...).Build()
 	pushCmd := command.Builder(common.CmdOcictl).Command(common.CmdPush).Flags(flags...).Build()
 
-	return []command.Command{buildCmd, pushCmd}
+	cmd := append(buildCmd.String(), "&&")
+	cmd = append(cmd, pushCmd.String()...)
+	return cmd
 }
-*/
 
 // constructBuilderJob constructs a K8s job for ocibuilder build step.
 func (opctx *operationContext) constructBuilderJob() (*batchv1.Job, error) {
@@ -101,6 +101,13 @@ func (opctx *operationContext) constructBuilderJob() (*batchv1.Job, error) {
 	labels := map[string]string{
 		common.LabelOwner:   opctx.builder.Name,
 		common.LabelJobType: "ocibuilder",
+	}
+
+	container := corev1.Container{
+		Name:      common.Name,
+		Image:     fmt.Sprintf("%s:%s", common.Image, common.Tag),
+		Command:   opctx.generateCommands(),
+		Resources: corev1.ResourceRequirements{},
 	}
 
 	return &batchv1.Job{
@@ -128,7 +135,7 @@ func (opctx *operationContext) constructBuilderJob() (*batchv1.Job, error) {
 				},
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
-						{},
+						container,
 					},
 				},
 			},

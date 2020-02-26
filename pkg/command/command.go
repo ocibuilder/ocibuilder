@@ -111,6 +111,11 @@ func (c Command) Wait() error {
 	return nil
 }
 
+// Outputs a string version of the command
+func (c Command) String() []string {
+	return append([]string{c.name}, c.constructCommand()...)
+}
+
 func (c Command) constructCommand() []string {
 	var commandVector = []string{c.command}
 
