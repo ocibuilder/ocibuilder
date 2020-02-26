@@ -68,7 +68,7 @@ ocictl-package-mac:
 .PHONY: controller
 controller:
 	make clean
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -o ${CURRENT_DIR}/controller/dist/ociop ${CURRENT_DIR}/controller/main.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -o ${CURRENT_DIR}/controller/dist/ocibuilder/controller ${CURRENT_DIR}/controller/main.go
 
 .PHONY: codegen
 test:

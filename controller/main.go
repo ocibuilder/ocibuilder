@@ -60,6 +60,7 @@ func main() {
 		panic("controller configmap is not provided")
 	}
 
-	ctrl := controller.NewController(restConfig, ctrlConfig, logger, configMap, namespace)
+	ctrl := controller.NewController(restConfig, logger, configMap, namespace)
+
 	ctrl.Run(context.Background(), 1, 1)
 }

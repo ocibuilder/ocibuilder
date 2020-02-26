@@ -110,6 +110,15 @@ func (opctx *operationContext) constructBuilderJob() (*batchv1.Job, error) {
 		Resources: corev1.ResourceRequirements{},
 	}
 
+	volume := corev1.Volume{
+		Name: "tmp",
+		VolumeSource: corev1.VolumeSource{
+			EmptyDir: &corev1.EmptyDirVolumeSource{
+				Medium: corev1.StorageMediumDefault,
+			},
+		},
+	}
+
 	return &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
 			GenerateName: opctx.builder.Name,
@@ -134,8 +143,12 @@ func (opctx *operationContext) constructBuilderJob() (*batchv1.Job, error) {
 					Labels:       labels,
 				},
 				Spec: corev1.PodSpec{
+					InitContainers: []corev1.Container{},
 					Containers: []corev1.Container{
 						container,
+					},
+					Volumes: []corev1.Volume{
+						volume,
 					},
 				},
 			},

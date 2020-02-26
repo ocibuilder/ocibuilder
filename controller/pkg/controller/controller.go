@@ -71,12 +71,11 @@ type Controller struct {
 }
 
 // NewController creates a new controller
-func NewController(rest *rest.Config, config *ControllerConfig, logger *logrus.Logger, configmap, namespace string) *Controller {
+func NewController(rest *rest.Config, logger *logrus.Logger, configmap, namespace string) *Controller {
 	rateLimiter := workqueue.NewItemExponentialFailureRateLimiter(rateLimiterBaseDelay, rateLimiterMaxDelay)
 	return &Controller{
 		namespace:  namespace,
 		configmap:  configmap,
-		config:     config,
 		kubeConfig: rest,
 		kubeClient: kubernetes.NewForConfigOrDie(rest),
 		ociClient:  ociv1alpha1.NewForConfigOrDie(rest),

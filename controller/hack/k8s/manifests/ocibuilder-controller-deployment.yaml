@@ -1,1 +1,21 @@
-# Define a "ocibuilder" custom resource definition
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ocibuilder-deployment
+  labels:
+    app: ocibuilder
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ocibuilder
+  template:
+    metadata:
+      labels:
+        app: ocibuilder
+    spec:
+      containers:
+        - name: ocibuilder
+          image: ocibuilder/controller:0.0.1
+          ports:
+            - containerPort: 8080
