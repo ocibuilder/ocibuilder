@@ -18,13 +18,14 @@ package main
 
 import (
 	"fmt"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"log"
 	"os"
 
+	ocbv1alpha1 "github.com/blackrock/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
 	"github.com/ghodss/yaml"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
 
@@ -39,23 +40,28 @@ func main() {
 		return
 	}
 
-	client := kubernetes.NewForConfigOrDie(restConfig).CoreV1().RESTClient()
-	req := client.Get().
-		Namespace(namespace).
-		Resource(resource).
-		Name(resourceName)
+	client := ocbv1alpha1.NewForConfigOrDie(restConfig)
 
-	result, err := req.Do().Get()
-	if err != nil {
-		log.Fatalln(err)
-		return
-	}
-	obj := result.DeepCopyObject()
-	spec := obj.(*v1alpha1.OCIBuilder)
-	if err := storeBuilderSpecification(spec); err != nil {
-		log.Fatalln(err)
-		return
-	}
+	ociObj, err := client.BlackrockV1alpha1().OCIBuilders(namespace).Get("my-r", metav1.GetOptions{})
+
+	//
+	//client := kubernetes.NewForConfigOrDie(restConfig).CoreV1().RESTClient()
+	//req := client.Get().
+	//	Namespace(namespace).
+	//	Resource(resource).
+	//	Name(resourceName)
+	//
+	//result, err := req.Do().Get()
+	//if err != nil {
+	//	log.Fatalln(err)
+	//	return
+	//}
+	//obj := result.DeepCopyObject()
+	//spec := obj.(*v1alpha1.OCIBuilder)
+	//if err := storeBuilderSpecification(spec); err != nil {
+	//	log.Fatalln(err)
+	//	return
+	//}
 }
 
 // storeBuilderSpecification stores the builder specification in a file

@@ -109,7 +109,7 @@ func (opctx *operationContext) constructBuilderJob() (*batchv1.Job, error) {
 			},
 			{
 				Name:  common.ResourceName,
-				Value: "",
+				Value: opctx.builder.Name,
 			},
 		},
 		Resources: corev1.ResourceRequirements{},
