@@ -18,14 +18,14 @@ package ocibuilder
 
 const (
 	// Group is the API Group
-	Group string = "github.com"
+	Group string = "github.com/ocibuilder"
 
 	// Kind is the kind constant for the sensor
-	Kind string = "OCIBuilder"
-	// Singular is the singular constant for the sensor
-	Singular string = "ocibuilder"
-	// Plural is the plural constant for the sensor
-	Plural string = "ocibuilders"
+	Kind string = "BuildSpecification"
+	// Singular is the singular constant for ocibuilder
+	Singular string = "buildspecification"
+	// Plural is the plural constant for ocibuilder
+	Plural string = "buildspecifications"
 	// FullName is the full name constant for the sensor
 	FullName string = Plural + "." + Group
 )

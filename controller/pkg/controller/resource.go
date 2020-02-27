@@ -21,6 +21,7 @@ import (
 	"path"
 
 	"github.com/ocibuilder/ocibuilder/common"
+	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder"
 	"github.com/ocibuilder/ocibuilder/pkg/command"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -95,23 +96,33 @@ func (opctx *operationContext) constructBuilderJob() (*batchv1.Job, error) {
 	}
 
 	initContainer := corev1.Container{
-		Name:       common.InitName,
-		Image:      fmt.Sprintf("%s:%s", common.InitImage, common.InitTag),
-		Command:    nil,
-		Args:       nil,
-		WorkingDir: "",
+		Name:  common.InitName,
+		Image: fmt.Sprintf("%s:%s", common.InitImage, common.InitTag),
 		Env: []corev1.EnvVar{
 			{
-				Name:  "",
+				Name:  common.Namespace,
+				Value: opctx.controller.namespace,
+			},
+			{
+				Name:  common.Resource,
+				Value: ocibuilder.Kind,
+			},
+			{
+				Name:  common.ResourceName,
 				Value: "",
 			},
 		},
-		Resources:    corev1.ResourceRequirements{},
-		VolumeMounts: nil,
+		Resources: corev1.ResourceRequirements{},
+		VolumeMounts: []corev1.VolumeMount{
+			{
+				Name:      common.VolumeName,
+				MountPath: common.VolumeMountPath,
+			},
+		},
 	}
 
 	volume := corev1.Volume{
-		Name: "tmp",
+		Name: common.VolumeName,
 		VolumeSource: corev1.VolumeSource{
 			EmptyDir: &corev1.EmptyDirVolumeSource{
 				Medium: corev1.StorageMediumDefault,

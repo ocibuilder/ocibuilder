@@ -107,7 +107,7 @@ const (
 // Container volume constants
 const (
 	VolumeMountPath = "/usr/src/app"
-	VolumeName      = "spec-volume"
+	VolumeName      = "spec"
 )
 
 // Default values of K8s Job specific variables

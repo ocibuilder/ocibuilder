@@ -1,7 +1,7 @@
 build:
   steps:
     - metadata:
-        name: ocibuilder/ociinit
+        name: docker.io/ocibuilder/ociinit
       tag: 0.1.0
       stages:
         - metadata:
@@ -18,3 +18,15 @@ build:
       context:
         localContext:
           contextPath: .
+
+login:
+  - registry: docker.io
+    token: ${E2E_DOCKERHUB_TOKEN}
+    creds:
+      plain:
+        username: ${E2E_DOCKERHUB_USER}
+
+push:
+  - registry: docker.io
+    image: ocibuilder/ociinit
+    tag: 0.1.0
