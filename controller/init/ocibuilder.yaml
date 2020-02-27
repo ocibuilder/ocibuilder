@@ -1,7 +1,7 @@
 build:
   steps:
     - metadata:
-        name: docker.io/ocibuilder/ociinit
+        name: docker.io/ocibuilder/init
       tag: 0.1.0
       stages:
         - metadata:
@@ -13,8 +13,8 @@ build:
                 inline:
                   - RUN mkdir -p /usr/src/app
                   - WORKDIR /usr/src/app
-                  - COPY dist/ociinit .
-                  - ENTRYPOINT ["ociinit"]
+                  - COPY dist/init .
+                  - ENTRYPOINT ["init"]
       context:
         localContext:
           contextPath: .
@@ -28,5 +28,5 @@ login:
 
 push:
   - registry: docker.io
-    image: ocibuilder/ociinit
+    image: ocibuilder/init
     tag: 0.1.0

@@ -22,9 +22,9 @@ import (
 	sync "sync"
 	time "time"
 
-	versioned "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
-	internalinterfaces "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/informers/externalversions/internalinterfaces"
-	ocibuilder "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/informers/externalversions/ocibuilder"
+	versioned2 "github.com/ocibuilder/ocibuilder/controller/pkg/client/ocibuilder/clientset/versioned"
+	internalinterfaces2 "github.com/ocibuilder/ocibuilder/controller/pkg/client/ocibuilder/informers/externalversions/internalinterfaces"
+	ocibuilder2 "github.com/ocibuilder/ocibuilder/controller/pkg/client/ocibuilder/informers/externalversions/ocibuilder"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -35,9 +35,9 @@ import (
 type SharedInformerOption func(*sharedInformerFactory) *sharedInformerFactory
 
 type sharedInformerFactory struct {
-	client           versioned.Interface
+	client           versioned2.Interface
 	namespace        string
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	tweakListOptions internalinterfaces2.TweakListOptionsFunc
 	lock             sync.Mutex
 	defaultResync    time.Duration
 	customResync     map[reflect.Type]time.Duration
@@ -59,7 +59,7 @@ func WithCustomResyncConfig(resyncConfig map[v1.Object]time.Duration) SharedInfo
 }
 
 // WithTweakListOptions sets a custom filter on all listers of the configured SharedInformerFactory.
-func WithTweakListOptions(tweakListOptions internalinterfaces.TweakListOptionsFunc) SharedInformerOption {
+func WithTweakListOptions(tweakListOptions internalinterfaces2.TweakListOptionsFunc) SharedInformerOption {
 	return func(factory *sharedInformerFactory) *sharedInformerFactory {
 		factory.tweakListOptions = tweakListOptions
 		return factory
@@ -75,7 +75,7 @@ func WithNamespace(namespace string) SharedInformerOption {
 }
 
 // NewSharedInformerFactory constructs a new instance of sharedInformerFactory for all namespaces.
-func NewSharedInformerFactory(client versioned.Interface, defaultResync time.Duration) SharedInformerFactory {
+func NewSharedInformerFactory(client versioned2.Interface, defaultResync time.Duration) SharedInformerFactory {
 	return NewSharedInformerFactoryWithOptions(client, defaultResync)
 }
 
@@ -83,12 +83,12 @@ func NewSharedInformerFactory(client versioned.Interface, defaultResync time.Dur
 // Listers obtained via this SharedInformerFactory will be subject to the same filters
 // as specified here.
 // Deprecated: Please use NewSharedInformerFactoryWithOptions instead
-func NewFilteredSharedInformerFactory(client versioned.Interface, defaultResync time.Duration, namespace string, tweakListOptions internalinterfaces.TweakListOptionsFunc) SharedInformerFactory {
+func NewFilteredSharedInformerFactory(client versioned2.Interface, defaultResync time.Duration, namespace string, tweakListOptions internalinterfaces2.TweakListOptionsFunc) SharedInformerFactory {
 	return NewSharedInformerFactoryWithOptions(client, defaultResync, WithNamespace(namespace), WithTweakListOptions(tweakListOptions))
 }
 
 // NewSharedInformerFactoryWithOptions constructs a new instance of a SharedInformerFactory with additional options.
-func NewSharedInformerFactoryWithOptions(client versioned.Interface, defaultResync time.Duration, options ...SharedInformerOption) SharedInformerFactory {
+func NewSharedInformerFactoryWithOptions(client versioned2.Interface, defaultResync time.Duration, options ...SharedInformerOption) SharedInformerFactory {
 	factory := &sharedInformerFactory{
 		client:           client,
 		namespace:        v1.NamespaceAll,
@@ -143,7 +143,7 @@ func (f *sharedInformerFactory) WaitForCacheSync(stopCh <-chan struct{}) map[ref
 
 // InternalInformerFor returns the SharedIndexInformer for obj using an internal
 // client.
-func (f *sharedInformerFactory) InformerFor(obj runtime.Object, newFunc internalinterfaces.NewInformerFunc) cache.SharedIndexInformer {
+func (f *sharedInformerFactory) InformerFor(obj runtime.Object, newFunc internalinterfaces2.NewInformerFunc) cache.SharedIndexInformer {
 	f.lock.Lock()
 	defer f.lock.Unlock()
 
@@ -167,13 +167,13 @@ func (f *sharedInformerFactory) InformerFor(obj runtime.Object, newFunc internal
 // SharedInformerFactory provides shared informers for resources in all known
 // API group versions.
 type SharedInformerFactory interface {
-	internalinterfaces.SharedInformerFactory
+	internalinterfaces2.SharedInformerFactory
 	ForResource(resource schema.GroupVersionResource) (GenericInformer, error)
 	WaitForCacheSync(stopCh <-chan struct{}) map[reflect.Type]bool
 
-	Ocibuilder() ocibuilder.Interface
+	Ocibuilder() ocibuilder2.Interface
 }
 
-func (f *sharedInformerFactory) Ocibuilder() ocibuilder.Interface {
-	return ocibuilder.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Ocibuilder() ocibuilder2.Interface {
+	return ocibuilder2.New(f, f.namespace, f.tweakListOptions)
 }

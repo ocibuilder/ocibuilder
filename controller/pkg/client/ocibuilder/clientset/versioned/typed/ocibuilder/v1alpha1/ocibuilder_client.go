@@ -18,8 +18,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	scheme2 "github.com/ocibuilder/ocibuilder/controller/pkg/client/ocibuilder/clientset/versioned/scheme"
 	v1alpha1 "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned/scheme"
 	rest "k8s.io/client-go/rest"
 )
 
@@ -69,7 +69,7 @@ func setConfigDefaults(config *rest.Config) error {
 	gv := v1alpha1.SchemeGroupVersion
 	config.GroupVersion = &gv
 	config.APIPath = "/apis"
-	config.NegotiatedSerializer = scheme.Codecs.WithoutConversion()
+	config.NegotiatedSerializer = scheme2.Codecs.WithoutConversion()
 
 	if config.UserAgent == "" {
 		config.UserAgent = rest.DefaultKubernetesUserAgent()

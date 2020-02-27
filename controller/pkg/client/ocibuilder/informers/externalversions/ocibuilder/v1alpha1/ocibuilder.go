@@ -20,10 +20,10 @@ package v1alpha1
 import (
 	time "time"
 
+	versioned2 "github.com/ocibuilder/ocibuilder/controller/pkg/client/ocibuilder/clientset/versioned"
+	internalinterfaces2 "github.com/ocibuilder/ocibuilder/controller/pkg/client/ocibuilder/informers/externalversions/internalinterfaces"
+	v1alpha12 "github.com/ocibuilder/ocibuilder/controller/pkg/client/ocibuilder/listers/ocibuilder/v1alpha1"
 	ocibuilderv1alpha1 "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	versioned "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
-	internalinterfaces "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/informers/externalversions/internalinterfaces"
-	v1alpha1 "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/listers/ocibuilder/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -34,26 +34,26 @@ import (
 // OCIBuilders.
 type OCIBuilderInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.OCIBuilderLister
+	Lister() v1alpha12.OCIBuilderLister
 }
 
 type oCIBuilderInformer struct {
-	factory          internalinterfaces.SharedInformerFactory
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	factory          internalinterfaces2.SharedInformerFactory
+	tweakListOptions internalinterfaces2.TweakListOptionsFunc
 	namespace        string
 }
 
 // NewOCIBuilderInformer constructs a new informer for OCIBuilder type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewOCIBuilderInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func NewOCIBuilderInformer(client versioned2.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewFilteredOCIBuilderInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
 // NewFilteredOCIBuilderInformer constructs a new informer for OCIBuilder type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredOCIBuilderInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredOCIBuilderInformer(client versioned2.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces2.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
@@ -75,7 +75,7 @@ func NewFilteredOCIBuilderInformer(client versioned.Interface, namespace string,
 	)
 }
 
-func (f *oCIBuilderInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+func (f *oCIBuilderInformer) defaultInformer(client versioned2.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
 	return NewFilteredOCIBuilderInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
@@ -83,6 +83,6 @@ func (f *oCIBuilderInformer) Informer() cache.SharedIndexInformer {
 	return f.factory.InformerFor(&ocibuilderv1alpha1.OCIBuilder{}, f.defaultInformer)
 }
 
-func (f *oCIBuilderInformer) Lister() v1alpha1.OCIBuilderLister {
-	return v1alpha1.NewOCIBuilderLister(f.Informer().GetIndexer())
+func (f *oCIBuilderInformer) Lister() v1alpha12.OCIBuilderLister {
+	return v1alpha12.NewOCIBuilderLister(f.Informer().GetIndexer())
 }

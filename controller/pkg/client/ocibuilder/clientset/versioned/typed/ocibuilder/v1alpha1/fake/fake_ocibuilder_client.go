@@ -18,7 +18,7 @@ limitations under the License.
 package fake
 
 import (
-	v1alpha1 "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned/typed/ocibuilder/v1alpha1"
+	v1alpha12 "github.com/ocibuilder/ocibuilder/controller/pkg/client/ocibuilder/clientset/versioned/typed/ocibuilder/v1alpha1"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )
@@ -27,7 +27,7 @@ type FakeOcibuilderV1alpha1 struct {
 	*testing.Fake
 }
 
-func (c *FakeOcibuilderV1alpha1) OCIBuilders(namespace string) v1alpha1.OCIBuilderInterface {
+func (c *FakeOcibuilderV1alpha1) OCIBuilders(namespace string) v1alpha12.OCIBuilderInterface {
 	return &FakeOCIBuilders{c, namespace}
 }
 

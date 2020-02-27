@@ -23,8 +23,8 @@ import (
 
 	"github.com/ghodss/yaml"
 	"github.com/ocibuilder/ocibuilder/common"
+	ocbv1alpha1 "github.com/ocibuilder/ocibuilder/controller/pkg/client/ocibuilder/clientset/versioned"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	ocbv1alpha1 "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 

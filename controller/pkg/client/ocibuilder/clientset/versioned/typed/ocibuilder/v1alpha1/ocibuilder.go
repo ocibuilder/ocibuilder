@@ -20,8 +20,8 @@ package v1alpha1
 import (
 	"time"
 
+	scheme2 "github.com/ocibuilder/ocibuilder/controller/pkg/client/ocibuilder/clientset/versioned/scheme"
 	v1alpha1 "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	scheme "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -69,7 +69,7 @@ func (c *oCIBuilders) Get(name string, options v1.GetOptions) (result *v1alpha1.
 		Namespace(c.ns).
 		Resource("ocibuilders").
 		Name(name).
-		VersionedParams(&options, scheme.ParameterCodec).
+		VersionedParams(&options, scheme2.ParameterCodec).
 		Do().
 		Into(result)
 	return
@@ -85,7 +85,7 @@ func (c *oCIBuilders) List(opts v1.ListOptions) (result *v1alpha1.OCIBuilderList
 	err = c.client.Get().
 		Namespace(c.ns).
 		Resource("ocibuilders").
-		VersionedParams(&opts, scheme.ParameterCodec).
+		VersionedParams(&opts, scheme2.ParameterCodec).
 		Timeout(timeout).
 		Do().
 		Into(result)
@@ -102,7 +102,7 @@ func (c *oCIBuilders) Watch(opts v1.ListOptions) (watch.Interface, error) {
 	return c.client.Get().
 		Namespace(c.ns).
 		Resource("ocibuilders").
-		VersionedParams(&opts, scheme.ParameterCodec).
+		VersionedParams(&opts, scheme2.ParameterCodec).
 		Timeout(timeout).
 		Watch()
 }
@@ -168,7 +168,7 @@ func (c *oCIBuilders) DeleteCollection(options *v1.DeleteOptions, listOptions v1
 	return c.client.Delete().
 		Namespace(c.ns).
 		Resource("ocibuilders").
-		VersionedParams(&listOptions, scheme.ParameterCodec).
+		VersionedParams(&listOptions, scheme2.ParameterCodec).
 		Timeout(timeout).
 		Body(options).
 		Do().
