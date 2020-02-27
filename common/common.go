@@ -93,6 +93,23 @@ const (
 	Tag   = "latest"
 )
 
+// Init Container image constants
+const (
+	InitName  = "ociinit"
+	InitImage = "ocibuilder/init"
+	InitTag   = "latest"
+	// Init container environment variables
+	Namespace    = "NAMESPACE"
+	Resource     = "RESOURCE"
+	ResourceName = "RESOURCE_NAME"
+)
+
+// Container volume constants
+const (
+	VolumeMountPath = "/usr/src/app"
+	VolumeName      = "spec-volume"
+)
+
 // Default values of K8s Job specific variables
 var (
 	BackoffLimit            = int32(2)

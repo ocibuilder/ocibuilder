@@ -53,22 +53,6 @@ func (opctx *operationContext) readJobConfiguration() *jobConfiguration {
 	return cfg
 }
 
-// storeBuilderSpecification stores the builder specification in a file
-//func (opctx *operationContext) storeBuilderSpecification() error {
-//	file, err := os.Create(fmt.Sprintf("%s/%s", common.ContextDirectory, common.SpecFilePath))
-//	if err != nil {
-//		return err
-//	}
-//	body, err := yaml.Marshal(opctx.builder)
-//	if err != nil {
-//		return err
-//	}
-//	if _, err := file.Write(body); err != nil {
-//		return err
-//	}
-//	return nil
-//}
-
 // generateCommands generates commands to be executed for the job
 func (opctx *operationContext) generateCommands() []string {
 	specificationFilePath := path.Clean(fmt.Sprintf("%s/%s", common.ContextDirectory, common.SpecFilePath))
@@ -110,6 +94,22 @@ func (opctx *operationContext) constructBuilderJob() (*batchv1.Job, error) {
 		Resources: corev1.ResourceRequirements{},
 	}
 
+	initContainer := corev1.Container{
+		Name:       common.InitName,
+		Image:      fmt.Sprintf("%s:%s", common.InitImage, common.InitTag),
+		Command:    nil,
+		Args:       nil,
+		WorkingDir: "",
+		Env: []corev1.EnvVar{
+			{
+				Name:  "",
+				Value: "",
+			},
+		},
+		Resources:    corev1.ResourceRequirements{},
+		VolumeMounts: nil,
+	}
+
 	volume := corev1.Volume{
 		Name: "tmp",
 		VolumeSource: corev1.VolumeSource{
@@ -143,7 +143,9 @@ func (opctx *operationContext) constructBuilderJob() (*batchv1.Job, error) {
 					Labels:       labels,
 				},
 				Spec: corev1.PodSpec{
-					InitContainers: []corev1.Container{},
+					InitContainers: []corev1.Container{
+						initContainer,
+					},
 					Containers: []corev1.Container{
 						container,
 					},

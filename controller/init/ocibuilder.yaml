@@ -1,0 +1,20 @@
+build:
+  steps:
+    - metadata:
+        name: ocibuilder/ociinit
+      tag: 0.1.0
+      stages:
+        - metadata:
+            name: build-image
+          base:
+            image: alpine:3.10.4
+          cmd:
+            - docker:
+                inline:
+                  - RUN mkdir -p /usr/src/app
+                  - WORKDIR /usr/src/app
+                  - COPY dist/ociinit .
+                  - ENTRYPOINT ["ociinit"]
+      context:
+        localContext:
+          contextPath: .
