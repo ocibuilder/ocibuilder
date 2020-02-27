@@ -21,7 +21,6 @@ import (
 	"path"
 
 	"github.com/ocibuilder/ocibuilder/common"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder"
 	"github.com/ocibuilder/ocibuilder/pkg/command"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -102,10 +101,6 @@ func (opctx *operationContext) constructBuilderJob() (*batchv1.Job, error) {
 			{
 				Name:  common.Namespace,
 				Value: opctx.controller.namespace,
-			},
-			{
-				Name:  common.Resource,
-				Value: ocibuilder.Kind,
 			},
 			{
 				Name:  common.ResourceName,
