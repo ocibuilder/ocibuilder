@@ -1,0 +1,45 @@
+apiVersion: github.com/ocibuilder/v1alpha1
+kind: BuildSpecification
+metadata:
+  name: build-crd
+spec:
+  build:
+    steps:
+      - metadata:
+          name: docker.io/ocibuildere2e/go-test-service
+        tag: 0.1.1
+        stages:
+          - metadata:
+              name: builder
+            base:
+              image: golang
+            cmd:
+              - docker:
+                  inline:
+                    - ADD . /src
+                    - RUN cd /src && go build -o goapp
+          - metadata:
+              name: operator
+            base:
+              image: alpine:3.10.4
+            cmd:
+              - docker:
+                  inline:
+                    - WORKDIR /app
+                    - COPY --from=builder /src/goapp /app/
+                    - ENTRYPOINT ./goapp
+        context:
+          gitContext:
+            url: https://github.com/artbegolli/go-service
+
+  login:
+    - registry: docker.io
+      token: ${E2E_DOCKERHUB_TOKEN}
+      creds:
+        plain:
+          username: ${E2E_DOCKERHUB_USER}
+
+  push:
+    - registry: docker.io
+      image: ocibuildere2e/go-test-service
+      tag: 0.1.1

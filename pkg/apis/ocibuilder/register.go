@@ -18,7 +18,7 @@ package ocibuilder
 
 const (
 	// Group is the API Group
-	Group string = "github.com/ocibuilder"
+	Group string = "ocibuilder"
 
 	// Kind is the kind constant for the sensor
 	Kind string = "BuildSpecification"

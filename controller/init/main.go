@@ -18,54 +18,59 @@ package main
 
 import (
 	"fmt"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"log"
 	"os"
 
-	ocbv1alpha1 "github.com/blackrock/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
 	"github.com/ghodss/yaml"
 	"github.com/ocibuilder/ocibuilder/common"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"k8s.io/client-go/rest"
+	ocbv1alpha1 "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func main() {
-	namespace := os.Getenv(common.Namespace)
-	resource := os.Getenv(common.Resource)
-	resourceName := os.Getenv(common.ResourceName)
+	namespace, ok := os.LookupEnv(common.Namespace)
+	if !ok {
+		namespace = "default"
+	}
 
-	restConfig, err := rest.InClusterConfig()
+	resourceName, ok := os.LookupEnv(common.ResourceName)
+	if !ok {
+		log.Fatalln("ocibuilder resource name not found")
+		return
+	}
+
+	kubeConfig, ok := os.LookupEnv(common.EnvVarKubeConfig)
+	if !ok {
+		log.Println("kubeconfig not found")
+	}
+
+	restConfig, err := common.GetClientConfig(kubeConfig)
 	if err != nil {
 		log.Fatalln(err)
 		return
 	}
 
 	client := ocbv1alpha1.NewForConfigOrDie(restConfig)
+	ociObject, err := client.OcibuilderV1alpha1().OCIBuilders(namespace).Get(resourceName, metav1.GetOptions{
+		TypeMeta:        metav1.TypeMeta{},
+		ResourceVersion: "",
+	})
 
-	ociObj, err := client.BlackrockV1alpha1().OCIBuilders(namespace).Get("my-r", metav1.GetOptions{})
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
 
-	//
-	//client := kubernetes.NewForConfigOrDie(restConfig).CoreV1().RESTClient()
-	//req := client.Get().
-	//	Namespace(namespace).
-	//	Resource(resource).
-	//	Name(resourceName)
-	//
-	//result, err := req.Do().Get()
-	//if err != nil {
-	//	log.Fatalln(err)
-	//	return
-	//}
-	//obj := result.DeepCopyObject()
-	//spec := obj.(*v1alpha1.OCIBuilder)
-	//if err := storeBuilderSpecification(spec); err != nil {
-	//	log.Fatalln(err)
-	//	return
-	//}
+	if err := storeBuilderSpecification(ociObject.Spec); err != nil {
+		log.Fatalln(err)
+		return
+	}
+
 }
 
 // storeBuilderSpecification stores the builder specification in a file
-func storeBuilderSpecification(spec *v1alpha1.OCIBuilder) error {
+func storeBuilderSpecification(spec v1alpha1.OCIBuilderSpec) error {
 	file, err := os.Create(fmt.Sprintf("%s/%s", common.VolumeMountPath, common.SpecFilePath))
 	if err != nil {
 		return err
