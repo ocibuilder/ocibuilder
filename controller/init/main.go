@@ -23,7 +23,7 @@ import (
 
 	"github.com/ghodss/yaml"
 	"github.com/ocibuilder/ocibuilder/common"
-	ocbv1alpha1 "github.com/ocibuilder/ocibuilder/controller/pkg/client/ocibuilder/clientset/versioned"
+	ocibv1alpha1 "github.com/ocibuilder/ocibuilder/controller/pkg/client/ocibuilder/clientset/versioned"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -51,7 +51,7 @@ func main() {
 		return
 	}
 
-	client := ocbv1alpha1.NewForConfigOrDie(restConfig)
+	client := ocibv1alpha1.NewForConfigOrDie(restConfig)
 	ociObject, err := client.OcibuilderV1alpha1().OCIBuilders(namespace).Get(resourceName, metav1.GetOptions{
 		TypeMeta:        metav1.TypeMeta{},
 		ResourceVersion: "",

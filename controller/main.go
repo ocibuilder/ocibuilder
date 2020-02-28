@@ -51,5 +51,9 @@ func main() {
 
 	ctrl := controller.NewController(restConfig, logger, configMap, namespace)
 
+	if err := ctrl.ResyncConfig(namespace); err != nil {
+		logger.Errorln("cannot resync config")
+		return
+	}
 	ctrl.Run(context.Background(), 1, 1)
 }
