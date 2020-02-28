@@ -42,7 +42,7 @@ func newSignCmd(out io.Writer) *cobra.Command {
 	sc := &signCmd{out: out}
 	cmd := &cobra.Command{
 		Use:   "sign",
-		Short: "Sign signs a container image ID and optionally pushes attestation to a metadata store",
+		Short: "Sign signs a container image ID and optionally pushes the attestation to a metadata store",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return sc.run(args)
 		},

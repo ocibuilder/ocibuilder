@@ -37,7 +37,7 @@ func TestMetadataWriter_ParseResponseMetadata(t *testing.T) {
 
 	mw := MetadataWriter{
 		Metadata: &v1alpha1.Metadata{
-			StoreConfig: v1alpha1.StoreConfig{},
+			StoreConfig: &v1alpha1.StoreConfig{},
 			Key:         nil,
 			Hostname:    "",
 			Data:        dataTypes,
@@ -60,7 +60,7 @@ func TestMetadataWriter_ParseResponseMetadata(t *testing.T) {
 func TestCreateAttestation(t *testing.T) {
 	mw := MetadataWriter{
 		Metadata: &v1alpha1.Metadata{
-			StoreConfig: v1alpha1.StoreConfig{},
+			StoreConfig: &v1alpha1.StoreConfig{},
 			Key: &v1alpha1.SignKey{
 				PlainPrivateKey: dummy.TestPrivKey,
 				PlainPublicKey:  dummy.TestPubKey,
