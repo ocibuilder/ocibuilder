@@ -708,6 +708,7 @@ type SignKey struct {
 	PlainPrivateKey string `json:"plainPrivateKey,omitempty" protobuf:"bytes,1,opt,name=plainPrivateKey"`
 	// PublicKey is the ascii armored public key for verification in image attestation
 	// +optional
+	// +optional
 	PlainPublicKey string `json:"plainPublicKey,omitempty" protobuf:"bytes,2,opt,name=plainPublicKey"`
 	// EnvPrivateKey is an env variable that holds an ascii armored private key used to sign images for image attestation
 	// +optional
