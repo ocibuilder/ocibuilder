@@ -52,7 +52,7 @@ func newSignCmd(out io.Writer) *cobra.Command {
 	f := cmd.Flags()
 	f.BoolVarP(&sc.debug, "debug", "d", false, "Turn on debug logging")
 	f.StringVarP(&sc.path, "path", "p", ".", "Path to your ocibuilder.yaml file")
-	f.BoolVarP(&sc.push, "push", "pu", false, "Push to specified metadata store")
+	f.BoolVar(&sc.push, "push", false, "Push to specified metadata store")
 	f.StringVar(&sc.pubKey, "pubkey", "", "The public key")
 	f.StringVar(&sc.priKey, "prikey", "", "The private signing key")
 	f.StringVarP(&sc.name, "name", "n", "", "The image name to sign")
