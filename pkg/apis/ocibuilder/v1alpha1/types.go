@@ -691,7 +691,7 @@ type BuildGenTemplate struct {
 // Metadata is where metadata to store is defined in the ocibuilder specification
 type Metadata struct {
 	// StoreType is the metadata store type to push metadata to
-	StoreConfig StoreConfig `json:"storeConfig,omitempty" protobuf:"bytes,1,opt,name=storeConfig"`
+	StoreConfig *StoreConfig `json:"storeConfig,omitempty" protobuf:"bytes,1,opt,name=storeConfig"`
 	// SignKey holds the key to sign an image for attestation purposes
 	Key *SignKey `json:"signKey,omitempty" protobuf:"bytes,2,opt,name=signKey"`
 	// Hostname is the hostname of the metadatastore

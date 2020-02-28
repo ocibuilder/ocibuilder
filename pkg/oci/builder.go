@@ -105,7 +105,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 		}
 
 		buildProvenance.EndTime = time.Now()
-		if spec.Metadata != nil {
+		if spec.Metadata.StoreConfig != nil {
 			log.Debugln("metadata specification present")
 			mw := NewMetadataWriter(log, spec.Metadata)
 

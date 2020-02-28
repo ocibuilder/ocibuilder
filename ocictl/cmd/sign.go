@@ -31,13 +31,11 @@ import (
 )
 
 type signCmd struct {
-	out    io.Writer
-	path   string
-	push   bool
-	debug  bool
-	pubKey string
-	priKey string
-	name   string
+	out   io.Writer
+	path  string
+	push  bool
+	debug bool
+	name  string
 }
 
 func newSignCmd(out io.Writer) *cobra.Command {
@@ -53,8 +51,6 @@ func newSignCmd(out io.Writer) *cobra.Command {
 	f.BoolVarP(&sc.debug, "debug", "d", false, "Turn on debug logging")
 	f.StringVarP(&sc.path, "path", "p", ".", "Path to your ocibuilder.yaml file")
 	f.BoolVar(&sc.push, "push", false, "Push to specified metadata store")
-	f.StringVar(&sc.pubKey, "pubkey", "", "The public key")
-	f.StringVar(&sc.priKey, "prikey", "", "The private signing key")
 	f.StringVarP(&sc.name, "name", "n", "", "The image name to sign")
 
 	return cmd
