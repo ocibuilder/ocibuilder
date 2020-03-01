@@ -116,7 +116,9 @@ func (sc *signCmd) run(args []string) error {
 	logger.WithField("imageId", inspectResponse.ID).Infoln("successfully signed image")
 	if sc.output != "" {
 		logger.WithField("path", sc.output).Infoln("outputting signature to file")
-		ioutil.WriteFile(sc.output, []byte(sig), 0644)
+		if err := ioutil.WriteFile(sc.output, []byte(sig), 0644); err != nil {
+			return err
+		}
 		return nil
 	}
 
