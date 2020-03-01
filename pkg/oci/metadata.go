@@ -49,7 +49,7 @@ func (m MetadataWriter) Write() error {
 	return nil
 }
 
-func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderClient, provenance v1alpha1.BuildProvenance) error {
+func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderClient, provenance *v1alpha1.BuildProvenance) error {
 	log := m.Logger
 
 	if _, ok := cli.(buildah.Client); ok {
@@ -127,7 +127,7 @@ func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderCli
 
 }
 
-func (m *MetadataWriter) createBuildRecord(digest string, buildProvenance v1alpha1.BuildProvenance) store.Record {
+func (m *MetadataWriter) createBuildRecord(digest string, buildProvenance *v1alpha1.BuildProvenance) store.Record {
 	derivedBuildRecord := store.Record{
 		Resource: m.resource,
 		Build: &gofeas.V1beta1buildDetails{
@@ -137,7 +137,7 @@ func (m *MetadataWriter) createBuildRecord(digest string, buildProvenance v1alph
 				BuiltArtifacts: []gofeas.ProvenanceArtifact{{
 					Checksum: digest,
 					Id:       m.resource,
-					Names:    []string{fmt.Sprintf("%s:%s", buildProvenance.Name, buildProvenance.Tag)},
+					Names:    []string{fmt.Sprintf("%s:%s", &buildProvenance.Name, buildProvenance.Tag)},
 				}},
 				StartTime:  buildProvenance.StartTime,
 				EndTime:    buildProvenance.EndTime,
