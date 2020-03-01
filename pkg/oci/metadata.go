@@ -43,13 +43,14 @@ type MetadataWriter struct {
 }
 
 func (m MetadataWriter) Write() error {
+	m.Logger.Debugln("writing records to metadata store")
 	if err := m.Store.Write(m.records...); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderClient, provenance v1alpha1.BuildProvenance) error {
+func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderClient, provenance *v1alpha1.BuildProvenance) error {
 	log := m.Logger
 
 	if _, ok := cli.(buildah.Client); ok {
@@ -127,7 +128,7 @@ func (m *MetadataWriter) ParseMetadata(imageName string, cli v1alpha1.BuilderCli
 
 }
 
-func (m *MetadataWriter) createBuildRecord(digest string, buildProvenance v1alpha1.BuildProvenance) store.Record {
+func (m *MetadataWriter) createBuildRecord(digest string, buildProvenance *v1alpha1.BuildProvenance) store.Record {
 	derivedBuildRecord := store.Record{
 		Resource: m.resource,
 		Build: &gofeas.V1beta1buildDetails{

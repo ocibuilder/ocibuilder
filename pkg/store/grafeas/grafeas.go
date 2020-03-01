@@ -89,6 +89,7 @@ func (g *graf) Write(rec ...*store.Record) error {
 		Occurrences: occurrences,
 	}
 
+	g.Logger.WithField("req", req).Debugln("making batch create occurrence request")
 	res, httpRes, err := g.Client.BatchCreateOccurrences(ctx.Background(), parent, req)
 
 	if httpRes != nil && httpRes.StatusCode != http.StatusOK {

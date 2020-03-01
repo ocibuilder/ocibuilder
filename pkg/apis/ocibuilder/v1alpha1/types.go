@@ -691,7 +691,7 @@ type BuildGenTemplate struct {
 // Metadata is where metadata to store is defined in the ocibuilder specification
 type Metadata struct {
 	// StoreType is the metadata store type to push metadata to
-	StoreConfig StoreConfig `json:"storeConfig,omitempty" protobuf:"bytes,1,opt,name=storeConfig"`
+	StoreConfig *StoreConfig `json:"storeConfig,omitempty" protobuf:"bytes,1,opt,name=storeConfig"`
 	// SignKey holds the key to sign an image for attestation purposes
 	Key *SignKey `json:"signKey,omitempty" protobuf:"bytes,2,opt,name=signKey"`
 	// Hostname is the hostname of the metadatastore
@@ -707,6 +707,7 @@ type SignKey struct {
 	// +optional
 	PlainPrivateKey string `json:"plainPrivateKey,omitempty" protobuf:"bytes,1,opt,name=plainPrivateKey"`
 	// PublicKey is the ascii armored public key for verification in image attestation
+	// +optional
 	// +optional
 	PlainPublicKey string `json:"plainPublicKey,omitempty" protobuf:"bytes,2,opt,name=plainPublicKey"`
 	// EnvPrivateKey is an env variable that holds an ascii armored private key used to sign images for image attestation
