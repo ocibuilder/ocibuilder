@@ -19,6 +19,7 @@ package cmd
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
 
 	"github.com/docker/docker/client"
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
@@ -31,11 +32,12 @@ import (
 )
 
 type signCmd struct {
-	out   io.Writer
-	path  string
-	push  bool
-	debug bool
-	name  string
+	out    io.Writer
+	path   string
+	push   bool
+	debug  bool
+	name   string
+	output string
 }
 
 func newSignCmd(out io.Writer) *cobra.Command {
@@ -52,6 +54,7 @@ func newSignCmd(out io.Writer) *cobra.Command {
 	f.StringVarP(&sc.path, "path", "p", ".", "Path to your ocibuilder.yaml file")
 	f.BoolVar(&sc.push, "push", false, "Push to specified metadata store")
 	f.StringVarP(&sc.name, "name", "n", "", "The image name to sign")
+	f.StringVarP(&sc.output, "output", "o", "", "Filepath to output image signature to")
 
 	return cmd
 }
@@ -68,7 +71,7 @@ func (sc *signCmd) run(args []string) error {
 
 	apiClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
-		log.WithError(err).Errorln("failed to fetch docker api client")
+		logger.WithError(err).Errorln("failed to fetch docker api client")
 		return err
 	}
 
@@ -79,37 +82,45 @@ func (sc *signCmd) run(args []string) error {
 
 	if sc.push {
 		ociBuilderSpec.Metadata.Data = []v1alpha1.MetadataType{"attestation"}
-		mw := oci.NewMetadataWriter(log, ociBuilderSpec.Metadata)
+		mw := oci.NewMetadataWriter(logger, ociBuilderSpec.Metadata)
 		if err := mw.ParseMetadata(sc.name, cli, &v1alpha1.BuildProvenance{
 			Name: sc.name,
 		}); err != nil {
 			return err
 		}
+		if err := mw.Write(); err != nil {
+			return err
+		}
 
 		logger.Infoln("image attestation has been pushed to metadata store")
-	} else {
-
-		inspectResponse, err := cli.ImageInspect(sc.name)
-		if err != nil || inspectResponse.ID == "" {
-			log.Errorln("error in inspecting image or no response ID returned - cannot push metadata")
-			return err
-		}
-
-		privKey, pubKey, err := crypto.ValidateKeysPacket(ociBuilderSpec.Metadata.Key)
-		if err != nil {
-			return err
-		}
-
-		e := crypto.CreateEntityFromKeys(privKey, pubKey)
-		id, sig, err := crypto.SignDigest(inspectResponse.ID, ociBuilderSpec.Metadata.Key.Passphrase, e)
-		if err != nil {
-			return err
-		}
-
-		logger.WithField("imageId", id).Infoln("successfully signed image")
-		logger.Infoln("image signature")
-		fmt.Println(sig)
+		return nil
 	}
 
+	inspectResponse, err := cli.ImageInspect(sc.name)
+	if err != nil || inspectResponse.ID == "" {
+		logger.Errorln("error in inspecting image or no response ID returned - cannot push metadata")
+		return err
+	}
+
+	privKey, pubKey, err := crypto.ValidateKeysPacket(ociBuilderSpec.Metadata.Key)
+	if err != nil {
+		return err
+	}
+
+	e := crypto.CreateEntityFromKeys(privKey, pubKey)
+	_, sig, err := crypto.SignDigest(inspectResponse.ID, ociBuilderSpec.Metadata.Key.Passphrase, e)
+	if err != nil {
+		return err
+	}
+
+	logger.WithField("imageId", inspectResponse.ID).Infoln("successfully signed image")
+	if sc.output != "" {
+		logger.WithField("path", sc.output).Infoln("outputting signature to file")
+		ioutil.WriteFile(sc.output, []byte(sig), 0644)
+		return nil
+	}
+
+	logger.Infoln("image signature")
+	fmt.Println(sig)
 	return nil
 }

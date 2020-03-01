@@ -51,7 +51,7 @@ func (i Initializer) Basic() error {
 		}
 	}
 
-	if err := ioutil.WriteFile("ocibuilder.yaml", template, 0777); err != nil {
+	if err := ioutil.WriteFile("ocibuilder.yaml", template, 0644); err != nil {
 		log.WithError(err).Errorln("error generating ocibuilder.yaml template file")
 		return err
 	}

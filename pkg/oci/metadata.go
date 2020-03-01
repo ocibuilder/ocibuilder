@@ -43,6 +43,7 @@ type MetadataWriter struct {
 }
 
 func (m MetadataWriter) Write() error {
+	m.Logger.Debugln("writing records to metadata store")
 	if err := m.Store.Write(m.records...); err != nil {
 		return err
 	}
