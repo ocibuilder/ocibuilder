@@ -137,7 +137,7 @@ func (m *MetadataWriter) createBuildRecord(digest string, buildProvenance *v1alp
 				BuiltArtifacts: []gofeas.ProvenanceArtifact{{
 					Checksum: digest,
 					Id:       m.resource,
-					Names:    []string{fmt.Sprintf("%s:%s", &buildProvenance.Name, buildProvenance.Tag)},
+					Names:    []string{fmt.Sprintf("%s:%s", buildProvenance.Name, buildProvenance.Tag)},
 				}},
 				StartTime:  buildProvenance.StartTime,
 				EndTime:    buildProvenance.EndTime,

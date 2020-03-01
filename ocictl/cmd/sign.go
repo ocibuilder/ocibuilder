@@ -78,8 +78,11 @@ func (sc *signCmd) run(args []string) error {
 	}
 
 	if sc.push {
+		ociBuilderSpec.Metadata.Data = []v1alpha1.MetadataType{"attestation"}
 		mw := oci.NewMetadataWriter(log, ociBuilderSpec.Metadata)
-		if err := mw.ParseMetadata(sc.name, cli, &v1alpha1.BuildProvenance{}); err != nil {
+		if err := mw.ParseMetadata(sc.name, cli, &v1alpha1.BuildProvenance{
+			Name: sc.name,
+		}); err != nil {
 			return err
 		}
 
