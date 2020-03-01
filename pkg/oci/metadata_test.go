@@ -44,7 +44,7 @@ func TestMetadataWriter_ParseResponseMetadata(t *testing.T) {
 		},
 		Logger: util.Logger,
 	}
-	err := mw.ParseMetadata("test-image", testClientMetadata{}, v1alpha1.BuildProvenance{})
+	err := mw.ParseMetadata("test-image", testClientMetadata{}, &v1alpha1.BuildProvenance{})
 	assert.Equal(t, nil, err)
 
 	record := mw.records[0]
