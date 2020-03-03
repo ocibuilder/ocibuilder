@@ -37,7 +37,7 @@ type Builder struct {
 	Provenance []*v1alpha1.BuildProvenance
 }
 
-func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBuildResponse, errChan chan<- error, finished chan<- bool) {
+func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan v1alpha1.OCIBuildResponse, errChan chan<- error, finished chan<- bool) {
 	log := b.Logger
 	cli := b.Client
 
@@ -104,7 +104,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 				return
 			}
 		}
-
+		<-res
 		buildProvenance.EndTime = time.Now()
 
 		if spec.Metadata != nil && spec.Metadata.StoreConfig != nil {
@@ -134,7 +134,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIBui
 	}
 }
 
-func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPushResponse, errChan chan<- error, finished chan<- bool) {
+func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan v1alpha1.OCIPushResponse, errChan chan<- error, finished chan<- bool) {
 	log := b.Logger
 	cli := b.Client
 
@@ -177,7 +177,7 @@ func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCIPush
 				return
 			}
 		}
-
+		<-res
 		if pushSpec.Purge {
 			if err := b.Purge(pushFullImageName); err != nil {
 				log.WithError(err).Errorln("unable to complete image purge")
@@ -293,13 +293,13 @@ func (b *Builder) Purge(imageName string) error {
 		ImageRemoveOptions: types.ImageRemoveOptions{},
 	}
 
-	res, err := cli.ImageRemove(removeOptions)
+	_, err := cli.ImageRemove(removeOptions)
 	if err != nil {
 		log.WithError(err).Errorln("unable to complete image purge")
 		return err
 	}
 
-	log.WithFields(logrus.Fields{"response": res}).Infoln("images purged")
+	log.WithField("name", imageName).Infoln("image purged")
 	return nil
 }
 

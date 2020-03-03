@@ -56,8 +56,9 @@ func TestBuilder_Build(t *testing.T) {
 				assert.Equal(t, nil, err)
 				return
 			}
-		case <-res:
+		case buildResponse := <-res:
 			{
+				res <- buildResponse
 			}
 		case fin := <-finished:
 			{

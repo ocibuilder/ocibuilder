@@ -586,6 +586,8 @@ type OCIBuildResponse struct {
 	Exec *command.Command `json:"exec,inline" protobuf:"bytes,2,name=exec"`
 	// Stderr is the stderr output stream used to stream buildah response
 	Stderr io.ReadCloser `json:"stderr,inline" protobuf:"bytes,3,name=stderr"`
+	// Finished is the flag to determine that the response has finished being read
+	Finished bool
 }
 
 // OCIPullOptions are the pull options for an ocibuilder pull
@@ -626,6 +628,8 @@ type OCIPushResponse struct {
 	Exec *command.Command `json:"exec,inline" protobuf:"bytes,2,name=exec"`
 	// Stderr is the stderr output stream used to stream buildah response
 	Stderr io.ReadCloser `json:"stderr,inline" protobuf:"bytes,3,name=stderr"`
+	// Finished is the flag to determine that the response has finished being read
+	Finished bool
 }
 
 // OCIRemoveOptions are the remove options for an ocibuilder remove

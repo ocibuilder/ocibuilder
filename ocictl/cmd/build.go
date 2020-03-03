@@ -158,6 +158,8 @@ func (b *buildCmd) run(args []string) error {
 						return err
 					}
 				}
+				buildResponse.Finished = true
+				res <- buildResponse
 				logger.Infoln("build step complete")
 			}
 
