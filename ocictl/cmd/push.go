@@ -154,6 +154,8 @@ func (p *pushCmd) run(args []string) error {
 						return err
 					}
 				}
+				pushResponse.Finished = true
+				res <- pushResponse
 				logger.Infoln("push step complete")
 			}
 
