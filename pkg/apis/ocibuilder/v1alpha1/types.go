@@ -149,6 +149,8 @@ type BuildSpec struct {
 	// Steps within a build
 	// +listType=map
 	Steps []BuildStep `json:"steps" protobuf:"bytes,2,rep,name=steps"`
+	// StorageDriver is the storage driver flag (default overlay2) see https://docs.docker.com/storage/storagedriver/select-storage-driver/
+	StorageDriver string `json:"storageDriver" protobuf:"bytes,2,rep,name=storageDriver"`
 }
 
 // BuildTemplate represents the build template that can shared across different builds
@@ -384,6 +386,8 @@ type ImageBuildArgs struct {
 	// Set to false by default
 	// +optional
 	Cache bool `json:"cache,omitempty" protobuf:"bytes,8,opt,name=cache"`
+	// StorageDriver is a buildah flag for storage driver e.g. vfs
+	StorageDriver string `json:"storageDriver" protobuf:"bytes,9,name=storageDriver"`
 }
 
 // BuildContext stores the chosen build context for your build, this can be Local, S3 or Git
