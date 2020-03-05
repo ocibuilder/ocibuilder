@@ -91,6 +91,7 @@ func ParseBuildSpec(spec *v1alpha1.BuildSpec) ([]v1alpha1.ImageBuildArgs, error)
 			Creator:          step.Creator,
 			Source:           step.Source,
 			Cache:            step.Cache,
+			StorageDriver:    spec.StorageDriver,
 		}
 		imageBuilds = append(imageBuilds, imageBuild)
 	}

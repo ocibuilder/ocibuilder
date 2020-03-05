@@ -85,6 +85,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan v1alpha1.OCIBuild
 				Labels:     opt.Labels,
 				NoCache:    !opt.Cache,
 			},
+			StorageDriver: opt.StorageDriver,
 		}
 
 		buildProvenance.StartTime = time.Now()
