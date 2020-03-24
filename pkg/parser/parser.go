@@ -78,7 +78,7 @@ func ParseBuildSpec(spec *v1alpha1.BuildSpec) ([]v1alpha1.ImageBuildArgs, error)
 		}
 
 		if err := context.InjectDockerfile(buildContextPath, dockerfilePath); err != nil {
-			return nil, errors.Wrap(err, "error attempting to inject Dockerfile")
+			return nil, errors.Errorf("error attempting to inject Dockerfile - err: %s", err)
 		}
 
 		imageBuild := v1alpha1.ImageBuildArgs{
@@ -134,7 +134,7 @@ func GenerateDockerfile(step v1alpha1.BuildStep, templates []v1alpha1.BuildTempl
 		return "", err
 	}
 	if _, err = file.Write(dockerfile); err != nil {
-		return "", err
+		return "", errors.Errorf("error generating Dockerfile err: %s", err)
 	}
 	return file.Name(), nil
 }

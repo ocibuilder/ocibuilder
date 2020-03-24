@@ -17,10 +17,9 @@ limitations under the License.
 package context
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/common"
 	"github.com/ocibuilder/ocibuilder/pkg/util"
 )
 
@@ -38,13 +37,13 @@ func NewLocalBuildContextReader(buildContext *v1alpha1.LocalContext) *LocalBuild
 
 // Read reads the build context from the local
 func (contextReader *LocalBuildContextReader) Read() (string, error) {
-	util.Logger.Infoln("reading local build context")
-	contextFilePath := fmt.Sprintf("%s%s%s", contextReader.buildContext.ContextPath, common.ContextDirectory, common.ContextFile)
-	contextFiles, err := ExcludeIgnored(contextReader.buildContext.ContextPath + "/.")
-	if err != nil {
-		return "", err
+	util.Logger.WithField("contextPath", contextReader.buildContext.ContextPath).Infoln("reading local build context")
+
+	if contextReader.buildContext.ContextPath == "" {
+		return "", errors.New("no contextPath specified for local build context")
 	}
-	if err := util.TarFile(contextFiles, contextFilePath); err != nil {
+
+	if err := TarBuildContext(contextReader.buildContext.ContextPath); err != nil {
 		return "", err
 	}
 	return contextReader.buildContext.ContextPath, nil

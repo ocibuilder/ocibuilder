@@ -211,7 +211,8 @@ func (contextReader *GitBuildContextReader) Read() (string, error) {
 			cloneOpt.Depth = 1
 		}
 
-		r, err = git.PlainClone(common.ContextDirectory, false, cloneOpt)
+		util.Logger.WithField("url", contextReader.buildContext.URL).Infoln("reading build context from git")
+		r, err = git.PlainClone(common.RemoteLocalDirectory+common.RemoteTempDirectory, false, cloneOpt)
 		if err != nil {
 			return "", errors.Errorf("failed to clone repository. err: %+v", err)
 		}
@@ -219,7 +220,11 @@ func (contextReader *GitBuildContextReader) Read() (string, error) {
 	if err := contextReader.pullFromRepository(r); err != nil {
 		return "", errors.Errorf("failed to pull latest changes from the repository. err: %+v", err)
 	}
-	return common.ContextDirectory, nil
+
+	if err := TarBuildContext(common.RemoteLocalDirectory); err != nil {
+		return "", err
+	}
+	return common.RemoteLocalDirectory, nil
 }
 
 // NewGitBuildContextReader returns a build context stored on the git
