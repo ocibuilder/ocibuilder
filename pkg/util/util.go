@@ -74,9 +74,15 @@ func TarFile(source []string, destination string) error {
 
 // ReadCredentials reads the credentials
 func ReadCredentials(client kubernetes.Interface, creds *v1alpha1.Credentials) (string, error) {
+
+	if creds == nil {
+		return "", nil
+	}
+
 	if creds.Plain != "" {
 		return creds.Plain, nil
 	}
+
 	if creds.Env != "" {
 		value, ok := os.LookupEnv(creds.Env)
 		if !ok {
@@ -84,6 +90,7 @@ func ReadCredentials(client kubernetes.Interface, creds *v1alpha1.Credentials) (
 		}
 		return value, nil
 	}
+
 	if creds.KubeSecret != nil {
 		if client == nil {
 			return "", errors.New("kubernetes client is not initialized")
@@ -98,5 +105,6 @@ func ReadCredentials(client kubernetes.Interface, creds *v1alpha1.Credentials) (
 		}
 		return string(value), nil
 	}
+
 	return "", errors.New("unknown credentials format")
 }
