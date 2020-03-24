@@ -72,6 +72,10 @@ const (
 	ContextFile = "context.tar.gz"
 	// ContextDirectoryUncompressed contains the uncompressed build context
 	ContextDirectoryUncompressed = "/ocibuilder/context/uncompressed/"
+	// Remote Local Directory
+	RemoteLocalDirectory = "."
+	// Remote Temp Directory
+	RemoteTempDirectory = "/ocib/temp/"
 )
 
 // Remote paths

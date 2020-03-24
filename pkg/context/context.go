@@ -75,7 +75,7 @@ func InjectDockerfile(contextPath string, dockerfilePath string) error {
 	contextTar := fmt.Sprintf("%s%s", contextDirectoryPath, common.ContextFile)
 
 	if err := util.UntarFile(contextTar, contextDirectoryPath); err != nil {
-		return errors.Wrap(err, "error extracting original context file at: "+contextTar)
+		return errors.Errorf("error extracting original context file at %s err: %s", contextTar, err)
 	}
 
 	if err := os.Remove(contextTar); err != nil {
@@ -121,4 +121,20 @@ func ExcludeIgnored(directory string) ([]string, error) {
 	}
 
 	return contextPaths, nil
+}
+
+// TarBuildContext tars a build context and places the context back in /ocib/context directory
+func TarBuildContext(source string) error {
+	util.Logger.Debugln("tarring build context")
+	contextFilePath := fmt.Sprintf("%s%s%s", source, common.ContextDirectory, common.ContextFile)
+	directoryToTar := fmt.Sprintf("%s/%s", source, common.RemoteLocalDirectory)
+	contextFiles, err := ExcludeIgnored(directoryToTar)
+	if err != nil {
+		return err
+	}
+
+	if err := util.TarFile(contextFiles, contextFilePath); err != nil {
+		return err
+	}
+	return nil
 }
