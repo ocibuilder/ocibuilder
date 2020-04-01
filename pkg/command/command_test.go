@@ -74,3 +74,14 @@ func TestHelperProcess(t *testing.T) {
 	}
 	os.Exit(0)
 }
+
+func TestCommand_constructCommand_emptyCommand(t *testing.T) {
+	flags := []Flag{
+		{"testFlag", "flagValue", false, false},
+	}
+	command := Builder("test").Flags(flags...).Args("testArg").Build()
+	commandVector := command.constructCommand()
+
+	expectedCommandVector := []string{"--testFlag", "flagValue", "testArg"}
+	assert.Equal(t, expectedCommandVector, commandVector)
+}
