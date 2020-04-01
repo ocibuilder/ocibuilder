@@ -112,7 +112,11 @@ func (c Command) Wait() error {
 }
 
 func (c Command) constructCommand() []string {
-	var commandVector = []string{c.command}
+	var commandVector = []string{}
+
+	if c.command != "" {
+		commandVector = append(commandVector, c.command)
+	}
 
 	for _, flag := range c.flags {
 		if flag.Short {
