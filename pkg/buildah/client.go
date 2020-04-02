@@ -22,20 +22,20 @@ import (
 	"io"
 	"io/ioutil"
 
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
+	"github.com/beval/beval/pkg/command"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/registry"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/command"
 	"github.com/sirupsen/logrus"
 )
 
-// Client is the client used for building with Buildah using the ocibuilder
+// Client is the client used for building with Buildah using the beval
 type Client struct {
 	Logger *logrus.Logger
 }
 
-// ImageBuild conducts an image build with Buildah using the ocibuilder
+// ImageBuild conducts an image build with Buildah using the beval
 func (cli Client) ImageBuild(options v1alpha1.OCIBuildOptions) (v1alpha1.OCIBuildResponse, error) {
 
 	buildFlags := []command.Flag{
@@ -69,7 +69,7 @@ func (cli Client) ImageBuild(options v1alpha1.OCIBuildOptions) (v1alpha1.OCIBuil
 	}, nil
 }
 
-// ImagePull conducts an image pull with Buildah using the ocibuilder
+// ImagePull conducts an image pull with Buildah using the beval
 func (cli Client) ImagePull(options v1alpha1.OCIPullOptions) (v1alpha1.OCIPullResponse, error) {
 
 	pullFlags := []command.Flag{
@@ -92,7 +92,7 @@ func (cli Client) ImagePull(options v1alpha1.OCIPullOptions) (v1alpha1.OCIPullRe
 	}, nil
 }
 
-// ImagePush conducts an image push with Buildah using the ocibuilder
+// ImagePush conducts an image push with Buildah using the beval
 func (cli Client) ImagePush(options v1alpha1.OCIPushOptions) (v1alpha1.OCIPushResponse, error) {
 
 	pushFlags := []command.Flag{
@@ -115,7 +115,7 @@ func (cli Client) ImagePush(options v1alpha1.OCIPushOptions) (v1alpha1.OCIPushRe
 	}, nil
 }
 
-// ImageRemove conducts an image remove with Buildah using the ocibuilder
+// ImageRemove conducts an image remove with Buildah using the beval
 func (cli Client) ImageRemove(options v1alpha1.OCIRemoveOptions) (v1alpha1.OCIRemoveResponse, error) {
 
 	cmd := command.Builder("buildah").Command("rmi").Args(options.Image).Build()
@@ -137,7 +137,7 @@ func (cli Client) ImageRemove(options v1alpha1.OCIRemoveOptions) (v1alpha1.OCIRe
 }
 
 // @TBC
-// ImageInspect conducts an inspect of a build image with Buildah using the ocibuilder
+// ImageInspect conducts an inspect of a build image with Buildah using the beval
 //
 // The type currently returned by running buildah inspect varies greatly to docker image inspect
 // issues have been created to manage this and have a more representative mapping between buildah and docker
@@ -171,7 +171,7 @@ func (cli Client) ImageHistory(imageId string) ([]image.HistoryResponseItem, err
 	return nil, nil
 }
 
-// RegistryLogin conducts a registry login with Buildah using the ocibuilder
+// RegistryLogin conducts a registry login with Buildah using the beval
 func (cli Client) RegistryLogin(options v1alpha1.OCILoginOptions) (v1alpha1.OCILoginResponse, error) {
 
 	loginFlags := []command.Flag{

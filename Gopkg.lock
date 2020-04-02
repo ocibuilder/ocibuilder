@@ -714,7 +714,7 @@
 [[projects]]
   branch = "master"
   digest = "1:6731f7fc74a840bd497ec8c9bbd2f1055af7c231451e33ed92dd68bca9995085"
-  name = "github.com/ocibuilder/gofeas"
+  name = "github.com/beval/gofeas"
   packages = ["."]
   pruneopts = "UT"
   revision = "2b67ed27b87f0ef6d50e25b5d645310dfa802873"
@@ -1728,7 +1728,7 @@
     "github.com/k14s/ytt/pkg/files",
     "github.com/mholt/archiver",
     "github.com/moby/buildkit/frontend/dockerfile/parser",
-    "github.com/ocibuilder/gofeas",
+    "github.com/beval/gofeas",
     "github.com/onsi/ginkgo",
     "github.com/onsi/gomega",
     "github.com/onsi/gomega/gexec",

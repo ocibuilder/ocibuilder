@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package ocibuilder
+package beval
 
 import (
 	"context"
@@ -22,8 +22,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/beval/beval/pkg/common"
 	"github.com/ghodss/yaml"
-	"github.com/ocibuilder/ocibuilder/pkg/common"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"

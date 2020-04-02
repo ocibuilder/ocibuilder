@@ -27,15 +27,15 @@ import (
 	"syscall"
 	"text/template"
 
+	"github.com/beval/beval/ocictl/pkg/utils"
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
+	"github.com/beval/beval/pkg/common"
+	"github.com/beval/beval/pkg/context"
+	"github.com/beval/beval/pkg/request"
+	"github.com/beval/beval/pkg/util"
+	"github.com/beval/beval/pkg/validate"
 	"github.com/gobuffalo/packr"
 	"github.com/moby/buildkit/frontend/dockerfile/parser"
-	"github.com/ocibuilder/ocibuilder/ocictl/pkg/utils"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/common"
-	"github.com/ocibuilder/ocibuilder/pkg/context"
-	"github.com/ocibuilder/ocibuilder/pkg/request"
-	"github.com/ocibuilder/ocibuilder/pkg/util"
-	"github.com/ocibuilder/ocibuilder/pkg/validate"
 	"github.com/pkg/errors"
 )
 

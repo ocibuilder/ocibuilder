@@ -18,7 +18,7 @@ limitations under the License.
 package fake
 
 import (
-	ocibuilderv1alpha1 "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	bevalv1alpha1 "github.com/beval/beval/pkg/apis/beval/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -31,7 +31,7 @@ var codecs = serializer.NewCodecFactory(scheme)
 
 //var parameterCodec = runtime.NewParameterCodec(scheme)
 var localSchemeBuilder = runtime.SchemeBuilder{
-	ocibuilderv1alpha1.AddToScheme,
+	bevalv1alpha1.AddToScheme,
 }
 
 // AddToScheme adds all types of this clientset into the given scheme. This allows composition

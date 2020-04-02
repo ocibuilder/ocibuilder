@@ -22,13 +22,13 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
+	"github.com/beval/beval/pkg/buildah"
+	"github.com/beval/beval/pkg/crypto"
+	"github.com/beval/beval/pkg/store"
+	"github.com/beval/beval/pkg/store/grafeas"
+	"github.com/beval/gofeas"
 	"github.com/google/uuid"
-	"github.com/ocibuilder/gofeas"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/buildah"
-	"github.com/ocibuilder/ocibuilder/pkg/crypto"
-	"github.com/ocibuilder/ocibuilder/pkg/store"
-	"github.com/ocibuilder/ocibuilder/pkg/store/grafeas"
 	"github.com/sirupsen/logrus"
 )
 

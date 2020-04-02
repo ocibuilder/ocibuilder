@@ -21,13 +21,13 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/util"
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
+	"github.com/beval/beval/pkg/util"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestReadLogin(t *testing.T) {
-	spec := v1alpha1.OCIBuilderSpec{}
+	spec := v1alpha1.bevalSpec{}
 	reader := Reader{
 		Logger: util.GetLogger(true),
 	}
@@ -38,7 +38,7 @@ func TestReadLogin(t *testing.T) {
 }
 
 func TestApplyParams(t *testing.T) {
-	spec := v1alpha1.OCIBuilderSpec{}
+	spec := v1alpha1.bevalSpec{}
 	reader := Reader{
 		Logger: util.GetLogger(true),
 	}
@@ -63,7 +63,7 @@ func TestApplyParams(t *testing.T) {
 }
 
 func TestApplyInvalidParams(t *testing.T) {
-	spec := v1alpha1.OCIBuilderSpec{}
+	spec := v1alpha1.bevalSpec{}
 	reader := Reader{
 		Logger: util.GetLogger(true),
 	}
@@ -78,7 +78,7 @@ func TestApplyInvalidParams(t *testing.T) {
 }
 
 func TestApplyParamsEnvVariable(t *testing.T) {
-	spec := v1alpha1.OCIBuilderSpec{}
+	spec := v1alpha1.bevalSpec{}
 	reader := Reader{
 		Logger: util.GetLogger(true),
 	}
@@ -106,7 +106,7 @@ func TestApplyParamsEnvVariable(t *testing.T) {
 }
 
 func TestApplyInvalidParamsEnvVariable(t *testing.T) {
-	spec := v1alpha1.OCIBuilderSpec{}
+	spec := v1alpha1.bevalSpec{}
 	reader := Reader{
 		Logger: util.GetLogger(true),
 	}

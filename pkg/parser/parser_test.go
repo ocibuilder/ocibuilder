@@ -21,8 +21,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
 	"github.com/ghodss/yaml"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/stretchr/testify/assert"
 )
 

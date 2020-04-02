@@ -23,11 +23,11 @@ import (
 	"os"
 	"time"
 
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
+	"github.com/beval/beval/pkg/common"
+	"github.com/beval/beval/pkg/parser"
+	"github.com/beval/beval/pkg/validate"
 	"github.com/docker/docker/api/types"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/common"
-	"github.com/ocibuilder/ocibuilder/pkg/parser"
-	"github.com/ocibuilder/ocibuilder/pkg/validate"
 	"github.com/sirupsen/logrus"
 )
 
@@ -37,7 +37,7 @@ type Builder struct {
 	Provenance []*v1alpha1.BuildProvenance
 }
 
-func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan v1alpha1.OCIBuildResponse, errChan chan<- error, finished chan<- bool) {
+func (b *Builder) Build(spec v1alpha1.bevalSpec, res chan v1alpha1.OCIBuildResponse, errChan chan<- error, finished chan<- bool) {
 	log := b.Logger
 	cli := b.Client
 
@@ -135,7 +135,7 @@ func (b *Builder) Build(spec v1alpha1.OCIBuilderSpec, res chan v1alpha1.OCIBuild
 	}
 }
 
-func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan v1alpha1.OCIPushResponse, errChan chan<- error, finished chan<- bool) {
+func (b *Builder) Push(spec v1alpha1.bevalSpec, res chan v1alpha1.OCIPushResponse, errChan chan<- error, finished chan<- bool) {
 	log := b.Logger
 	cli := b.Client
 
@@ -191,7 +191,7 @@ func (b *Builder) Push(spec v1alpha1.OCIBuilderSpec, res chan v1alpha1.OCIPushRe
 	finished <- true
 }
 
-func (b *Builder) Pull(spec v1alpha1.OCIBuilderSpec, imageName string, res chan<- v1alpha1.OCIPullResponse, errChan chan<- error, finished chan<- bool) {
+func (b *Builder) Pull(spec v1alpha1.bevalSpec, imageName string, res chan<- v1alpha1.OCIPullResponse, errChan chan<- error, finished chan<- bool) {
 	log := b.Logger
 	cli := b.Client
 
@@ -238,7 +238,7 @@ func (b *Builder) Pull(spec v1alpha1.OCIBuilderSpec, imageName string, res chan<
 	finished <- true
 }
 
-func (b *Builder) Login(spec v1alpha1.OCIBuilderSpec, res chan<- v1alpha1.OCILoginResponse, errChan chan<- error, finished chan<- bool) {
+func (b *Builder) Login(spec v1alpha1.bevalSpec, res chan<- v1alpha1.OCILoginResponse, errChan chan<- error, finished chan<- bool) {
 	log := b.Logger
 	cli := b.Client
 
@@ -324,7 +324,7 @@ func (b *Builder) Clean() {
 	}
 }
 
-func (b Builder) generateAuthRegistryString(registry string, spec v1alpha1.OCIBuilderSpec) (string, error) {
+func (b Builder) generateAuthRegistryString(registry string, spec v1alpha1.bevalSpec) (string, error) {
 	if err := validate.ValidateLogin(spec); err != nil {
 		return "", err
 	}

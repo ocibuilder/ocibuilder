@@ -17,9 +17,10 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/ocibuilder/ocibuilder/provenance"
-	"github.com/spf13/cobra"
 	"io"
+
+	"github.com/beval/beval/provenance"
+	"github.com/spf13/cobra"
 )
 
 type versionCmd struct {
@@ -31,7 +32,7 @@ func newVersionCmd(out io.Writer) *cobra.Command {
 	vc := &versionCmd{out: out}
 	cmd := &cobra.Command{
 		Use:   "version",
-		Short: "prints the version of ocibuilder",
+		Short: "prints the version of beval",
 		Run: func(cmd *cobra.Command, args []string) {
 			vc.run()
 		},

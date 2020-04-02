@@ -18,27 +18,27 @@ limitations under the License.
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned/scheme"
+	v1alpha1 "github.com/beval/beval/pkg/apis/beval/v1alpha1"
+	"github.com/beval/beval/pkg/client/beval/clientset/versioned/scheme"
 	rest "k8s.io/client-go/rest"
 )
 
-type OcibuilderV1alpha1Interface interface {
+type bevalV1alpha1Interface interface {
 	RESTClient() rest.Interface
-	OCIBuildersGetter
+	bevalsGetter
 }
 
-// OcibuilderV1alpha1Client is used to interact with features provided by the ocibuilder.com group.
-type OcibuilderV1alpha1Client struct {
+// bevalV1alpha1Client is used to interact with features provided by the beval.com group.
+type bevalV1alpha1Client struct {
 	restClient rest.Interface
 }
 
-func (c *OcibuilderV1alpha1Client) OCIBuilders(namespace string) OCIBuilderInterface {
-	return newOCIBuilders(c, namespace)
+func (c *bevalV1alpha1Client) bevals(namespace string) bevalInterface {
+	return newbevals(c, namespace)
 }
 
-// NewForConfig creates a new OcibuilderV1alpha1Client for the given config.
-func NewForConfig(c *rest.Config) (*OcibuilderV1alpha1Client, error) {
+// NewForConfig creates a new bevalV1alpha1Client for the given config.
+func NewForConfig(c *rest.Config) (*bevalV1alpha1Client, error) {
 	config := *c
 	if err := setConfigDefaults(&config); err != nil {
 		return nil, err
@@ -47,12 +47,12 @@ func NewForConfig(c *rest.Config) (*OcibuilderV1alpha1Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &OcibuilderV1alpha1Client{client}, nil
+	return &bevalV1alpha1Client{client}, nil
 }
 
-// NewForConfigOrDie creates a new OcibuilderV1alpha1Client for the given config and
+// NewForConfigOrDie creates a new bevalV1alpha1Client for the given config and
 // panics if there is an error in the config.
-func NewForConfigOrDie(c *rest.Config) *OcibuilderV1alpha1Client {
+func NewForConfigOrDie(c *rest.Config) *bevalV1alpha1Client {
 	client, err := NewForConfig(c)
 	if err != nil {
 		panic(err)
@@ -60,9 +60,9 @@ func NewForConfigOrDie(c *rest.Config) *OcibuilderV1alpha1Client {
 	return client
 }
 
-// New creates a new OcibuilderV1alpha1Client for the given RESTClient.
-func New(c rest.Interface) *OcibuilderV1alpha1Client {
-	return &OcibuilderV1alpha1Client{c}
+// New creates a new bevalV1alpha1Client for the given RESTClient.
+func New(c rest.Interface) *bevalV1alpha1Client {
+	return &bevalV1alpha1Client{c}
 }
 
 func setConfigDefaults(config *rest.Config) error {
@@ -80,7 +80,7 @@ func setConfigDefaults(config *rest.Config) error {
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *OcibuilderV1alpha1Client) RESTClient() rest.Interface {
+func (c *bevalV1alpha1Client) RESTClient() rest.Interface {
 	if c == nil {
 		return nil
 	}

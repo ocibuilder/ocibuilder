@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
 )
 
 func RequestRemote(url string, filepath string, auth v1alpha1.RemoteCreds) error {

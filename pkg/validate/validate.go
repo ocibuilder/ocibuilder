@@ -19,14 +19,14 @@ package validate
 import (
 	"os"
 
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/common"
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
+	"github.com/beval/beval/pkg/common"
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
 )
 
-// Validate validates a ocibuilder spec.
-func Validate(spec *v1alpha1.OCIBuilderSpec) error {
+// Validate validates a beval spec.
+func Validate(spec *v1alpha1.bevalSpec) error {
 	if spec == nil {
 		return errors.New("builder spec can't be nil")
 	}
@@ -82,7 +82,7 @@ func ValidateLoginPassword(spec v1alpha1.LoginSpec) (string, error) {
 }
 
 // ValidateLogin validates the top level login specification
-func ValidateLogin(spec v1alpha1.OCIBuilderSpec) error {
+func ValidateLogin(spec v1alpha1.bevalSpec) error {
 	if spec.Login == nil {
 		return errors.New("at least one login must be provided")
 	}
@@ -90,7 +90,7 @@ func ValidateLogin(spec v1alpha1.OCIBuilderSpec) error {
 }
 
 // ValidatePush validates the top level push specification
-func ValidatePush(spec v1alpha1.OCIBuilderSpec) error {
+func ValidatePush(spec v1alpha1.bevalSpec) error {
 	if spec.Push == nil {
 		return errors.New("at least one push spec must be provided")
 	}

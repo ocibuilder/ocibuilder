@@ -25,13 +25,13 @@ import (
 	"os"
 	"strings"
 
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
+	"github.com/beval/beval/pkg/common"
+	"github.com/beval/beval/pkg/request"
+	"github.com/beval/beval/pkg/util"
 	cmdcore "github.com/k14s/ytt/pkg/cmd/core"
 	cmdtpl "github.com/k14s/ytt/pkg/cmd/template"
 	"github.com/k14s/ytt/pkg/files"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/common"
-	"github.com/ocibuilder/ocibuilder/pkg/request"
-	"github.com/ocibuilder/ocibuilder/pkg/util"
 	"github.com/pkg/errors"
 )
 
@@ -46,7 +46,7 @@ type YttOverlay struct {
 // Apply applies the overlay on a YttOverlay struct
 func (y YttOverlay) Apply() ([]byte, error) {
 	if y.Spec == nil {
-		return nil, errors.New("spec file is not defined, overlays is currently only supported for ocibuilder.yaml files")
+		return nil, errors.New("spec file is not defined, overlays is currently only supported for beval.yaml files")
 	}
 
 	overlayFile, err := retrieveOverlayFile(y.Path)
@@ -80,7 +80,7 @@ func (y YttOverlay) Apply() ([]byte, error) {
 		annotatedOverlay = overlay
 	}
 	filesToProcess := []*files.File{
-		files.MustNewFileFromSource(files.NewBytesSource("ocibuilder.yaml", y.Spec)),
+		files.MustNewFileFromSource(files.NewBytesSource("beval.yaml", y.Spec)),
 		files.MustNewFileFromSource(files.NewBytesSource(y.Path, annotatedOverlay)),
 	}
 

@@ -14,17 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package ocibuilder
+package beval
 
 import (
 	"context"
 	"log"
 	"time"
 
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	ociv1alpha1 "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
-	"github.com/ocibuilder/ocibuilder/pkg/common"
-	"github.com/ocibuilder/ocibuilder/provenance"
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
+	ociv1alpha1 "github.com/beval/beval/pkg/client/beval/clientset/versioned"
+	"github.com/beval/beval/pkg/common"
+	"github.com/beval/beval/provenance"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -42,13 +42,13 @@ const (
 
 // ControllerConfig contain the configuration settings for the controller
 type ControllerConfig struct {
-	// InstanceID is a label selector to limit the controller's watch of ocibuilders to a specific instance.
+	// InstanceID is a label selector to limit the controller's watch of bevals to a specific instance.
 	InstanceID string
 	// namespace is a label selector filter to limit controller's watch to specific namespace
 	Namespace string
 }
 
-// Controller listens for new ocibuilder resources and hands off handling of each resource on the queue to the operator
+// Controller listens for new beval resources and hands off handling of each resource on the queue to the operator
 type Controller struct {
 	// configmap is the name of the K8s configmap which contains controller configuration
 	configmap string
@@ -62,7 +62,7 @@ type Controller struct {
 	kubeConfig *rest.Config
 	// kubeClient communicates with Kubernetes API server
 	kubeClient kubernetes.Interface
-	// ociClient is the client to operates on ocibuilder resource
+	// ociClient is the client to operates on beval resource
 	ociClient ociv1alpha1.Interface
 	// informer provides eventually consistent linkage of its clients to the authoritative state of a given collection of objects.
 	informer cache.SharedIndexInformer
@@ -95,16 +95,16 @@ func (ctrl *Controller) processNextItem() bool {
 
 	obj, exists, err := ctrl.informer.GetIndexer().GetByKey(key.(string))
 	if err != nil {
-		ctrl.logger.WithError(err).WithField("key", key).Errorln("failed to get ocibuilder from informer index")
+		ctrl.logger.WithError(err).WithField("key", key).Errorln("failed to get beval from informer index")
 		return true
 	}
 
 	if !exists {
-		// this happens after ocibuilder was deleted, but work queue still had entry in it
+		// this happens after beval was deleted, but work queue still had entry in it
 		return true
 	}
 
-	builder, ok := obj.(*v1alpha1.OCIBuilder)
+	builder, ok := obj.(*v1alpha1.beval)
 	if !ok {
 		ctrl.logger.WithError(err).WithField("key", key).Errorln("key in index is not a builder")
 		return true
@@ -114,7 +114,7 @@ func (ctrl *Controller) processNextItem() bool {
 
 	err = ctx.operate()
 	if err != nil {
-		ctrl.logger.WithError(err).WithField(common.LabelOCIBuilderName, builder.Name).Errorln("failed to operate on the ocibuilder obejct")
+		ctrl.logger.WithError(err).WithField(common.LabelbevalName, builder.Name).Errorln("failed to operate on the beval obejct")
 	}
 
 	err = ctrl.handleErr(err, key)
@@ -135,8 +135,8 @@ func (ctrl *Controller) handleErr(err error, key interface{}) error {
 	}
 
 	// due to the base delay of 5ms of the DefaultControllerRateLimiter
-	// requeues will happen very quickly even after a ocibuilder pod goes down
-	// we want to give the ocibuilder pod a chance to come back up so we give a generous number of retries
+	// requeues will happen very quickly even after a beval pod goes down
+	// we want to give the beval pod a chance to come back up so we give a generous number of retries
 	if ctrl.queue.NumRequeues(key) < 20 {
 		// Re-enqueue the key rate limited. This key will be processed later again.
 		ctrl.queue.AddRateLimited(key)

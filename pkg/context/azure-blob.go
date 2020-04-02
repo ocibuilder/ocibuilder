@@ -24,9 +24,9 @@ import (
 	"os"
 
 	"github.com/Azure/azure-storage-blob-go/azblob"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/common"
-	"github.com/ocibuilder/ocibuilder/pkg/util"
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
+	"github.com/beval/beval/pkg/common"
+	"github.com/beval/beval/pkg/util"
 	"k8s.io/client-go/kubernetes"
 )
 

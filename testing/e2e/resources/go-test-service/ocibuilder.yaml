@@ -15,7 +15,7 @@ build:
               - ENTRYPOINT ./goapp
   steps:
     - metadata:
-        name: docker.io/ocibuildere2e/go-test-service
+        name: docker.io/bevale2e/go-test-service
         labels:
           type: build-1
           overlay: first-step
@@ -54,7 +54,7 @@ login:
 
 push:
   - registry: docker.io
-    image: ocibuildere2e/go-test-service
+    image: bevale2e/go-test-service
     tag: v0.1.0
 
 params:

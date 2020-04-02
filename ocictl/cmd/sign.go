@@ -21,13 +21,13 @@ import (
 	"io"
 	"io/ioutil"
 
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
+	"github.com/beval/beval/pkg/crypto"
+	"github.com/beval/beval/pkg/docker"
+	"github.com/beval/beval/pkg/oci"
+	"github.com/beval/beval/pkg/read"
+	"github.com/beval/beval/pkg/util"
 	"github.com/docker/docker/client"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/crypto"
-	"github.com/ocibuilder/ocibuilder/pkg/docker"
-	"github.com/ocibuilder/ocibuilder/pkg/oci"
-	"github.com/ocibuilder/ocibuilder/pkg/read"
-	"github.com/ocibuilder/ocibuilder/pkg/util"
 	"github.com/spf13/cobra"
 )
 
@@ -51,7 +51,7 @@ func newSignCmd(out io.Writer) *cobra.Command {
 	}
 	f := cmd.Flags()
 	f.BoolVarP(&sc.debug, "debug", "d", false, "Turn on debug logging")
-	f.StringVarP(&sc.path, "path", "p", ".", "Path to your ocibuilder.yaml file")
+	f.StringVarP(&sc.path, "path", "p", ".", "Path to your beval.yaml file")
 	f.BoolVar(&sc.push, "push", false, "Push to specified metadata store")
 	f.StringVarP(&sc.name, "name", "n", "", "The image name to sign")
 	f.StringVarP(&sc.output, "output", "o", "", "Filepath to output image signature to")
@@ -62,9 +62,9 @@ func newSignCmd(out io.Writer) *cobra.Command {
 func (sc *signCmd) run(args []string) error {
 	logger := util.GetLogger(sc.debug)
 	reader := read.Reader{Logger: logger}
-	ociBuilderSpec := v1alpha1.OCIBuilderSpec{Daemon: true}
+	bevalSpec := v1alpha1.bevalSpec{Daemon: true}
 
-	if err := reader.Read(&ociBuilderSpec, "", sc.path); err != nil {
+	if err := reader.Read(&bevalSpec, "", sc.path); err != nil {
 		log.WithError(err).Errorln("failed to read spec")
 		return err
 	}
@@ -81,8 +81,8 @@ func (sc *signCmd) run(args []string) error {
 	}
 
 	if sc.push {
-		ociBuilderSpec.Metadata.Data = []v1alpha1.MetadataType{"attestation"}
-		mw := oci.NewMetadataWriter(logger, ociBuilderSpec.Metadata)
+		bevalSpec.Metadata.Data = []v1alpha1.MetadataType{"attestation"}
+		mw := oci.NewMetadataWriter(logger, bevalSpec.Metadata)
 		if err := mw.ParseMetadata(sc.name, cli, &v1alpha1.BuildProvenance{
 			Name: sc.name,
 		}); err != nil {
@@ -102,13 +102,13 @@ func (sc *signCmd) run(args []string) error {
 		return err
 	}
 
-	privKey, pubKey, err := crypto.ValidateKeysPacket(ociBuilderSpec.Metadata.Key)
+	privKey, pubKey, err := crypto.ValidateKeysPacket(bevalSpec.Metadata.Key)
 	if err != nil {
 		return err
 	}
 
 	e := crypto.CreateEntityFromKeys(privKey, pubKey)
-	_, sig, err := crypto.SignDigest(inspectResponse.ID, ociBuilderSpec.Metadata.Key.Passphrase, e)
+	_, sig, err := crypto.SignDigest(inspectResponse.ID, bevalSpec.Metadata.Key.Passphrase, e)
 	if err != nil {
 		return err
 	}

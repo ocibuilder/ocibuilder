@@ -14,44 +14,44 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package ocibuilder
+package beval
 
 import (
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/common"
-	"github.com/ocibuilder/ocibuilder/pkg/validate"
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
+	"github.com/beval/beval/pkg/common"
+	"github.com/beval/beval/pkg/validate"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	batchv1 "k8s.io/api/batch/v1"
 )
 
-// the context of an operation on a ocibuilder object.
-// the controller creates this context each time it picks a ocibuilder object off its queue.
+// the context of an operation on a beval object.
+// the controller creates this context each time it picks a beval object off its queue.
 type operationContext struct {
-	// builder is the ocibuilder object
-	builder *v1alpha1.OCIBuilder
-	// updated indicates whether the ocibuilder object was updated and needs to be persisted back to k8
+	// builder is the beval object
+	builder *v1alpha1.beval
+	// updated indicates whether the beval object was updated and needs to be persisted back to k8
 	updated bool
-	// logger is the logging context to correlate logs with a ocibuilder
+	// logger is the logging context to correlate logs with a beval
 	logger *logrus.Logger
 	// reference to the controller
 	controller *Controller
 }
 
 // newOperationContext returns a new context of controller operation
-func newOperationContext(builder *v1alpha1.OCIBuilder, controller *Controller) *operationContext {
+func newOperationContext(builder *v1alpha1.beval, controller *Controller) *operationContext {
 	return &operationContext{
 		builder:    builder,
 		controller: controller,
 		logger: controller.logger.WithFields(map[string]interface{}{
-			common.LabelOCIBuilderName: builder.Name,
-			common.LabelNamespace:      builder.Namespace,
+			common.LabelbevalName: builder.Name,
+			common.LabelNamespace: builder.Namespace,
 		}).Logger,
 		updated: false,
 	}
 }
 
-// operate operate on an ocibuilder object and manages its lifecycle
+// operate operate on an beval object and manages its lifecycle
 func (opCtx *operationContext) operate() error {
 	log := opCtx.logger.WithFields(map[string]interface{}{
 		common.LabelName:      opCtx.builder.Name,
@@ -77,7 +77,7 @@ func (opCtx *operationContext) operate() error {
 	return nil
 }
 
-// constructBuilderJob constructs a K8s job for ocibuilder build step.
+// constructBuilderJob constructs a K8s job for beval build step.
 func (opCtx *operationContext) constructBuilderJob() *batchv1.Job {
 	return &batchv1.Job{}
 }

@@ -18,9 +18,9 @@ limitations under the License.
 package fake
 
 import (
-	clientset "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
-	ocibuilderv1alpha1 "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned/typed/ocibuilder/v1alpha1"
-	fakeocibuilderv1alpha1 "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned/typed/ocibuilder/v1alpha1/fake"
+	clientset "github.com/beval/beval/pkg/client/beval/clientset/versioned"
+	bevalv1alpha1 "github.com/beval/beval/pkg/client/beval/clientset/versioned/typed/beval/v1alpha1"
+	fakebevalv1alpha1 "github.com/beval/beval/pkg/client/beval/clientset/versioned/typed/beval/v1alpha1/fake"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"
@@ -75,7 +75,7 @@ func (c *Clientset) Tracker() testing.ObjectTracker {
 
 var _ clientset.Interface = &Clientset{}
 
-// OcibuilderV1alpha1 retrieves the OcibuilderV1alpha1Client
-func (c *Clientset) OcibuilderV1alpha1() ocibuilderv1alpha1.OcibuilderV1alpha1Interface {
-	return &fakeocibuilderv1alpha1.FakeOcibuilderV1alpha1{Fake: &c.Fake}
+// bevalV1alpha1 retrieves the bevalV1alpha1Client
+func (c *Clientset) bevalV1alpha1() bevalv1alpha1.bevalV1alpha1Interface {
+	return &fakebevalv1alpha1.FakebevalV1alpha1{Fake: &c.Fake}
 }

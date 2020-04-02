@@ -20,9 +20,9 @@ import (
 	"io"
 	"os"
 
+	"github.com/beval/beval/pkg/util"
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/docker/pkg/term"
-	"github.com/ocibuilder/ocibuilder/pkg/util"
 )
 
 var log = util.GetLogger(false)

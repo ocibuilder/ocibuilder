@@ -14,18 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package ocibuilder
+package beval
 
 const (
 	// Group is the API Group
 	Group string = "github.com"
 
 	// Kind is the kind constant for the sensor
-	Kind string = "OCIBuilder"
+	Kind string = "beval"
 	// Singular is the singular constant for the sensor
-	Singular string = "ocibuilder"
+	Singular string = "beval"
 	// Plural is the plural constant for the sensor
-	Plural string = "ocibuilders"
+	Plural string = "bevals"
 	// FullName is the full name constant for the sensor
 	FullName string = Plural + "." + Group
 )

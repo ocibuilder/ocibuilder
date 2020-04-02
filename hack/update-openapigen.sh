@@ -10,6 +10,6 @@ VERSION="v1alpha1"
 
 go run ${OPENAPIGEN_PKG}/cmd/openapi-gen/openapi-gen.go \
     --go-header-file ${PROJECT_ROOT}/hack/custom-boilerplate.go.txt \
-    --input-dirs github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/${VERSION} \
-    --output-package /github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/${VERSION} \
+    --input-dirs github.com/beval/beval/pkg/apis/beval/${VERSION} \
+    --output-package /github.com/beval/beval/pkg/apis/beval/${VERSION} \
     $@

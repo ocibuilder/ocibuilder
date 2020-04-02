@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
 	"github.com/moby/buildkit/frontend/dockerfile/parser"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/sirupsen/logrus"
 )
 
@@ -24,7 +24,7 @@ type DockerGenerator struct {
 	Logger *logrus.Logger
 }
 
-// Generate aims to generate an ocibuilder.yaml specification from a Dockerfile
+// Generate aims to generate an beval.yaml specification from a Dockerfile
 func (d DockerGenerator) Generate() ([]byte, error) {
 	file, err := os.Open(d.Filepath)
 	if err != nil {
@@ -81,13 +81,13 @@ func (d DockerGenerator) Generate() ([]byte, error) {
 		templates = append(templates, string(tmpl))
 	}
 
-	ocibuilderTmpl := v1alpha1.GenerateTemplate{
+	bevalTmpl := v1alpha1.GenerateTemplate{
 		ImageName: d.ImageName,
 		Stages:    stages,
 		Tag:       d.Tag,
 		Templates: templates,
 	}
-	spec, err := generate("ocibuilder_tmpl", ocibuilderTmpl)
+	spec, err := generate("beval_tmpl", bevalTmpl)
 	if err != nil {
 		return nil, err
 	}

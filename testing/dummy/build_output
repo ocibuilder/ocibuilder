@@ -23,4 +23,4 @@ Step 9/9 : LABEL type=build-1
  ---> Using cache
  ---> 4ffd5e714396
 Successfully built 4ffd5e714396
-Successfully tagged ocibuildere2e/go-test-service:v0.1.0
+Successfully tagged bevale2e/go-test-service:v0.1.0

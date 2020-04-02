@@ -21,7 +21,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ocibuilder/ocibuilder/pkg/util"
+	"github.com/beval/beval/pkg/util"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -44,5 +44,5 @@ func TestExcludeIgnored(t *testing.T) {
 
 	files, err := ExcludeIgnored("../../testing/e2e/resources/go-test-service")
 	assert.Equal(t, nil, err)
-	assert.Equal(t, []string{DIR + ".dockerignore", DIR + "main.go", DIR + "ocibuilder.yaml", DIR + "overlay.yaml"}, files)
+	assert.Equal(t, []string{DIR + ".dockerignore", DIR + "main.go", DIR + "beval.yaml", DIR + "overlay.yaml"}, files)
 }

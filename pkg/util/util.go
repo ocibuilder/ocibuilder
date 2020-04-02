@@ -19,8 +19,8 @@ package util
 import (
 	"os"
 
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
 	"github.com/mholt/archiver"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"

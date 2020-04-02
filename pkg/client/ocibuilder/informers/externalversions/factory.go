@@ -22,9 +22,9 @@ import (
 	sync "sync"
 	time "time"
 
-	versioned "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
-	internalinterfaces "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/informers/externalversions/internalinterfaces"
-	ocibuilder "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/informers/externalversions/ocibuilder"
+	versioned "github.com/beval/beval/pkg/client/beval/clientset/versioned"
+	beval "github.com/beval/beval/pkg/client/beval/informers/externalversions/beval"
+	internalinterfaces "github.com/beval/beval/pkg/client/beval/informers/externalversions/internalinterfaces"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -171,9 +171,9 @@ type SharedInformerFactory interface {
 	ForResource(resource schema.GroupVersionResource) (GenericInformer, error)
 	WaitForCacheSync(stopCh <-chan struct{}) map[reflect.Type]bool
 
-	Ocibuilder() ocibuilder.Interface
+	beval() beval.Interface
 }
 
-func (f *sharedInformerFactory) Ocibuilder() ocibuilder.Interface {
-	return ocibuilder.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) beval() beval.Interface {
+	return beval.New(f, f.namespace, f.tweakListOptions)
 }

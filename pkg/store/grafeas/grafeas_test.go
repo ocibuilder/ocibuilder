@@ -20,10 +20,10 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/ocibuilder/gofeas"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/store"
-	"github.com/ocibuilder/ocibuilder/pkg/util"
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
+	"github.com/beval/beval/pkg/store"
+	"github.com/beval/beval/pkg/util"
+	"github.com/beval/gofeas"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 )

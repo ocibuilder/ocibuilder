@@ -6,8 +6,8 @@ import (
 	"os"
 	"text/template"
 
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
 	"github.com/gobuffalo/packr"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 )
 
 func GenerateSpecification(generator v1alpha1.SpecGenerator, dry bool) error {
@@ -23,7 +23,7 @@ func GenerateSpecification(generator v1alpha1.SpecGenerator, dry bool) error {
 		return nil
 	}
 
-	if err := ioutil.WriteFile("ocibuilder.yaml", spec, 0644); err != nil {
+	if err := ioutil.WriteFile("beval.yaml", spec, 0644); err != nil {
 		return err
 	}
 	return nil

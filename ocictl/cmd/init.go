@@ -19,9 +19,9 @@ package cmd
 import (
 	"io"
 
+	"github.com/beval/beval/pkg/initialize"
+	"github.com/beval/beval/pkg/util"
 	"github.com/gobuffalo/packr"
-	"github.com/ocibuilder/ocibuilder/pkg/initialize"
-	"github.com/ocibuilder/ocibuilder/pkg/util"
 	"github.com/spf13/cobra"
 )
 
@@ -35,7 +35,7 @@ func newInitCmd(out io.Writer) *cobra.Command {
 	ic := &initCmd{out: out}
 	cmd := &cobra.Command{
 		Use:   "init",
-		Short: "Initialises a template ocibuilder.yaml file for ocibuilder",
+		Short: "Initialises a template beval.yaml file for beval",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return ic.run(args)
 		},
@@ -74,7 +74,7 @@ func newFromDockerCmd(out io.Writer) *cobra.Command {
 	fd := &fromDockerCmd{out: out}
 	cmd := &cobra.Command{
 		Use:   "from-docker",
-		Short: "Initialises a template ocibuilder.yaml file from a docker file",
+		Short: "Initialises a template beval.yaml file from a docker file",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return fd.run(args)
 		},

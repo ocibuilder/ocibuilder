@@ -20,7 +20,7 @@ package externalversions
 import (
 	"fmt"
 
-	v1alpha1 "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	v1alpha1 "github.com/beval/beval/pkg/apis/beval/v1alpha1"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
 )
@@ -51,9 +51,9 @@ func (f *genericInformer) Lister() cache.GenericLister {
 // TODO extend this to unknown resources with a client pool
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
-	// Group=ocibuilder.com, Version=v1alpha1
-	case v1alpha1.SchemeGroupVersion.WithResource("ocibuilders"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Ocibuilder().V1alpha1().OCIBuilders().Informer()}, nil
+	// Group=beval.com, Version=v1alpha1
+	case v1alpha1.SchemeGroupVersion.WithResource("bevals"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.beval().V1alpha1().bevals().Informer()}, nil
 
 	}
 

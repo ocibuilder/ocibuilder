@@ -1,6 +1,6 @@
 ---
 name: Task
-about: Tasks related to the development of the ocibuilder (maintainers only)
+about: Tasks related to the development of the beval (maintainers only)
 title: ''
 labels: ''
 assignees: ''

@@ -18,7 +18,7 @@ limitations under the License.
 package versioned
 
 import (
-	ocibuilderv1alpha1 "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned/typed/ocibuilder/v1alpha1"
+	bevalv1alpha1 "github.com/beval/beval/pkg/client/beval/clientset/versioned/typed/beval/v1alpha1"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"
@@ -26,19 +26,19 @@ import (
 
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
-	OcibuilderV1alpha1() ocibuilderv1alpha1.OcibuilderV1alpha1Interface
+	bevalV1alpha1() bevalv1alpha1.bevalV1alpha1Interface
 }
 
 // Clientset contains the clients for groups. Each group has exactly one
 // version included in a Clientset.
 type Clientset struct {
 	*discovery.DiscoveryClient
-	ocibuilderV1alpha1 *ocibuilderv1alpha1.OcibuilderV1alpha1Client
+	bevalV1alpha1 *bevalv1alpha1.bevalV1alpha1Client
 }
 
-// OcibuilderV1alpha1 retrieves the OcibuilderV1alpha1Client
-func (c *Clientset) OcibuilderV1alpha1() ocibuilderv1alpha1.OcibuilderV1alpha1Interface {
-	return c.ocibuilderV1alpha1
+// bevalV1alpha1 retrieves the bevalV1alpha1Client
+func (c *Clientset) bevalV1alpha1() bevalv1alpha1.bevalV1alpha1Interface {
+	return c.bevalV1alpha1
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -57,7 +57,7 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 	}
 	var cs Clientset
 	var err error
-	cs.ocibuilderV1alpha1, err = ocibuilderv1alpha1.NewForConfig(&configShallowCopy)
+	cs.bevalV1alpha1, err = bevalv1alpha1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 // panics if there is an error in the config.
 func NewForConfigOrDie(c *rest.Config) *Clientset {
 	var cs Clientset
-	cs.ocibuilderV1alpha1 = ocibuilderv1alpha1.NewForConfigOrDie(c)
+	cs.bevalV1alpha1 = bevalv1alpha1.NewForConfigOrDie(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClientForConfigOrDie(c)
 	return &cs
@@ -82,7 +82,7 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 // New creates a new Clientset for the given RESTClient.
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
-	cs.ocibuilderV1alpha1 = ocibuilderv1alpha1.New(c)
+	cs.bevalV1alpha1 = bevalv1alpha1.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)
 	return &cs

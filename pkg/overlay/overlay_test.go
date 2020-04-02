@@ -21,7 +21,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ocibuilder/ocibuilder/pkg/common"
+	"github.com/beval/beval/pkg/common"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -75,7 +75,7 @@ func TestRetrieveOverlayFile(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, expectedOverlay, string(bodyLocal))
 
-	overlayRemote, err := retrieveOverlayFile("https://raw.githubusercontent.com/ocibuilder/ocibuilder/master/testing/dummy/overlay_overlay_test.yaml")
+	overlayRemote, err := retrieveOverlayFile("https://raw.githubusercontent.com/beval/beval/master/testing/dummy/overlay_overlay_test.yaml")
 	assert.Equal(t, nil, err)
 
 	bodyRemote, err := ioutil.ReadAll(overlayRemote)

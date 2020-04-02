@@ -16,7 +16,7 @@ limitations under the License.
 
 package common
 
-import "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder"
+import "github.com/beval/beval/pkg/apis/beval"
 
 // Controller environment variables
 const (
@@ -27,30 +27,30 @@ const (
 
 // Controller labels
 const (
-	//LabelKeyControllerInstanceID is the label which allows to separate application among multiple running ocibuilder controllers.
-	LabelKeyControllerInstanceID = ocibuilder.FullName + "/controller-instanceid"
+	//LabelKeyControllerInstanceID is the label which allows to separate application among multiple running beval controllers.
+	LabelKeyControllerInstanceID = beval.FullName + "/controller-instanceid"
 	// LabelKeyPhase is a label applied to indicate the current phase of the builder (for filtering purposes)
-	LabelKeyPhase = ocibuilder.FullName + "/phase"
+	LabelKeyPhase = beval.FullName + "/phase"
 	// LabelKeyComplete is the label to mark builders as complete
-	LabelKeyComplete = ocibuilder.FullName + "/complete"
-	// LabelOCIBuilderName is the label to indicate the name of an ocibuilder object
-	LabelOCIBuilderName = "ocibuilder-name"
+	LabelKeyComplete = beval.FullName + "/complete"
+	// LabelbevalName is the label to indicate the name of an beval object
+	LabelbevalName = "beval-name"
 )
 
 // Miscellaneous constants for controller
 const (
-	// ControllerConfigMapKey is the key in the configmap to retrieve ocibuilder controller configuration from.
+	// ControllerConfigMapKey is the key in the configmap to retrieve beval controller configuration from.
 	// Content encoding is expected to be YAML.
 	ControllerConfigMapKey = "config"
 )
 
-// OCIBuilder resource labels
+// beval resource labels
 const (
-	// LabelName refers to label of the ocibuilder resource name
+	// LabelName refers to label of the beval resource name
 	LabelName = "name"
 	// LabelNamespace is the label to indicate K8s namespace
 	LabelNamespace = "namespace"
-	// LabelPhase is the label to indicate the phase of the ocibuilder resourc
+	// LabelPhase is the label to indicate the phase of the beval resourc
 	LabelPhase = "phase"
 )
 
@@ -66,12 +66,12 @@ const (
 
 // Build context constants
 const (
-	// ContextDirectory holds the ocibuilder context
+	// ContextDirectory holds the beval context
 	ContextDirectory = "/ocib/context/"
 	// ContextFile contains the compressed build context
 	ContextFile = "context.tar.gz"
 	// ContextDirectoryUncompressed contains the uncompressed build context
-	ContextDirectoryUncompressed = "/ocibuilder/context/uncompressed/"
+	ContextDirectoryUncompressed = "/beval/context/uncompressed/"
 	// Remote Local Directory
 	RemoteLocalDirectory = "."
 	// Remote Temp Directory

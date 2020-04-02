@@ -23,10 +23,10 @@ import (
 	"strings"
 
 	"github.com/artbegolli/yenv"
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
+	"github.com/beval/beval/pkg/overlay"
+	"github.com/beval/beval/pkg/validate"
 	"github.com/ghodss/yaml"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/overlay"
-	"github.com/ocibuilder/ocibuilder/pkg/validate"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/tidwall/sjson"
@@ -39,10 +39,10 @@ type Reader struct {
 }
 
 // Read is responsible for reading in the specification files, either
-// combined in ocibuilder.yaml or separated in login.yaml, build.yaml and push.yaml.
-// The passed in OCIBuilderSpec reference is populated
+// combined in beval.yaml or separated in login.yaml, build.yaml and push.yaml.
+// The passed in bevalSpec reference is populated
 // If a filepath is not specified the current working directory is used
-func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepaths ...string) error {
+func (r Reader) Read(spec *v1alpha1.bevalSpec, overlayPath string, filepaths ...string) error {
 	dir, err := os.Getwd()
 	if err != nil {
 		return err
@@ -51,10 +51,10 @@ func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepath
 	if filepath != "" {
 		dir = filepath
 	}
-	r.Logger.WithField("filepath", dir+"/ocibuilder.yaml").Debugln("looking for ocibuilder.yaml")
-	file, err := ioutil.ReadFile(dir + "/ocibuilder.yaml")
+	r.Logger.WithField("filepath", dir+"/beval.yaml").Debugln("looking for beval.yaml")
+	file, err := ioutil.ReadFile(dir + "/beval.yaml")
 	if err != nil {
-		r.Logger.Infoln("ocibuilder.yaml file not found, looking for individual specifications...")
+		r.Logger.Infoln("beval.yaml file not found, looking for individual specifications...")
 		if err := r.readIndividualSpecs(spec, dir); err != nil {
 			return errors.Wrap(err, "failed to read individual specs")
 		}
@@ -102,8 +102,8 @@ func (r Reader) Read(spec *v1alpha1.OCIBuilderSpec, overlayPath string, filepath
 }
 
 // readIndividualSpecs reads the individual specifications if a global
-// ocibuilder.yaml is not found
-func (r Reader) readIndividualSpecs(spec *v1alpha1.OCIBuilderSpec, path string) error {
+// beval.yaml is not found
+func (r Reader) readIndividualSpecs(spec *v1alpha1.bevalSpec, path string) error {
 	var loginSpec []v1alpha1.LoginSpec
 	var buildSpec *v1alpha1.BuildSpec
 	var pushSpec []v1alpha1.PushSpec
@@ -146,7 +146,7 @@ func applyOverlay(yamlTemplate []byte, overlayPath string) ([]byte, error) {
 	return overlayedSpec, nil
 }
 
-func (r Reader) applyParams(yamlObj []byte, spec *v1alpha1.OCIBuilderSpec) error {
+func (r Reader) applyParams(yamlObj []byte, spec *v1alpha1.bevalSpec) error {
 	log := r.Logger
 
 	// Yenv applies all environment variables in the form ${ENV_VARIABLE_HERE}

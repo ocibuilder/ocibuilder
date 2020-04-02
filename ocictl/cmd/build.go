@@ -20,19 +20,19 @@ import (
 	"errors"
 	"io"
 
+	"github.com/beval/beval/ocictl/pkg/utils"
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
+	"github.com/beval/beval/pkg/buildah"
+	"github.com/beval/beval/pkg/docker"
+	"github.com/beval/beval/pkg/oci"
+	"github.com/beval/beval/pkg/read"
+	"github.com/beval/beval/pkg/util"
 	"github.com/docker/docker/client"
-	"github.com/ocibuilder/ocibuilder/ocictl/pkg/utils"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/buildah"
-	"github.com/ocibuilder/ocibuilder/pkg/docker"
-	"github.com/ocibuilder/ocibuilder/pkg/oci"
-	"github.com/ocibuilder/ocibuilder/pkg/read"
-	"github.com/ocibuilder/ocibuilder/pkg/util"
 	"github.com/spf13/cobra"
 )
 
 const buildDesc = `
-This command runs an image build with the specification defined in your projects ocibuilder.yaml file.
+This command runs an image build with the specification defined in your projects beval.yaml file.
 It can run a build in both docker and buildah varieties.
 `
 
@@ -56,8 +56,8 @@ func newBuildCmd(out io.Writer) *cobra.Command {
 		},
 	}
 	f := cmd.Flags()
-	f.StringVarP(&bc.name, "name", "n", "", "Specify the name of your build or defined in ocibuilder.yaml")
-	f.StringVarP(&bc.path, "path", "p", "", "Path to your ocibuilder.yaml or build.yaml. By default will look in the current working directory")
+	f.StringVarP(&bc.name, "name", "n", "", "Specify the name of your build or defined in beval.yaml")
+	f.StringVarP(&bc.path, "path", "p", "", "Path to your beval.yaml or build.yaml. By default will look in the current working directory")
 	f.StringVarP(&bc.builder, "builder", "b", "docker", "Choose either docker and buildah as the targeted image builder. By default the builder is docker.")
 	f.BoolVarP(&bc.debug, "debug", "d", false, "Turn on debug logging")
 	f.StringVarP(&bc.overlay, "overlay", "o", "", "Path to your overlay.yaml file")
@@ -69,16 +69,16 @@ func (b *buildCmd) run(args []string) error {
 	var cli v1alpha1.BuilderClient
 	logger := util.GetLogger(b.debug)
 	reader := read.Reader{Logger: logger}
-	ociBuilderSpec := v1alpha1.OCIBuilderSpec{Daemon: true}
+	bevalSpec := v1alpha1.bevalSpec{Daemon: true}
 
-	if err := reader.Read(&ociBuilderSpec, b.overlay, b.path); err != nil {
+	if err := reader.Read(&bevalSpec, b.overlay, b.path); err != nil {
 		log.WithError(err).Errorln("failed to read spec")
 		return err
 	}
 
 	// Prioritise builder passed in as argument, default builder is docker
 	builderType := b.builder
-	if !ociBuilderSpec.Daemon {
+	if !bevalSpec.Daemon {
 		builderType = "buildah"
 	}
 
@@ -97,7 +97,7 @@ func (b *buildCmd) run(args []string) error {
 				Logger:    logger,
 			}
 
-			ociBuilderSpec.Daemon = true
+			bevalSpec.Daemon = true
 		}
 
 	case v1alpha1.BuildahFramework:
@@ -106,7 +106,7 @@ func (b *buildCmd) run(args []string) error {
 				Logger: logger,
 			}
 
-			ociBuilderSpec.Daemon = false
+			bevalSpec.Daemon = false
 		}
 
 	default:
@@ -130,7 +130,7 @@ func (b *buildCmd) run(args []string) error {
 		close(errChan)
 	}()
 
-	go builder.Build(ociBuilderSpec, res, errChan, finished)
+	go builder.Build(bevalSpec, res, errChan, finished)
 
 	for {
 		select {

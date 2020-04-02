@@ -23,10 +23,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/ocibuilder/ocibuilder/ocictl/pkg/utils"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/common"
-	"github.com/ocibuilder/ocibuilder/pkg/util"
+	"github.com/beval/beval/ocictl/pkg/utils"
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
+	"github.com/beval/beval/pkg/common"
+	"github.com/beval/beval/pkg/util"
 	"github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
 )
@@ -67,7 +67,7 @@ func GetBuildContextReader(buildContext *v1alpha1.BuildContext, k8sConfigPath st
 	return nil, errors.New("unknown build context")
 }
 
-// InjectDockerfile embeds the generated ocibuilder dockerfile into your build context tar
+// InjectDockerfile embeds the generated beval dockerfile into your build context tar
 // looking in /ocib/context/context.tar.gz
 func InjectDockerfile(contextPath string, dockerfilePath string) error {
 

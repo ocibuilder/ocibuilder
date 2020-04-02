@@ -28,46 +28,46 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AliyunOSSContext":      schema_pkg_apis_ocibuilder_v1alpha1_AliyunOSSContext(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AnsibleGalaxy":         schema_pkg_apis_ocibuilder_v1alpha1_AnsibleGalaxy(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AnsibleLocal":          schema_pkg_apis_ocibuilder_v1alpha1_AnsibleLocal(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AnsibleStep":           schema_pkg_apis_ocibuilder_v1alpha1_AnsibleStep(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AzureBlobContext":      schema_pkg_apis_ocibuilder_v1alpha1_AzureBlobContext(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Base":                  schema_pkg_apis_ocibuilder_v1alpha1_Base(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildContext":          schema_pkg_apis_ocibuilder_v1alpha1_BuildContext(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildSpec":             schema_pkg_apis_ocibuilder_v1alpha1_BuildSpec(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildStep":             schema_pkg_apis_ocibuilder_v1alpha1_BuildStep(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildTemplate":         schema_pkg_apis_ocibuilder_v1alpha1_BuildTemplate(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildTemplateStep":     schema_pkg_apis_ocibuilder_v1alpha1_BuildTemplateStep(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Command":               schema_pkg_apis_ocibuilder_v1alpha1_Command(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Credentials":           schema_pkg_apis_ocibuilder_v1alpha1_Credentials(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.DockerStep":            schema_pkg_apis_ocibuilder_v1alpha1_DockerStep(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.EnvCreds":              schema_pkg_apis_ocibuilder_v1alpha1_EnvCreds(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.GCSContext":            schema_pkg_apis_ocibuilder_v1alpha1_GCSContext(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.GitContext":            schema_pkg_apis_ocibuilder_v1alpha1_GitContext(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.GitRemoteConfig":       schema_pkg_apis_ocibuilder_v1alpha1_GitRemoteConfig(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.ImageBuildArgs":        schema_pkg_apis_ocibuilder_v1alpha1_ImageBuildArgs(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.K8sCreds":              schema_pkg_apis_ocibuilder_v1alpha1_K8sCreds(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.KubeSecretCredentials": schema_pkg_apis_ocibuilder_v1alpha1_KubeSecretCredentials(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.LocalContext":          schema_pkg_apis_ocibuilder_v1alpha1_LocalContext(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.LoginSpec":             schema_pkg_apis_ocibuilder_v1alpha1_LoginSpec(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Metadata":              schema_pkg_apis_ocibuilder_v1alpha1_Metadata(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.NodeStatus":            schema_pkg_apis_ocibuilder_v1alpha1_NodeStatus(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.OCIBuilder":            schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilder(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.OCIBuilderList":        schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderList(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.OCIBuilderSpec":        schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderSpec(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.OCIBuilderStatus":      schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderStatus(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Param":                 schema_pkg_apis_ocibuilder_v1alpha1_Param(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.PlainCreds":            schema_pkg_apis_ocibuilder_v1alpha1_PlainCreds(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.PushSpec":              schema_pkg_apis_ocibuilder_v1alpha1_PushSpec(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.RegistryCreds":         schema_pkg_apis_ocibuilder_v1alpha1_RegistryCreds(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.S3Bucket":              schema_pkg_apis_ocibuilder_v1alpha1_S3Bucket(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.S3Context":             schema_pkg_apis_ocibuilder_v1alpha1_S3Context(ref),
-		"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Stage":                 schema_pkg_apis_ocibuilder_v1alpha1_Stage(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.AliyunOSSContext":      schema_pkg_apis_beval_v1alpha1_AliyunOSSContext(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.AnsibleGalaxy":         schema_pkg_apis_beval_v1alpha1_AnsibleGalaxy(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.AnsibleLocal":          schema_pkg_apis_beval_v1alpha1_AnsibleLocal(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.AnsibleStep":           schema_pkg_apis_beval_v1alpha1_AnsibleStep(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.AzureBlobContext":      schema_pkg_apis_beval_v1alpha1_AzureBlobContext(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.Base":                  schema_pkg_apis_beval_v1alpha1_Base(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.BuildContext":          schema_pkg_apis_beval_v1alpha1_BuildContext(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.BuildSpec":             schema_pkg_apis_beval_v1alpha1_BuildSpec(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.BuildStep":             schema_pkg_apis_beval_v1alpha1_BuildStep(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.BuildTemplate":         schema_pkg_apis_beval_v1alpha1_BuildTemplate(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.BuildTemplateStep":     schema_pkg_apis_beval_v1alpha1_BuildTemplateStep(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.Command":               schema_pkg_apis_beval_v1alpha1_Command(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.Credentials":           schema_pkg_apis_beval_v1alpha1_Credentials(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.DockerStep":            schema_pkg_apis_beval_v1alpha1_DockerStep(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.EnvCreds":              schema_pkg_apis_beval_v1alpha1_EnvCreds(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.GCSContext":            schema_pkg_apis_beval_v1alpha1_GCSContext(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.GitContext":            schema_pkg_apis_beval_v1alpha1_GitContext(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.GitRemoteConfig":       schema_pkg_apis_beval_v1alpha1_GitRemoteConfig(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.ImageBuildArgs":        schema_pkg_apis_beval_v1alpha1_ImageBuildArgs(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.K8sCreds":              schema_pkg_apis_beval_v1alpha1_K8sCreds(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.KubeSecretCredentials": schema_pkg_apis_beval_v1alpha1_KubeSecretCredentials(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.LocalContext":          schema_pkg_apis_beval_v1alpha1_LocalContext(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.LoginSpec":             schema_pkg_apis_beval_v1alpha1_LoginSpec(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.Metadata":              schema_pkg_apis_beval_v1alpha1_Metadata(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.NodeStatus":            schema_pkg_apis_beval_v1alpha1_NodeStatus(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.beval":                 schema_pkg_apis_beval_v1alpha1_beval(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.bevalList":             schema_pkg_apis_beval_v1alpha1_bevalList(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.bevalSpec":             schema_pkg_apis_beval_v1alpha1_bevalSpec(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.bevalStatus":           schema_pkg_apis_beval_v1alpha1_bevalStatus(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.Param":                 schema_pkg_apis_beval_v1alpha1_Param(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.PlainCreds":            schema_pkg_apis_beval_v1alpha1_PlainCreds(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.PushSpec":              schema_pkg_apis_beval_v1alpha1_PushSpec(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.RegistryCreds":         schema_pkg_apis_beval_v1alpha1_RegistryCreds(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.S3Bucket":              schema_pkg_apis_beval_v1alpha1_S3Bucket(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.S3Context":             schema_pkg_apis_beval_v1alpha1_S3Context(ref),
+		"github.com/beval/beval/pkg/apis/beval/v1alpha1.Stage":                 schema_pkg_apis_beval_v1alpha1_Stage(ref),
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_AliyunOSSContext(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_AliyunOSSContext(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -77,13 +77,13 @@ func schema_pkg_apis_ocibuilder_v1alpha1_AliyunOSSContext(ref common.ReferenceCa
 					"accessId": {
 						SchemaProps: spec.SchemaProps{
 							Description: "AccessId refers to access id",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Credentials"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.Credentials"),
 						},
 					},
 					"accessSecret": {
 						SchemaProps: spec.SchemaProps{
 							Description: "AccessSecret refers to access secret",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Credentials"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.Credentials"),
 						},
 					},
 					"endpoint": {
@@ -96,7 +96,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_AliyunOSSContext(ref common.ReferenceCa
 					"bucket": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Bucket refers to the bucket name on gcs",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.S3Bucket"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.S3Bucket"),
 						},
 					},
 				},
@@ -104,11 +104,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_AliyunOSSContext(ref common.ReferenceCa
 			},
 		},
 		Dependencies: []string{
-			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Credentials", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.S3Bucket"},
+			"github.com/beval/beval/pkg/apis/beval/v1alpha1.Credentials", "github.com/beval/beval/pkg/apis/beval/v1alpha1.S3Bucket"},
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_AnsibleGalaxy(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_AnsibleGalaxy(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -136,7 +136,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_AnsibleGalaxy(ref common.ReferenceCallb
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_AnsibleLocal(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_AnsibleLocal(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -157,7 +157,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_AnsibleLocal(ref common.ReferenceCallba
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_AnsibleStep(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_AnsibleStep(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -167,24 +167,24 @@ func schema_pkg_apis_ocibuilder_v1alpha1_AnsibleStep(ref common.ReferenceCallbac
 					"local": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Local contains information to install a ansible role through local playbook",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AnsibleLocal"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.AnsibleLocal"),
 						},
 					},
 					"galaxy": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Galaxy contains information to install a ansible role through ansible-galaxy",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AnsibleGalaxy"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.AnsibleGalaxy"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AnsibleGalaxy", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AnsibleLocal"},
+			"github.com/beval/beval/pkg/apis/beval/v1alpha1.AnsibleGalaxy", "github.com/beval/beval/pkg/apis/beval/v1alpha1.AnsibleLocal"},
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_AzureBlobContext(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_AzureBlobContext(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -194,19 +194,19 @@ func schema_pkg_apis_ocibuilder_v1alpha1_AzureBlobContext(ref common.ReferenceCa
 					"account": {
 						SchemaProps: spec.SchemaProps{
 							Description: "AzureStorageAccount refers to the account name",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Credentials"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.Credentials"),
 						},
 					},
 					"accessKey": {
 						SchemaProps: spec.SchemaProps{
 							Description: "AccessKey refers to the access key",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Credentials"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.Credentials"),
 						},
 					},
 					"url": {
 						SchemaProps: spec.SchemaProps{
 							Description: "URL refers to blob's URL",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Credentials"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.Credentials"),
 						},
 					},
 				},
@@ -214,11 +214,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_AzureBlobContext(ref common.ReferenceCa
 			},
 		},
 		Dependencies: []string{
-			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Credentials"},
+			"github.com/beval/beval/pkg/apis/beval/v1alpha1.Credentials"},
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_Base(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_Base(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -252,7 +252,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_Base(ref common.ReferenceCallback) comm
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_BuildContext(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_BuildContext(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -262,48 +262,48 @@ func schema_pkg_apis_ocibuilder_v1alpha1_BuildContext(ref common.ReferenceCallba
 					"localContext": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Local context contains local context information for a build",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.LocalContext"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.LocalContext"),
 						},
 					},
 					"s3Context": {
 						SchemaProps: spec.SchemaProps{
 							Description: "S3Context refers to the context stored on S3 bucket for a build",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.S3Context"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.S3Context"),
 						},
 					},
 					"gitContext": {
 						SchemaProps: spec.SchemaProps{
 							Description: "GitContext refers to the context stored on Git repository",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.GitContext"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.GitContext"),
 						},
 					},
 					"gcsContext": {
 						SchemaProps: spec.SchemaProps{
 							Description: "GCSContext refers to the context stored on the GCS",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.GCSContext"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.GCSContext"),
 						},
 					},
 					"azureBlobContext": {
 						SchemaProps: spec.SchemaProps{
 							Description: "AzureBlobContext refers to the context stored on the Azure Storage Blob",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AzureBlobContext"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.AzureBlobContext"),
 						},
 					},
 					"aliyunOSSContext": {
 						SchemaProps: spec.SchemaProps{
 							Description: "AliyunOSSContext refers to the context stored on the Aliyun OSS",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AliyunOSSContext"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.AliyunOSSContext"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AliyunOSSContext", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AzureBlobContext", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.GCSContext", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.GitContext", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.LocalContext", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.S3Context"},
+			"github.com/beval/beval/pkg/apis/beval/v1alpha1.AliyunOSSContext", "github.com/beval/beval/pkg/apis/beval/v1alpha1.AzureBlobContext", "github.com/beval/beval/pkg/apis/beval/v1alpha1.GCSContext", "github.com/beval/beval/pkg/apis/beval/v1alpha1.GitContext", "github.com/beval/beval/pkg/apis/beval/v1alpha1.LocalContext", "github.com/beval/beval/pkg/apis/beval/v1alpha1.S3Context"},
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_BuildSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_BuildSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -322,7 +322,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_BuildSpec(ref common.ReferenceCallback)
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildTemplate"),
+										Ref: ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.BuildTemplate"),
 									},
 								},
 							},
@@ -340,7 +340,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_BuildSpec(ref common.ReferenceCallback)
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildStep"),
+										Ref: ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.BuildStep"),
 									},
 								},
 							},
@@ -351,11 +351,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_BuildSpec(ref common.ReferenceCallback)
 			},
 		},
 		Dependencies: []string{
-			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildStep", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildTemplate"},
+			"github.com/beval/beval/pkg/apis/beval/v1alpha1.BuildStep", "github.com/beval/beval/pkg/apis/beval/v1alpha1.BuildTemplate"},
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_BuildStep(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_BuildStep(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -381,7 +381,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_BuildStep(ref common.ReferenceCallback)
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Stage"),
+										Ref: ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.Stage"),
 									},
 								},
 							},
@@ -425,7 +425,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_BuildStep(ref common.ReferenceCallback)
 					"context": {
 						SchemaProps: spec.SchemaProps{
 							Description: "BuildContext used for image build default looks at the current working directory",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildContext"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.BuildContext"),
 						},
 					},
 				},
@@ -433,11 +433,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_BuildStep(ref common.ReferenceCallback)
 			},
 		},
 		Dependencies: []string{
-			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildContext", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Stage"},
+			"github.com/beval/beval/pkg/apis/beval/v1alpha1.BuildContext", "github.com/beval/beval/pkg/apis/beval/v1alpha1.Stage"},
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_BuildTemplate(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_BuildTemplate(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -463,7 +463,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_BuildTemplate(ref common.ReferenceCallb
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildTemplateStep"),
+										Ref: ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.BuildTemplateStep"),
 									},
 								},
 							},
@@ -474,11 +474,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_BuildTemplate(ref common.ReferenceCallb
 			},
 		},
 		Dependencies: []string{
-			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildTemplateStep"},
+			"github.com/beval/beval/pkg/apis/beval/v1alpha1.BuildTemplateStep"},
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_BuildTemplateStep(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_BuildTemplateStep(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -488,24 +488,24 @@ func schema_pkg_apis_ocibuilder_v1alpha1_BuildTemplateStep(ref common.ReferenceC
 					"docker": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Docker represents a docker step within build template steps",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.DockerStep"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.DockerStep"),
 						},
 					},
 					"ansible": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Ansible represents a ansible step within build template steps",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AnsibleStep"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.AnsibleStep"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AnsibleStep", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.DockerStep"},
+			"github.com/beval/beval/pkg/apis/beval/v1alpha1.AnsibleStep", "github.com/beval/beval/pkg/apis/beval/v1alpha1.DockerStep"},
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_Command(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_Command(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -592,7 +592,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_Command(ref common.ReferenceCallback) c
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_Credentials(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_Credentials(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -616,18 +616,18 @@ func schema_pkg_apis_ocibuilder_v1alpha1_Credentials(ref common.ReferenceCallbac
 					"kubeSecret": {
 						SchemaProps: spec.SchemaProps{
 							Description: "KubeSecret refers to K8s secret that holds the credentials",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.KubeSecretCredentials"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.KubeSecretCredentials"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.KubeSecretCredentials"},
+			"github.com/beval/beval/pkg/apis/beval/v1alpha1.KubeSecretCredentials"},
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_DockerStep(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_DockerStep(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -666,7 +666,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_DockerStep(ref common.ReferenceCallback
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_EnvCreds(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_EnvCreds(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -694,7 +694,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_EnvCreds(ref common.ReferenceCallback) 
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_GCSContext(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_GCSContext(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -711,7 +711,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_GCSContext(ref common.ReferenceCallback
 					"apiKey": {
 						SchemaProps: spec.SchemaProps{
 							Description: "APIKey for authentication",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Credentials"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.Credentials"),
 						},
 					},
 					"authRequired": {
@@ -731,7 +731,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_GCSContext(ref common.ReferenceCallback
 					"bucket": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Bucket refers to the bucket name on gcs",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.S3Bucket"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.S3Bucket"),
 						},
 					},
 					"region": {
@@ -746,11 +746,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_GCSContext(ref common.ReferenceCallback
 			},
 		},
 		Dependencies: []string{
-			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Credentials", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.S3Bucket"},
+			"github.com/beval/beval/pkg/apis/beval/v1alpha1.Credentials", "github.com/beval/beval/pkg/apis/beval/v1alpha1.S3Bucket"},
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_GitContext(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_GitContext(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -767,13 +767,13 @@ func schema_pkg_apis_ocibuilder_v1alpha1_GitContext(ref common.ReferenceCallback
 					"username": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Username for authentication",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Credentials"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.Credentials"),
 						},
 					},
 					"password": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Password for authentication",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Credentials"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.Credentials"),
 						},
 					},
 					"sshKeyPath": {
@@ -807,7 +807,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_GitContext(ref common.ReferenceCallback
 					"remote": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Remote to manage set of tracked repositories. Defaults to \"origin\". Refer https://git-scm.com/docs/git-remote",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.GitRemoteConfig"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.GitRemoteConfig"),
 						},
 					},
 				},
@@ -815,11 +815,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_GitContext(ref common.ReferenceCallback
 			},
 		},
 		Dependencies: []string{
-			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Credentials", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.GitRemoteConfig"},
+			"github.com/beval/beval/pkg/apis/beval/v1alpha1.Credentials", "github.com/beval/beval/pkg/apis/beval/v1alpha1.GitRemoteConfig"},
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_GitRemoteConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_GitRemoteConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -859,7 +859,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_GitRemoteConfig(ref common.ReferenceCal
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_ImageBuildArgs(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_ImageBuildArgs(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -890,7 +890,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_ImageBuildArgs(ref common.ReferenceCall
 					"ansible": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Ansible step outlines the ansible steps in the build *optional",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AnsibleStep"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.AnsibleStep"),
 						},
 					},
 					"purge": {
@@ -903,7 +903,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_ImageBuildArgs(ref common.ReferenceCall
 					"context": {
 						SchemaProps: spec.SchemaProps{
 							Description: "BuildContext is the context for Docker and Buildah defaults to LocalContext in current working directory",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildContext"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.BuildContext"),
 						},
 					},
 				},
@@ -911,11 +911,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_ImageBuildArgs(ref common.ReferenceCall
 			},
 		},
 		Dependencies: []string{
-			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.AnsibleStep", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildContext"},
+			"github.com/beval/beval/pkg/apis/beval/v1alpha1.AnsibleStep", "github.com/beval/beval/pkg/apis/beval/v1alpha1.BuildContext"},
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_K8sCreds(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_K8sCreds(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -943,7 +943,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_K8sCreds(ref common.ReferenceCallback) 
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_KubeSecretCredentials(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_KubeSecretCredentials(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -972,7 +972,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_KubeSecretCredentials(ref common.Refere
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_LocalContext(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_LocalContext(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -993,7 +993,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_LocalContext(ref common.ReferenceCallba
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_LoginSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_LoginSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -1016,7 +1016,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_LoginSpec(ref common.ReferenceCallback)
 					"creds": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Creds refer to credentials required to log into the registry",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.RegistryCreds"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.RegistryCreds"),
 						},
 					},
 				},
@@ -1024,11 +1024,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_LoginSpec(ref common.ReferenceCallback)
 			},
 		},
 		Dependencies: []string{
-			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.RegistryCreds"},
+			"github.com/beval/beval/pkg/apis/beval/v1alpha1.RegistryCreds"},
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_Metadata(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_Metadata(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -1079,11 +1079,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_Metadata(ref common.ReferenceCallback) 
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_NodeStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_NodeStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "NodeStatus describes the status for an individual node in the ocibuilder configurations. A single node can represent one configuration.",
+				Description: "NodeStatus describes the status for an individual node in the beval configurations. A single node can represent one configuration.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"id": {
@@ -1129,7 +1129,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_NodeStatus(ref common.ReferenceCallback
 					},
 					"updateTime": {
 						SchemaProps: spec.SchemaProps{
-							Description: "UpdateTime is the time when node(OCIBuilder configuration) was updated",
+							Description: "UpdateTime is the time when node(beval configuration) was updated",
 							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.MicroTime"),
 						},
 					},
@@ -1142,11 +1142,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_NodeStatus(ref common.ReferenceCallback
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilder(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_beval(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "OCIBuilder is the definition of a ocibuilder resource",
+				Description: "beval is the definition of a beval resource",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -1327,12 +1327,12 @@ func schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilder(ref common.ReferenceCallback
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.OCIBuilderSpec"),
+							Ref: ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.bevalSpec"),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.OCIBuilderStatus"),
+							Ref: ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.bevalStatus"),
 						},
 					},
 				},
@@ -1340,15 +1340,15 @@ func schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilder(ref common.ReferenceCallback
 			},
 		},
 		Dependencies: []string{
-			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.OCIBuilderSpec", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.OCIBuilderStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.Initializers", "k8s.io/apimachinery/pkg/apis/meta/v1.ManagedFieldsEntry", "k8s.io/apimachinery/pkg/apis/meta/v1.OwnerReference", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+			"github.com/beval/beval/pkg/apis/beval/v1alpha1.bevalSpec", "github.com/beval/beval/pkg/apis/beval/v1alpha1.bevalStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.Initializers", "k8s.io/apimachinery/pkg/apis/meta/v1.ManagedFieldsEntry", "k8s.io/apimachinery/pkg/apis/meta/v1.OwnerReference", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_bevalList(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "OCIBuilderList is the list of OCIBuilder resources.",
+				Description: "bevalList is the list of beval resources.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
@@ -1381,7 +1381,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderList(ref common.ReferenceCall
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.OCIBuilder"),
+										Ref: ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.beval"),
 									},
 								},
 							},
@@ -1392,15 +1392,15 @@ func schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderList(ref common.ReferenceCall
 			},
 		},
 		Dependencies: []string{
-			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.OCIBuilder", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+			"github.com/beval/beval/pkg/apis/beval/v1alpha1.beval", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_bevalSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "OCIBuilderSpec represents OCIBuilder specifications.",
+				Description: "bevalSpec represents beval specifications.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"params": {
@@ -1415,7 +1415,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderSpec(ref common.ReferenceCall
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Param"),
+										Ref: ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.Param"),
 									},
 								},
 							},
@@ -1433,7 +1433,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderSpec(ref common.ReferenceCall
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.LoginSpec"),
+										Ref: ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.LoginSpec"),
 									},
 								},
 							},
@@ -1442,7 +1442,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderSpec(ref common.ReferenceCall
 					"build": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Build represents the build specifications for images",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildSpec"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.BuildSpec"),
 						},
 					},
 					"push": {
@@ -1457,7 +1457,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderSpec(ref common.ReferenceCall
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.PushSpec"),
+										Ref: ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.PushSpec"),
 									},
 								},
 							},
@@ -1467,46 +1467,46 @@ func schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderSpec(ref common.ReferenceCall
 			},
 		},
 		Dependencies: []string{
-			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildSpec", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.LoginSpec", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Param", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.PushSpec"},
+			"github.com/beval/beval/pkg/apis/beval/v1alpha1.BuildSpec", "github.com/beval/beval/pkg/apis/beval/v1alpha1.LoginSpec", "github.com/beval/beval/pkg/apis/beval/v1alpha1.Param", "github.com/beval/beval/pkg/apis/beval/v1alpha1.PushSpec"},
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_bevalStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "OCIBuilderStatus holds the status of a OCIBuilder resource",
+				Description: "bevalStatus holds the status of a beval resource",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"phase": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Phase is the high-level summary of the OCIBuilder",
+							Description: "Phase is the high-level summary of the beval",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"startedAt": {
 						SchemaProps: spec.SchemaProps{
-							Description: "StartedAt is the time at which this OCIBuilder was initiated",
+							Description: "StartedAt is the time at which this beval was initiated",
 							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
 						},
 					},
 					"message": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Message is a human readable string indicating details about a OCIBuilder in its phase",
+							Description: "Message is a human readable string indicating details about a beval in its phase",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"nodes": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Nodes is a mapping between a node ID and the node's status it records the states for the configurations of OCIBuilder.",
+							Description: "Nodes is a mapping between a node ID and the node's status it records the states for the configurations of beval.",
 							Type:        []string{"object"},
 							AdditionalProperties: &spec.SchemaOrBool{
 								Allows: true,
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.NodeStatus"),
+										Ref: ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.NodeStatus"),
 									},
 								},
 							},
@@ -1517,11 +1517,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_OCIBuilderStatus(ref common.ReferenceCa
 			},
 		},
 		Dependencies: []string{
-			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.NodeStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+			"github.com/beval/beval/pkg/apis/beval/v1alpha1.NodeStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_Param(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_Param(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -1556,7 +1556,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_Param(ref common.ReferenceCallback) com
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_PlainCreds(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_PlainCreds(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -1582,7 +1582,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_PlainCreds(ref common.ReferenceCallback
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_PushSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_PushSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -1638,7 +1638,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_PushSpec(ref common.ReferenceCallback) 
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_RegistryCreds(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_RegistryCreds(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -1648,30 +1648,30 @@ func schema_pkg_apis_ocibuilder_v1alpha1_RegistryCreds(ref common.ReferenceCallb
 					"k8s": {
 						SchemaProps: spec.SchemaProps{
 							Description: "K8s refer to the credentials stored in K8s secrets",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.K8sCreds"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.K8sCreds"),
 						},
 					},
 					"env": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Env refers to the credentials stored in environment variables",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.EnvCreds"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.EnvCreds"),
 						},
 					},
 					"plain": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Plain refers to the credentials set inline",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.PlainCreds"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.PlainCreds"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.EnvCreds", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.K8sCreds", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.PlainCreds"},
+			"github.com/beval/beval/pkg/apis/beval/v1alpha1.EnvCreds", "github.com/beval/beval/pkg/apis/beval/v1alpha1.K8sCreds", "github.com/beval/beval/pkg/apis/beval/v1alpha1.PlainCreds"},
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_S3Bucket(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_S3Bucket(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -1697,7 +1697,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_S3Bucket(ref common.ReferenceCallback) 
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_S3Context(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_S3Context(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -1712,7 +1712,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_S3Context(ref common.ReferenceCallback)
 					},
 					"bucket": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.S3Bucket"),
+							Ref: ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.S3Bucket"),
 						},
 					},
 					"region": {
@@ -1729,12 +1729,12 @@ func schema_pkg_apis_ocibuilder_v1alpha1_S3Context(ref common.ReferenceCallback)
 					},
 					"accessKey": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Credentials"),
+							Ref: ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.Credentials"),
 						},
 					},
 					"secretKey": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Credentials"),
+							Ref: ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.Credentials"),
 						},
 					},
 				},
@@ -1742,11 +1742,11 @@ func schema_pkg_apis_ocibuilder_v1alpha1_S3Context(ref common.ReferenceCallback)
 			},
 		},
 		Dependencies: []string{
-			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Credentials", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.S3Bucket"},
+			"github.com/beval/beval/pkg/apis/beval/v1alpha1.Credentials", "github.com/beval/beval/pkg/apis/beval/v1alpha1.S3Bucket"},
 	}
 }
 
-func schema_pkg_apis_ocibuilder_v1alpha1_Stage(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_beval_v1alpha1_Stage(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -1756,7 +1756,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_Stage(ref common.ReferenceCallback) com
 					"base": {
 						SchemaProps: spec.SchemaProps{
 							Description: "BaseImage refers to parent image for given build stage.",
-							Ref:         ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Base"),
+							Ref:         ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.Base"),
 						},
 					},
 					"template": {
@@ -1778,7 +1778,7 @@ func schema_pkg_apis_ocibuilder_v1alpha1_Stage(ref common.ReferenceCallback) com
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildTemplateStep"),
+										Ref: ref("github.com/beval/beval/pkg/apis/beval/v1alpha1.BuildTemplateStep"),
 									},
 								},
 							},
@@ -1789,6 +1789,6 @@ func schema_pkg_apis_ocibuilder_v1alpha1_Stage(ref common.ReferenceCallback) com
 			},
 		},
 		Dependencies: []string{
-			"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.Base", "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1.BuildTemplateStep"},
+			"github.com/beval/beval/pkg/apis/beval/v1alpha1.Base", "github.com/beval/beval/pkg/apis/beval/v1alpha1.BuildTemplateStep"},
 	}
 }

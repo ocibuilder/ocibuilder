@@ -5,12 +5,12 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRequestRemoteNoAuth(t *testing.T) {
-	url := "https://raw.githubusercontent.com/ocibuilder/ocibuilder/master/testing/dummy/overlay_overlay_test.yaml"
+	url := "https://raw.githubusercontent.com/beval/beval/master/testing/dummy/overlay_overlay_test.yaml"
 	filepath := "../../testing/dummy/downloaded_overlay.yaml"
 
 	defer os.Remove(filepath)

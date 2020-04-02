@@ -17,10 +17,10 @@ limitations under the License.
 
 package v1alpha1
 
-// OCIBuilderListerExpansion allows custom methods to be added to
-// OCIBuilderLister.
-type OCIBuilderListerExpansion interface{}
+// bevalListerExpansion allows custom methods to be added to
+// bevalLister.
+type bevalListerExpansion interface{}
 
-// OCIBuilderNamespaceListerExpansion allows custom methods to be added to
-// OCIBuilderNamespaceLister.
-type OCIBuilderNamespaceListerExpansion interface{}
+// bevalNamespaceListerExpansion allows custom methods to be added to
+// bevalNamespaceLister.
+type bevalNamespaceListerExpansion interface{}

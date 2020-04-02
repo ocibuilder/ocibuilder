@@ -1,7 +1,7 @@
 package e2e
 
 import (
-	"github.com/ocibuilder/ocibuilder/testing/e2e/resources/utils"
+	"github.com/beval/beval/testing/e2e/resources/utils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
@@ -37,7 +37,7 @@ var _ = Describe("ocictl buildah", func() {
 	}, 25)
 
 	It("completes a pull and exits with status code 0", func() {
-		args := []string{"pull", "-b", "buildah", "-i", "ocibuildere2e/go-test-service:v0.1.0", "-p", "./resources/go-test-service", "-d"}
+		args := []string{"pull", "-b", "buildah", "-i", "bevale2e/go-test-service:v0.1.0", "-p", "./resources/go-test-service", "-d"}
 		session = utils.RunOcictl(ocictlPath, args)
 		Eventually(func() *gexec.Session {
 			return session

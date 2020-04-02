@@ -20,54 +20,54 @@ package v1alpha1
 import (
 	"time"
 
-	v1alpha1 "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	scheme "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned/scheme"
+	v1alpha1 "github.com/beval/beval/pkg/apis/beval/v1alpha1"
+	scheme "github.com/beval/beval/pkg/client/beval/clientset/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	rest "k8s.io/client-go/rest"
 )
 
-// OCIBuildersGetter has a method to return a OCIBuilderInterface.
+// bevalsGetter has a method to return a bevalInterface.
 // A group's client should implement this interface.
-type OCIBuildersGetter interface {
-	OCIBuilders(namespace string) OCIBuilderInterface
+type bevalsGetter interface {
+	bevals(namespace string) bevalInterface
 }
 
-// OCIBuilderInterface has methods to work with OCIBuilder resources.
-type OCIBuilderInterface interface {
-	Create(*v1alpha1.OCIBuilder) (*v1alpha1.OCIBuilder, error)
-	Update(*v1alpha1.OCIBuilder) (*v1alpha1.OCIBuilder, error)
-	UpdateStatus(*v1alpha1.OCIBuilder) (*v1alpha1.OCIBuilder, error)
+// bevalInterface has methods to work with beval resources.
+type bevalInterface interface {
+	Create(*v1alpha1.beval) (*v1alpha1.beval, error)
+	Update(*v1alpha1.beval) (*v1alpha1.beval, error)
+	UpdateStatus(*v1alpha1.beval) (*v1alpha1.beval, error)
 	Delete(name string, options *v1.DeleteOptions) error
 	DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error
-	Get(name string, options v1.GetOptions) (*v1alpha1.OCIBuilder, error)
-	List(opts v1.ListOptions) (*v1alpha1.OCIBuilderList, error)
+	Get(name string, options v1.GetOptions) (*v1alpha1.beval, error)
+	List(opts v1.ListOptions) (*v1alpha1.bevalList, error)
 	Watch(opts v1.ListOptions) (watch.Interface, error)
-	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.OCIBuilder, err error)
-	OCIBuilderExpansion
+	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.beval, err error)
+	bevalExpansion
 }
 
-// oCIBuilders implements OCIBuilderInterface
-type oCIBuilders struct {
+// bevals implements bevalInterface
+type bevals struct {
 	client rest.Interface
 	ns     string
 }
 
-// newOCIBuilders returns a OCIBuilders
-func newOCIBuilders(c *OcibuilderV1alpha1Client, namespace string) *oCIBuilders {
-	return &oCIBuilders{
+// newbevals returns a bevals
+func newbevals(c *bevalV1alpha1Client, namespace string) *bevals {
+	return &bevals{
 		client: c.RESTClient(),
 		ns:     namespace,
 	}
 }
 
-// Get takes name of the oCIBuilder, and returns the corresponding oCIBuilder object, and an error if there is any.
-func (c *oCIBuilders) Get(name string, options v1.GetOptions) (result *v1alpha1.OCIBuilder, err error) {
-	result = &v1alpha1.OCIBuilder{}
+// Get takes name of the beval, and returns the corresponding beval object, and an error if there is any.
+func (c *bevals) Get(name string, options v1.GetOptions) (result *v1alpha1.beval, err error) {
+	result = &v1alpha1.beval{}
 	err = c.client.Get().
 		Namespace(c.ns).
-		Resource("ocibuilders").
+		Resource("bevals").
 		Name(name).
 		VersionedParams(&options, scheme.ParameterCodec).
 		Do().
@@ -75,16 +75,16 @@ func (c *oCIBuilders) Get(name string, options v1.GetOptions) (result *v1alpha1.
 	return
 }
 
-// List takes label and field selectors, and returns the list of OCIBuilders that match those selectors.
-func (c *oCIBuilders) List(opts v1.ListOptions) (result *v1alpha1.OCIBuilderList, err error) {
+// List takes label and field selectors, and returns the list of bevals that match those selectors.
+func (c *bevals) List(opts v1.ListOptions) (result *v1alpha1.bevalList, err error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
 	}
-	result = &v1alpha1.OCIBuilderList{}
+	result = &v1alpha1.bevalList{}
 	err = c.client.Get().
 		Namespace(c.ns).
-		Resource("ocibuilders").
+		Resource("bevals").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
 		Do().
@@ -92,8 +92,8 @@ func (c *oCIBuilders) List(opts v1.ListOptions) (result *v1alpha1.OCIBuilderList
 	return
 }
 
-// Watch returns a watch.Interface that watches the requested oCIBuilders.
-func (c *oCIBuilders) Watch(opts v1.ListOptions) (watch.Interface, error) {
+// Watch returns a watch.Interface that watches the requested bevals.
+func (c *bevals) Watch(opts v1.ListOptions) (watch.Interface, error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
@@ -101,32 +101,32 @@ func (c *oCIBuilders) Watch(opts v1.ListOptions) (watch.Interface, error) {
 	opts.Watch = true
 	return c.client.Get().
 		Namespace(c.ns).
-		Resource("ocibuilders").
+		Resource("bevals").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
 		Watch()
 }
 
-// Create takes the representation of a oCIBuilder and creates it.  Returns the server's representation of the oCIBuilder, and an error, if there is any.
-func (c *oCIBuilders) Create(oCIBuilder *v1alpha1.OCIBuilder) (result *v1alpha1.OCIBuilder, err error) {
-	result = &v1alpha1.OCIBuilder{}
+// Create takes the representation of a beval and creates it.  Returns the server's representation of the beval, and an error, if there is any.
+func (c *bevals) Create(beval *v1alpha1.beval) (result *v1alpha1.beval, err error) {
+	result = &v1alpha1.beval{}
 	err = c.client.Post().
 		Namespace(c.ns).
-		Resource("ocibuilders").
-		Body(oCIBuilder).
+		Resource("bevals").
+		Body(beval).
 		Do().
 		Into(result)
 	return
 }
 
-// Update takes the representation of a oCIBuilder and updates it. Returns the server's representation of the oCIBuilder, and an error, if there is any.
-func (c *oCIBuilders) Update(oCIBuilder *v1alpha1.OCIBuilder) (result *v1alpha1.OCIBuilder, err error) {
-	result = &v1alpha1.OCIBuilder{}
+// Update takes the representation of a beval and updates it. Returns the server's representation of the beval, and an error, if there is any.
+func (c *bevals) Update(beval *v1alpha1.beval) (result *v1alpha1.beval, err error) {
+	result = &v1alpha1.beval{}
 	err = c.client.Put().
 		Namespace(c.ns).
-		Resource("ocibuilders").
-		Name(oCIBuilder.Name).
-		Body(oCIBuilder).
+		Resource("bevals").
+		Name(beval.Name).
+		Body(beval).
 		Do().
 		Into(result)
 	return
@@ -135,24 +135,24 @@ func (c *oCIBuilders) Update(oCIBuilder *v1alpha1.OCIBuilder) (result *v1alpha1.
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
 
-func (c *oCIBuilders) UpdateStatus(oCIBuilder *v1alpha1.OCIBuilder) (result *v1alpha1.OCIBuilder, err error) {
-	result = &v1alpha1.OCIBuilder{}
+func (c *bevals) UpdateStatus(beval *v1alpha1.beval) (result *v1alpha1.beval, err error) {
+	result = &v1alpha1.beval{}
 	err = c.client.Put().
 		Namespace(c.ns).
-		Resource("ocibuilders").
-		Name(oCIBuilder.Name).
+		Resource("bevals").
+		Name(beval.Name).
 		SubResource("status").
-		Body(oCIBuilder).
+		Body(beval).
 		Do().
 		Into(result)
 	return
 }
 
-// Delete takes name of the oCIBuilder and deletes it. Returns an error if one occurs.
-func (c *oCIBuilders) Delete(name string, options *v1.DeleteOptions) error {
+// Delete takes name of the beval and deletes it. Returns an error if one occurs.
+func (c *bevals) Delete(name string, options *v1.DeleteOptions) error {
 	return c.client.Delete().
 		Namespace(c.ns).
-		Resource("ocibuilders").
+		Resource("bevals").
 		Name(name).
 		Body(options).
 		Do().
@@ -160,14 +160,14 @@ func (c *oCIBuilders) Delete(name string, options *v1.DeleteOptions) error {
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *oCIBuilders) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
+func (c *bevals) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
 	var timeout time.Duration
 	if listOptions.TimeoutSeconds != nil {
 		timeout = time.Duration(*listOptions.TimeoutSeconds) * time.Second
 	}
 	return c.client.Delete().
 		Namespace(c.ns).
-		Resource("ocibuilders").
+		Resource("bevals").
 		VersionedParams(&listOptions, scheme.ParameterCodec).
 		Timeout(timeout).
 		Body(options).
@@ -175,12 +175,12 @@ func (c *oCIBuilders) DeleteCollection(options *v1.DeleteOptions, listOptions v1
 		Error()
 }
 
-// Patch applies the patch and returns the patched oCIBuilder.
-func (c *oCIBuilders) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.OCIBuilder, err error) {
-	result = &v1alpha1.OCIBuilder{}
+// Patch applies the patch and returns the patched beval.
+func (c *bevals) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.beval, err error) {
+	result = &v1alpha1.beval{}
 	err = c.client.Patch(pt).
 		Namespace(c.ns).
-		Resource("ocibuilders").
+		Resource("bevals").
 		SubResource(subresources...).
 		Name(name).
 		Body(data).

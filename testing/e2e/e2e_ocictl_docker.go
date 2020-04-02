@@ -3,7 +3,7 @@ package e2e
 import (
 	"os"
 
-	"github.com/ocibuilder/ocibuilder/testing/e2e/resources/utils"
+	"github.com/beval/beval/testing/e2e/resources/utils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
@@ -19,8 +19,8 @@ var _ = Describe("ocictl docker", func() {
 
 	AfterSuite(func() {
 		gexec.CleanupBuildArtifacts()
-		if _, err := os.Stat("./ocibuilder.yaml"); err == nil {
-			os.Remove("ocibuilder.yaml")
+		if _, err := os.Stat("./beval.yaml"); err == nil {
+			os.Remove("beval.yaml")
 		}
 	})
 

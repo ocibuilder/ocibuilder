@@ -20,69 +20,69 @@ package v1alpha1
 import (
 	time "time"
 
-	ocibuilderv1alpha1 "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	versioned "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned"
-	internalinterfaces "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/informers/externalversions/internalinterfaces"
-	v1alpha1 "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/listers/ocibuilder/v1alpha1"
+	bevalv1alpha1 "github.com/beval/beval/pkg/apis/beval/v1alpha1"
+	versioned "github.com/beval/beval/pkg/client/beval/clientset/versioned"
+	internalinterfaces "github.com/beval/beval/pkg/client/beval/informers/externalversions/internalinterfaces"
+	v1alpha1 "github.com/beval/beval/pkg/client/beval/listers/beval/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
 	cache "k8s.io/client-go/tools/cache"
 )
 
-// OCIBuilderInformer provides access to a shared informer and lister for
-// OCIBuilders.
-type OCIBuilderInformer interface {
+// bevalInformer provides access to a shared informer and lister for
+// bevals.
+type bevalInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.OCIBuilderLister
+	Lister() v1alpha1.bevalLister
 }
 
-type oCIBuilderInformer struct {
+type bevalInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
 	namespace        string
 }
 
-// NewOCIBuilderInformer constructs a new informer for OCIBuilder type.
+// NewbevalInformer constructs a new informer for beval type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewOCIBuilderInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredOCIBuilderInformer(client, namespace, resyncPeriod, indexers, nil)
+func NewbevalInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredbevalInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
-// NewFilteredOCIBuilderInformer constructs a new informer for OCIBuilder type.
+// NewFilteredbevalInformer constructs a new informer for beval type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredOCIBuilderInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredbevalInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.OcibuilderV1alpha1().OCIBuilders(namespace).List(options)
+				return client.bevalV1alpha1().bevals(namespace).List(options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.OcibuilderV1alpha1().OCIBuilders(namespace).Watch(options)
+				return client.bevalV1alpha1().bevals(namespace).Watch(options)
 			},
 		},
-		&ocibuilderv1alpha1.OCIBuilder{},
+		&bevalv1alpha1.beval{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *oCIBuilderInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredOCIBuilderInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *bevalInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+	return NewFilteredbevalInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *oCIBuilderInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&ocibuilderv1alpha1.OCIBuilder{}, f.defaultInformer)
+func (f *bevalInformer) Informer() cache.SharedIndexInformer {
+	return f.factory.InformerFor(&bevalv1alpha1.beval{}, f.defaultInformer)
 }
 
-func (f *oCIBuilderInformer) Lister() v1alpha1.OCIBuilderLister {
-	return v1alpha1.NewOCIBuilderLister(f.Informer().GetIndexer())
+func (f *bevalInformer) Lister() v1alpha1.bevalLister {
+	return v1alpha1.NewbevalLister(f.Informer().GetIndexer())
 }

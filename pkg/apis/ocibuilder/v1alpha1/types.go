@@ -21,9 +21,9 @@ import (
 	"io"
 	"time"
 
+	"github.com/beval/beval/pkg/command"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/registry"
-	"github.com/ocibuilder/ocibuilder/pkg/command"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -70,28 +70,28 @@ const (
 	Image MetadataType = "image"
 )
 
-// OCIBuilder is the definition of a ocibuilder resource
+// beval is the definition of a beval resource
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +k8s:openapi-gen=true
-type OCIBuilder struct {
+type beval struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:",inline" protobuf:"bytes,1,name=metadata"`
-	Spec              OCIBuilderSpec   `json:"spec" protobuf:"bytes,2,name=spec"`
-	Status            OCIBuilderStatus `json:"status" protobuf:"bytes,3,name=status"`
+	Spec              bevalSpec   `json:"spec" protobuf:"bytes,2,name=spec"`
+	Status            bevalStatus `json:"status" protobuf:"bytes,3,name=status"`
 }
 
-// OCIBuilderList is the list of OCIBuilder resources.
+// bevalList is the list of beval resources.
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-type OCIBuilderList struct {
+type bevalList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata" protobuf:"bytes,1,name=metadata"`
 	// +listType=map
-	Items []OCIBuilder `json:"items" protobuf:"bytes,2,name=items"`
+	Items []beval `json:"items" protobuf:"bytes,2,name=items"`
 }
 
-// OCIBuilderSpec represents OCIBuilder specifications.
-type OCIBuilderSpec struct {
+// bevalSpec represents beval specifications.
+type bevalSpec struct {
 	// Envs are the list of environment variables available to components.
 	// +optional
 	// +listType=map
@@ -116,16 +116,16 @@ type OCIBuilderSpec struct {
 	Metadata *Metadata `json:"metadata,omitempty" protobuf:"bytes,6,opt,name=metadata"`
 }
 
-// OCIBuilderStatus holds the status of a OCIBuilder resource
-type OCIBuilderStatus struct {
-	// Phase is the high-level summary of the OCIBuilder
+// bevalStatus holds the status of a beval resource
+type bevalStatus struct {
+	// Phase is the high-level summary of the beval
 	Phase NodePhase `json:"phase" protobuf:"bytes,1,opt,name=phase"`
-	// StartedAt is the time at which this OCIBuilder was initiated
+	// StartedAt is the time at which this beval was initiated
 	StartedAt metav1.Time `json:"startedAt,omitempty" protobuf:"bytes,2,opt,name=startedAt"`
-	// Message is a human readable string indicating details about a OCIBuilder in its phase
+	// Message is a human readable string indicating details about a beval in its phase
 	Message string `json:"message,omitempty" protobuf:"bytes,4,opt,name=message"`
 	// Nodes is a mapping between a node ID and the node's status
-	// it records the states for the configurations of OCIBuilder.
+	// it records the states for the configurations of beval.
 	Nodes map[string]*NodeStatus `json:"nodes" protobuf:"bytes,1,name=nodes"`
 }
 
@@ -338,7 +338,7 @@ type PushSpec struct {
 	Overlay string `json:"overlay" protobuf:"bytes,7,name=overlay"`
 }
 
-// NodeStatus describes the status for an individual node in the ocibuilder configurations.
+// NodeStatus describes the status for an individual node in the beval configurations.
 // A single node can represent one configuration.
 type NodeStatus struct {
 	// ID is a unique identifier of a node within build steps
@@ -354,7 +354,7 @@ type NodeStatus struct {
 	StartedAt metav1.MicroTime `json:"startedAt,omitempty" protobuf:"bytes,7,opt,name=startedAt"`
 	// Message store data or something to save for configuration
 	Message string `json:"message,omitempty" protobuf:"bytes,8,opt,name=message"`
-	// UpdateTime is the time when node(OCIBuilder configuration) was updated
+	// UpdateTime is the time when node(beval configuration) was updated
 	UpdateTime metav1.MicroTime `json:"updateTime,omitempty" protobuf:"bytes,9,opt,name=updateTime"`
 }
 
@@ -568,7 +568,7 @@ type BuildProvenance struct {
 	ID string `json:"id,omitempty"`
 }
 
-// OCIBuildOptions are the build options for an ocibuilder build
+// OCIBuildOptions are the build options for an beval build
 type OCIBuildOptions struct {
 	// ImageBuildOptions are standard Docker API image build options
 	types.ImageBuildOptions `json:"imageBuildOptions,inline" protobuf:"bytes,1,name=imageBuildOptions"`
@@ -582,7 +582,7 @@ type OCIBuildOptions struct {
 	StorageDriver string `json:"storageDriver" protobuf:"bytes,5,name=storageDriver"`
 }
 
-// OCIBuildResponse is the build response from an ocibuilder build
+// OCIBuildResponse is the build response from an beval build
 type OCIBuildResponse struct {
 	// ImageBuildResponse is standard build response from the Docker API
 	types.ImageBuildResponse `json:"imageBuildResponse,inline" protobuf:"bytes,1,name=imageBuildResponse"`
@@ -594,7 +594,7 @@ type OCIBuildResponse struct {
 	Finished bool
 }
 
-// OCIPullOptions are the pull options for an ocibuilder pull
+// OCIPullOptions are the pull options for an beval pull
 type OCIPullOptions struct {
 	// ImagePullOptions are the standard Docker API pull options
 	types.ImagePullOptions `json:"imagePullOptions,inline" protobuf:"bytes,1,name=imagePullOptions"`
@@ -604,9 +604,9 @@ type OCIPullOptions struct {
 	Ctx ctx.Context `json:"ctx,inline" protobuf:"bytes3,name=ctx"`
 }
 
-// OCIPullResponse is the pull response from an ocibuilder pull
+// OCIPullResponse is the pull response from an beval pull
 type OCIPullResponse struct {
-	// Body is the body of the response from an ocibuilder pull
+	// Body is the body of the response from an beval pull
 	Body io.ReadCloser `json:"body,inline" protobuf:"bytes,1,name=body"`
 	// Exec is part of the response for Buildah command executions
 	Exec *command.Command `json:"exec,inline" protobuf:"bytes,2,name=exec"`
@@ -614,7 +614,7 @@ type OCIPullResponse struct {
 	Stderr io.ReadCloser `json:"stderr,inline" protobuf:"bytes,3,name=stderr"`
 }
 
-// OCIPushOptions are the pull options for an ocibuilder push
+// OCIPushOptions are the pull options for an beval push
 type OCIPushOptions struct {
 	// ImagePushOptions are the standard Docker API push options
 	types.ImagePushOptions `json:"imagePushOptions,inline" protobuf:"bytes,1,name=imagePushOptions"`
@@ -624,9 +624,9 @@ type OCIPushOptions struct {
 	Ctx ctx.Context `json:"ctx,inline" protobuf:"bytes3,name=ctx"`
 }
 
-// OCIPushResponse is the push response from an ocibuilder push
+// OCIPushResponse is the push response from an beval push
 type OCIPushResponse struct {
-	// Body is the body of the response from an ocibuilder push
+	// Body is the body of the response from an beval push
 	Body io.ReadCloser `json:"body,inline" protobuf:"bytes,1,name=body"`
 	// Exec is part of the response for Buildah command executions
 	Exec *command.Command `json:"exec,inline" protobuf:"bytes,2,name=exec"`
@@ -636,7 +636,7 @@ type OCIPushResponse struct {
 	Finished bool
 }
 
-// OCIRemoveOptions are the remove options for an ocibuilder remove
+// OCIRemoveOptions are the remove options for an beval remove
 type OCIRemoveOptions struct {
 	// ImageRemoveOptions are the standard Docker API remove options
 	types.ImageRemoveOptions `json:"imageRemoveOptions,inline" protobuf:"bytes,1,name=imageRemoveOptions"`
@@ -646,7 +646,7 @@ type OCIRemoveOptions struct {
 	Ctx ctx.Context `json:"ctx,inline" protobuf:"bytes,3,name=ctx"`
 }
 
-// OCIRemoveResponse is the response from an ocibuilder remove
+// OCIRemoveResponse is the response from an beval remove
 type OCIRemoveResponse struct {
 	// Response are the responses from an image delete
 	Response []types.ImageDeleteResponseItem `json:"response,inline" protobuf:"bytes,1,name=response"`
@@ -656,7 +656,7 @@ type OCIRemoveResponse struct {
 	Stderr io.ReadCloser `json:"stderr,inline" protobuf:"bytes,3,name=stderr"`
 }
 
-// OCILoginOptions are the login options for an ocibuilder login
+// OCILoginOptions are the login options for an beval login
 type OCILoginOptions struct {
 	// AuthConfig is the standard auth config for the Docker API
 	types.AuthConfig `json:"authConfig,inline" protobuf:"bytes,1,name=authConfig"`
@@ -664,7 +664,7 @@ type OCILoginOptions struct {
 	Ctx ctx.Context `json:"ctx,inline" protobuf:"bytes,2,name=ctx"`
 }
 
-// OCILoginResponse is the login response from an ocibuilder login
+// OCILoginResponse is the login response from an beval login
 type OCILoginResponse struct {
 	// AuthenticateOKBody is the standar login response from the Docker API
 	registry.AuthenticateOKBody
@@ -696,7 +696,7 @@ type BuildGenTemplate struct {
 	Cmds []string
 }
 
-// Metadata is where metadata to store is defined in the ocibuilder specification
+// Metadata is where metadata to store is defined in the beval specification
 type Metadata struct {
 	// StoreType is the metadata store type to push metadata to
 	StoreConfig *StoreConfig `json:"storeConfig,omitempty" protobuf:"bytes,1,opt,name=storeConfig"`

@@ -18,22 +18,22 @@ limitations under the License.
 package fake
 
 import (
-	v1alpha1 "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/clientset/versioned/typed/ocibuilder/v1alpha1"
+	v1alpha1 "github.com/beval/beval/pkg/client/beval/clientset/versioned/typed/beval/v1alpha1"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )
 
-type FakeOcibuilderV1alpha1 struct {
+type FakebevalV1alpha1 struct {
 	*testing.Fake
 }
 
-func (c *FakeOcibuilderV1alpha1) OCIBuilders(namespace string) v1alpha1.OCIBuilderInterface {
-	return &FakeOCIBuilders{c, namespace}
+func (c *FakebevalV1alpha1) bevals(namespace string) v1alpha1.bevalInterface {
+	return &Fakebevals{c, namespace}
 }
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *FakeOcibuilderV1alpha1) RESTClient() rest.Interface {
+func (c *FakebevalV1alpha1) RESTClient() rest.Interface {
 	var ret *rest.RESTClient
 	return ret
 }

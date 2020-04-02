@@ -17,7 +17,7 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/ocibuilder/ocibuilder/pkg/util"
+	"github.com/beval/beval/pkg/util"
 	"github.com/spf13/cobra"
 )
 
@@ -31,7 +31,7 @@ const rootDesc = `
 \____/\___/_/\___/\__/_/   
                            
                          
-The ocictl is a tool offered by ocibuilder for pulling, building and
+The ocictl is a tool offered by beval for pulling, building and
 pushing your images using your specified build framework.
 `
 
@@ -39,7 +39,7 @@ pushing your images using your specified build framework.
 func NewRootCmd(args []string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "ocictl",
-		Short: "The ocictl provided by ocibuilder",
+		Short: "The ocictl provided by beval",
 		Long:  rootDesc,
 	}
 	flags := cmd.PersistentFlags()

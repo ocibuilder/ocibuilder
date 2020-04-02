@@ -1,3 +1,3 @@
 FROM centos:7
-COPY dist/ocibuilder-controller /bin/
-ENTRYPOINT [ "/bin/ocibuilder-controller" ]
+COPY dist/beval-controller /bin/
+ENTRYPOINT [ "/bin/beval-controller" ]

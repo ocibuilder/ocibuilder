@@ -14,7 +14,7 @@
 
 * **Image Diff** - support for running container diff on previously built images using [container-diff](https://github.com/GoogleContainerTools/container-diff).
 Allows you to easily spot differences in image dependencies.
-* **Operator** - kubernetes operator for the ocibuilder allowing you to build images using kubectl.
+* **Operator** - kubernetes operator for the beval allowing you to build images using kubectl.
 * **Caching** - caching of image layers
 * **Multi Stage Purging** - enhance purging to remove image stages in a multi-stage build
 * **Metadata Metrics Storage** - webhook for accessing image build metadata

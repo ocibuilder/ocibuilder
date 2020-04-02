@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # This install script is intended to download and install the latest available
-# release of the ocictl from ocibuilder.
+# release of the ocictl from beval.
 #
 # It attempts to identify the current platform and an error will be thrown if
 # the platform is not supported.
@@ -10,11 +10,11 @@
 # - INSTALL_DIRECTORY (optional): defaults to $GOPATH/bin
 #
 # You can install using this script:
-# $ curl https://raw.githubusercontent.com/ocibuilder/ocibuilder/master/install.sh | sh
+# $ curl https://raw.githubusercontent.com/beval/beval/master/install.sh | sh
 
 set -e
 
-RELEASES_URL="https://github.com/ocibuilder/ocibuilder/releases"
+RELEASES_URL="https://github.com/beval/beval/releases"
 LATEST_VERSION=$(curl --silent "$RELEASES_URL/latest" | sed 's#.*tag/\(.*\)\".*#\1#')
 DOWNLOAD_BIN="ocictl/ocictl"
 

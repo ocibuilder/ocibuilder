@@ -16,10 +16,10 @@ limitations under the License.
 
 package dummy
 
-import "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+import "github.com/beval/beval/pkg/apis/beval/v1alpha1"
 
 // Spec is a dummy spec
-var Spec = v1alpha1.OCIBuilderSpec{
+var Spec = v1alpha1.bevalSpec{
 	Build: BuildSpec,
 	Login: LoginSpec,
 	Push:  PushSpec,

@@ -18,13 +18,13 @@ limitations under the License.
 package v1alpha1
 
 import (
-	internalinterfaces "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/informers/externalversions/internalinterfaces"
+	internalinterfaces "github.com/beval/beval/pkg/client/beval/informers/externalversions/internalinterfaces"
 )
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
-	// OCIBuilders returns a OCIBuilderInformer.
-	OCIBuilders() OCIBuilderInformer
+	// bevals returns a bevalInformer.
+	bevals() bevalInformer
 }
 
 type version struct {
@@ -38,7 +38,7 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// OCIBuilders returns a OCIBuilderInformer.
-func (v *version) OCIBuilders() OCIBuilderInformer {
-	return &oCIBuilderInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+// bevals returns a bevalInformer.
+func (v *version) bevals() bevalInformer {
+	return &bevalInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

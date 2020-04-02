@@ -1,4 +1,4 @@
-PACKAGE=github.com/ocibuilder/ocibuilder/provenance
+PACKAGE=github.com/beval/beval/provenance
 CURRENT_DIR=$(shell pwd)
 DIST_DIR=${CURRENT_DIR}/dist
 OCICTL_DIR=${DIST_DIR}/ocictl
@@ -7,15 +7,15 @@ VERSION                = $(shell cat ${CURRENT_DIR}/VERSION)
 BUILD_DATE             = $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 GIT_COMMIT             = $(shell git rev-parse HEAD)
 GENERATE_GROUPS        = vendor/k8s.io/code-generator/generate-groups.sh
-DEEPCOPY_GEN           = pkg/apis/ocibuilder/v1alpha1/zz_generated.deepcopy.go
-DEEPCOPY_SRC           = $(shell find pkg/apis/ocibuilder/v1alpha1 | grep -v zz_generated)
-CLIENTSET_GEN          = pkg/client/ocibuilder/clientset
+DEEPCOPY_GEN           = pkg/apis/beval/v1alpha1/zz_generated.deepcopy.go
+DEEPCOPY_SRC           = $(shell find pkg/apis/beval/v1alpha1 | grep -v zz_generated)
+CLIENTSET_GEN          = pkg/client/beval/clientset
 CLIENTSET_SRC          = $(shell egrep -l -R "^\/\/\s\+genclient" 2>/dev/null | grep -v vendor)
-INFORMERS_GEN          = pkg/client/ocibuilder/informers
-LISTERS_GEN            = pkg/client/ocibuilder/listers
+INFORMERS_GEN          = pkg/client/beval/informers
+LISTERS_GEN            = pkg/client/beval/listers
 HEADER_FILE            = hack/custom-boilerplate.go.txt
-OCIBUILDER             = github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder
-OCIBUILDER_APIS        = github.com/ocibuilder/ocibuilder/pkg/apis
+beval             = github.com/beval/beval/pkg/client/beval
+beval_APIS        = github.com/beval/beval/pkg/apis
 
 override LDFLAGS += \
   -X ${PACKAGE}.version=${VERSION} \
@@ -23,17 +23,17 @@ override LDFLAGS += \
   -X ${PACKAGE}.gitCommit=${GIT_COMMIT} \
 
 define generate
-	$(GENERATE_GROUPS) $(1) $(OCIBUILDER) $(OCIBUILDER_APIS) \
-	"ocibuilder:v1alpha1" --go-header-file $(HEADER_FILE)
+	$(GENERATE_GROUPS) $(1) $(beval) $(beval_APIS) \
+	"beval:v1alpha1" --go-header-file $(HEADER_FILE)
 endef
 
-.PHONY: ocibuilder
-ocibuilder:
-	go build -o ${DIST_DIR}/ocibuilder -v .
+.PHONY: beval
+beval:
+	go build -o ${DIST_DIR}/beval -v .
 
-.PHONY: ocibuilder-linux
-ocibuilder-linux:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 make ocibuilder
+.PHONY: beval-linux
+beval-linux:
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 make beval
 
 .PHONY: ocictl
 ocictl: $(OCICTL_DIR)/ocictl

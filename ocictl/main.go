@@ -19,8 +19,8 @@ package main
 import (
 	"os"
 
-	"github.com/ocibuilder/ocibuilder/ocictl/cmd"
-	"github.com/ocibuilder/ocibuilder/pkg/util"
+	"github.com/beval/beval/ocictl/cmd"
+	"github.com/beval/beval/pkg/util"
 )
 
 var log = util.GetLogger(false)

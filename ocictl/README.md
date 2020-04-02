@@ -7,7 +7,7 @@ ocictl login -d <PATH_TO_FILE> --builder=docker
 ocictl login -d <PATH_TO_FILE> --builder=buildah
 ```
 
-under the hood, it returns the output of `docker login -u testuser -p testpassword <registry>` or/and `buildah login -u testuser -p testpassword <registry>`. `<registry>` value is fetched from `login.yaml` or `ocibuilder.yaml`
+under the hood, it returns the output of `docker login -u testuser -p testpassword <registry>` or/and `buildah login -u testuser -p testpassword <registry>`. `<registry>` value is fetched from `login.yaml` or `beval.yaml`
 
 ### ocictl build
 
@@ -31,7 +31,7 @@ ocictl pull -i <REGISTRY-NAME>/<IMAGE-NAME>:<TAG-VERSION> -d <PATH_TO_FILE> --bu
 ocictl pull -i <REGISTRY-NAME>/<IMAGE-NAME>:<TAG-VERSION> -d <PATH_TO_FILE> --builder=buildah
 ```
 
-under the hood, it returns the output of `docker pull <REGISTRY-NAME>/<IMAGE-NAME>:<TAG-VERSION>`or/and `buildah pull <REGISTRY-NAME>/<IMAGE-NAME>:<TAG-VERSION>`. `<REGISTRY-NAME>` value should match with the one in `ocibuilder.yaml` or `login.yaml`
+under the hood, it returns the output of `docker pull <REGISTRY-NAME>/<IMAGE-NAME>:<TAG-VERSION>`or/and `buildah pull <REGISTRY-NAME>/<IMAGE-NAME>:<TAG-VERSION>`. `<REGISTRY-NAME>` value should match with the one in `beval.yaml` or `login.yaml`
 
 ### ocictl push
 
@@ -42,15 +42,15 @@ ocictl push -d <PATH_TO_FILE> --builder=docker
 ocictl push -d <PATH_TO_FILE> --builder=buildah
 ```
 
-under the hood, it returns the output of `docker push <REGISTRY-NAME>/<IMAGE-NAME>:<TAG-VERSION>` or/and `buildah push <REGISTRY-NAME>/<IMAGE-NAME>:<TAG-VERSION>`. `<REGISTRY-NAME>`, `<IMAGE-NAME>` and `<TAG-VERSION>` is fetched from `ocibuilder.yaml` or `push.yaml`
+under the hood, it returns the output of `docker push <REGISTRY-NAME>/<IMAGE-NAME>:<TAG-VERSION>` or/and `buildah push <REGISTRY-NAME>/<IMAGE-NAME>:<TAG-VERSION>`. `<REGISTRY-NAME>`, `<IMAGE-NAME>` and `<TAG-VERSION>` is fetched from `beval.yaml` or `push.yaml`
 
-**Note:** Common functions between ocibuilder/docker and ocibuilder/buildah are under `ocibuilder/common/` directory. We are using go client for executing Docker commands (https://github.com/docker/go-docker). There is no client for buildah. We can use `exec` package in go (exec.Run()) for running buildah commands.
+**Note:** Common functions between beval/docker and beval/buildah are under `beval/common/` directory. We are using go client for executing Docker commands (https://github.com/docker/go-docker). There is no client for buildah. We can use `exec` package in go (exec.Run()) for running buildah commands.
 
 ### How to use Overlays
 
-The ocibuilder supports yaml overlays which can be applied at runtime using the `--overlay` command line flag and passing in an overlay yaml file.
+The beval supports yaml overlays which can be applied at runtime using the `--overlay` command line flag and passing in an overlay yaml file.
 
-The overlaying functionality of ocibuilder is built on top of [ytt](https://github.com/k14s/ytt) which makes use of annotations for matching and overlaying yaml on top of a template. The ocibuilder abstracts away these annotations so you should be able to pass a
+The overlaying functionality of beval is built on top of [ytt](https://github.com/k14s/ytt) which makes use of annotations for matching and overlaying yaml on top of a template. The beval abstracts away these annotations so you should be able to pass a
 standard yaml overlay file and if the fields match up will be applied to your template at runtime. If you want to specify your own ytt annotations, you are able to do so by passing a [standard annotated ytt overlay file](https://get-ytt.io/#example:example-overlay-files)
 
 **Note**: if you want to overlay an array element in yaml make sure to prepend the field with a dash (**-**) so that the ytt annotations can be applied correctly.

@@ -99,14 +99,14 @@ func GetProvenance() Provenance {
 	}
 }
 
-// Print prints the provenance of the ocibuilder
+// Print prints the provenance of the beval
 func (v Provenance) Print(w io.Writer) {
 	if _, err := fmt.Fprintf(w, "%s\n", v.Version); err != nil {
 		logrus.WithError(err).Errorln("error printing ocictl version")
 	}
 }
 
-// PrintVerbose prints the verbose provenance of the ocibuilder
+// PrintVerbose prints the verbose provenance of the beval
 func (v Provenance) PrintVerbose(w io.Writer) {
 	if _, err := fmt.Fprintf(w, "Version: %s, Build Date: %s, Git Commit: %s, OS: %s, arch: %s\n",
 		v.Version,

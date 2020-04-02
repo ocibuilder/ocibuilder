@@ -21,13 +21,13 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
+	"github.com/beval/beval/pkg/buildah"
+	"github.com/beval/beval/pkg/docker"
+	"github.com/beval/beval/pkg/oci"
+	"github.com/beval/beval/pkg/read"
+	"github.com/beval/beval/pkg/util"
 	"github.com/docker/docker/client"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/buildah"
-	"github.com/ocibuilder/ocibuilder/pkg/docker"
-	"github.com/ocibuilder/ocibuilder/pkg/oci"
-	"github.com/ocibuilder/ocibuilder/pkg/read"
-	"github.com/ocibuilder/ocibuilder/pkg/util"
 	"github.com/spf13/cobra"
 )
 
@@ -54,7 +54,7 @@ func newLoginCmd(out io.Writer) *cobra.Command {
 		},
 	}
 	f := cmd.Flags()
-	f.StringVarP(&lc.path, "path", "p", "", "Path to your ocibuilder.yaml or login.yaml. By default will look in the current working directory")
+	f.StringVarP(&lc.path, "path", "p", "", "Path to your beval.yaml or login.yaml. By default will look in the current working directory")
 	f.StringVarP(&lc.builder, "builder", "b", "docker", "Choose either docker and buildah as the targeted image builder. By default the builder is docker.")
 	f.BoolVarP(&lc.debug, "debug", "d", false, "Turn on debug logging")
 	return cmd
@@ -64,16 +64,16 @@ func (l *loginCmd) run(args []string) error {
 	var cli v1alpha1.BuilderClient
 	logger := util.GetLogger(l.debug)
 	reader := read.Reader{Logger: logger}
-	ociBuilderSpec := v1alpha1.OCIBuilderSpec{Daemon: true}
+	bevalSpec := v1alpha1.bevalSpec{Daemon: true}
 
-	if err := reader.Read(&ociBuilderSpec, "", l.path); err != nil {
+	if err := reader.Read(&bevalSpec, "", l.path); err != nil {
 		log.WithError(err).Errorln("failed to read spec")
 		return err
 	}
 
 	// Prioritise builder passed in as argument, default builder is docker
 	builderType := l.builder
-	if !ociBuilderSpec.Daemon {
+	if !bevalSpec.Daemon {
 		builderType = "buildah"
 	}
 
@@ -121,7 +121,7 @@ func (l *loginCmd) run(args []string) error {
 		close(errChan)
 	}()
 
-	go builder.Login(ociBuilderSpec, res, errChan, finished)
+	go builder.Login(bevalSpec, res, errChan, finished)
 
 	for {
 		select {

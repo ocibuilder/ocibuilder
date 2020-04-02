@@ -20,9 +20,9 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/common"
-	"github.com/ocibuilder/ocibuilder/pkg/util"
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
+	"github.com/beval/beval/pkg/common"
+	"github.com/beval/beval/pkg/util"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/ssh"
 	"gopkg.in/src-d/go-git.v4"

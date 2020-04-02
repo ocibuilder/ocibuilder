@@ -21,8 +21,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/beval/beval/pkg/generate"
 	"github.com/gobuffalo/packr"
-	"github.com/ocibuilder/ocibuilder/pkg/generate"
 	"github.com/sirupsen/logrus"
 )
 
@@ -33,7 +33,7 @@ type Initializer struct {
 	Logger *logrus.Logger
 }
 
-// Basic handles a basic ocictl init, creating a documented ocibuilder.yaml specification to be modified
+// Basic handles a basic ocictl init, creating a documented beval.yaml specification to be modified
 func (i Initializer) Basic() error {
 	box := i.Box
 	log := i.Logger
@@ -51,15 +51,15 @@ func (i Initializer) Basic() error {
 		}
 	}
 
-	if err := ioutil.WriteFile("ocibuilder.yaml", template, 0644); err != nil {
-		log.WithError(err).Errorln("error generating ocibuilder.yaml template file")
+	if err := ioutil.WriteFile("beval.yaml", template, 0644); err != nil {
+		log.WithError(err).Errorln("error generating beval.yaml template file")
 		return err
 	}
 
 	return nil
 }
 
-// FromDocker handles an init from a docker file, generating an ocibuilder spec
+// FromDocker handles an init from a docker file, generating an beval spec
 func (i Initializer) FromDocker(imageName string, path string) error {
 
 	tags := strings.Split(imageName, ":")

@@ -21,8 +21,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
-	"github.com/ocibuilder/ocibuilder/pkg/util"
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
+	"github.com/beval/beval/pkg/util"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -62,4 +62,4 @@ var buildContext = &v1alpha1.BuildContext{
 	},
 }
 
-var expectedFileNames = []string{".dockerignore", "main.go", "ocibuilder.yaml", "overlay.yaml"}
+var expectedFileNames = []string{".dockerignore", "main.go", "beval.yaml", "overlay.yaml"}

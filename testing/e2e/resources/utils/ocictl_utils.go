@@ -10,7 +10,7 @@ import (
 
 // BuildOcictl builds the ocictl for e2e testing purposes
 func BuildOcictl() string {
-	ocictlPath, err := gexec.Build("github.com/ocibuilder/ocibuilder/ocictl")
+	ocictlPath, err := gexec.Build("github.com/beval/beval/ocictl")
 	Expect(err).NotTo(HaveOccurred())
 	return ocictlPath
 }

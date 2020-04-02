@@ -18,7 +18,7 @@ limitations under the License.
 package fake
 
 import (
-	v1alpha1 "github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
+	v1alpha1 "github.com/beval/beval/pkg/apis/beval/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -27,31 +27,31 @@ import (
 	testing "k8s.io/client-go/testing"
 )
 
-// FakeOCIBuilders implements OCIBuilderInterface
-type FakeOCIBuilders struct {
-	Fake *FakeOcibuilderV1alpha1
+// Fakebevals implements bevalInterface
+type Fakebevals struct {
+	Fake *FakebevalV1alpha1
 	ns   string
 }
 
-var ocibuildersResource = schema.GroupVersionResource{Group: "ocibuilder.com", Version: "v1alpha1", Resource: "ocibuilders"}
+var bevalsResource = schema.GroupVersionResource{Group: "beval.com", Version: "v1alpha1", Resource: "bevals"}
 
-var ocibuildersKind = schema.GroupVersionKind{Group: "ocibuilder.com", Version: "v1alpha1", Kind: "OCIBuilder"}
+var bevalsKind = schema.GroupVersionKind{Group: "beval.com", Version: "v1alpha1", Kind: "beval"}
 
-// Get takes name of the oCIBuilder, and returns the corresponding oCIBuilder object, and an error if there is any.
-func (c *FakeOCIBuilders) Get(name string, options v1.GetOptions) (result *v1alpha1.OCIBuilder, err error) {
+// Get takes name of the beval, and returns the corresponding beval object, and an error if there is any.
+func (c *Fakebevals) Get(name string, options v1.GetOptions) (result *v1alpha1.beval, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(ocibuildersResource, c.ns, name), &v1alpha1.OCIBuilder{})
+		Invokes(testing.NewGetAction(bevalsResource, c.ns, name), &v1alpha1.beval{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.OCIBuilder), err
+	return obj.(*v1alpha1.beval), err
 }
 
-// List takes label and field selectors, and returns the list of OCIBuilders that match those selectors.
-func (c *FakeOCIBuilders) List(opts v1.ListOptions) (result *v1alpha1.OCIBuilderList, err error) {
+// List takes label and field selectors, and returns the list of bevals that match those selectors.
+func (c *Fakebevals) List(opts v1.ListOptions) (result *v1alpha1.bevalList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(ocibuildersResource, ocibuildersKind, c.ns, opts), &v1alpha1.OCIBuilderList{})
+		Invokes(testing.NewListAction(bevalsResource, bevalsKind, c.ns, opts), &v1alpha1.bevalList{})
 
 	if obj == nil {
 		return nil, err
@@ -61,8 +61,8 @@ func (c *FakeOCIBuilders) List(opts v1.ListOptions) (result *v1alpha1.OCIBuilder
 	if label == nil {
 		label = labels.Everything()
 	}
-	list := &v1alpha1.OCIBuilderList{ListMeta: obj.(*v1alpha1.OCIBuilderList).ListMeta}
-	for _, item := range obj.(*v1alpha1.OCIBuilderList).Items {
+	list := &v1alpha1.bevalList{ListMeta: obj.(*v1alpha1.bevalList).ListMeta}
+	for _, item := range obj.(*v1alpha1.bevalList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -70,70 +70,70 @@ func (c *FakeOCIBuilders) List(opts v1.ListOptions) (result *v1alpha1.OCIBuilder
 	return list, err
 }
 
-// Watch returns a watch.Interface that watches the requested oCIBuilders.
-func (c *FakeOCIBuilders) Watch(opts v1.ListOptions) (watch.Interface, error) {
+// Watch returns a watch.Interface that watches the requested bevals.
+func (c *Fakebevals) Watch(opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewWatchAction(ocibuildersResource, c.ns, opts))
+		InvokesWatch(testing.NewWatchAction(bevalsResource, c.ns, opts))
 
 }
 
-// Create takes the representation of a oCIBuilder and creates it.  Returns the server's representation of the oCIBuilder, and an error, if there is any.
-func (c *FakeOCIBuilders) Create(oCIBuilder *v1alpha1.OCIBuilder) (result *v1alpha1.OCIBuilder, err error) {
+// Create takes the representation of a beval and creates it.  Returns the server's representation of the beval, and an error, if there is any.
+func (c *Fakebevals) Create(beval *v1alpha1.beval) (result *v1alpha1.beval, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(ocibuildersResource, c.ns, oCIBuilder), &v1alpha1.OCIBuilder{})
+		Invokes(testing.NewCreateAction(bevalsResource, c.ns, beval), &v1alpha1.beval{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.OCIBuilder), err
+	return obj.(*v1alpha1.beval), err
 }
 
-// Update takes the representation of a oCIBuilder and updates it. Returns the server's representation of the oCIBuilder, and an error, if there is any.
-func (c *FakeOCIBuilders) Update(oCIBuilder *v1alpha1.OCIBuilder) (result *v1alpha1.OCIBuilder, err error) {
+// Update takes the representation of a beval and updates it. Returns the server's representation of the beval, and an error, if there is any.
+func (c *Fakebevals) Update(beval *v1alpha1.beval) (result *v1alpha1.beval, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(ocibuildersResource, c.ns, oCIBuilder), &v1alpha1.OCIBuilder{})
+		Invokes(testing.NewUpdateAction(bevalsResource, c.ns, beval), &v1alpha1.beval{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.OCIBuilder), err
+	return obj.(*v1alpha1.beval), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeOCIBuilders) UpdateStatus(oCIBuilder *v1alpha1.OCIBuilder) (*v1alpha1.OCIBuilder, error) {
+func (c *Fakebevals) UpdateStatus(beval *v1alpha1.beval) (*v1alpha1.beval, error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceAction(ocibuildersResource, "status", c.ns, oCIBuilder), &v1alpha1.OCIBuilder{})
+		Invokes(testing.NewUpdateSubresourceAction(bevalsResource, "status", c.ns, beval), &v1alpha1.beval{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.OCIBuilder), err
+	return obj.(*v1alpha1.beval), err
 }
 
-// Delete takes name of the oCIBuilder and deletes it. Returns an error if one occurs.
-func (c *FakeOCIBuilders) Delete(name string, options *v1.DeleteOptions) error {
+// Delete takes name of the beval and deletes it. Returns an error if one occurs.
+func (c *Fakebevals) Delete(name string, options *v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(ocibuildersResource, c.ns, name), &v1alpha1.OCIBuilder{})
+		Invokes(testing.NewDeleteAction(bevalsResource, c.ns, name), &v1alpha1.beval{})
 
 	return err
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakeOCIBuilders) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(ocibuildersResource, c.ns, listOptions)
+func (c *Fakebevals) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
+	action := testing.NewDeleteCollectionAction(bevalsResource, c.ns, listOptions)
 
-	_, err := c.Fake.Invokes(action, &v1alpha1.OCIBuilderList{})
+	_, err := c.Fake.Invokes(action, &v1alpha1.bevalList{})
 	return err
 }
 
-// Patch applies the patch and returns the patched oCIBuilder.
-func (c *FakeOCIBuilders) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.OCIBuilder, err error) {
+// Patch applies the patch and returns the patched beval.
+func (c *Fakebevals) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.beval, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(ocibuildersResource, c.ns, name, pt, data, subresources...), &v1alpha1.OCIBuilder{})
+		Invokes(testing.NewPatchSubresourceAction(bevalsResource, c.ns, name, pt, data, subresources...), &v1alpha1.beval{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.OCIBuilder), err
+	return obj.(*v1alpha1.beval), err
 }

@@ -14,11 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package ocibuilder
+package beval
 
 import (
-	informers "github.com/ocibuilder/ocibuilder/pkg/client/ocibuilder/informers/externalversions"
-	"github.com/ocibuilder/ocibuilder/pkg/common"
+	informers "github.com/beval/beval/pkg/client/beval/informers/externalversions"
+	"github.com/beval/beval/pkg/common"
 	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
@@ -38,7 +38,7 @@ func (ctrl *Controller) instanceIDReq() (*labels.Requirement, error) {
 	return instanceIDReq, nil
 }
 
-// newControllerInformer adds new ocibuilders to the controller's queue based on Add, Update, and Delete Event Handlers for the ocibuilder resources
+// newControllerInformer adds new bevals to the controller's queue based on Add, Update, and Delete Event Handlers for the beval resources
 func (ctrl *Controller) newControllerInformer(labelFilterRequirements *labels.Requirement) cache.SharedIndexInformer {
 	informerFactory := informers.NewSharedInformerFactoryWithOptions(
 		ctrl.ociClient,
@@ -50,7 +50,7 @@ func (ctrl *Controller) newControllerInformer(labelFilterRequirements *labels.Re
 			options.LabelSelector = labelSelector.String()
 		}),
 	)
-	informer := informerFactory.Ocibuilder().V1alpha1().OCIBuilders().Informer()
+	informer := informerFactory.beval().V1alpha1().bevals().Informer()
 	informer.AddEventHandler(
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {

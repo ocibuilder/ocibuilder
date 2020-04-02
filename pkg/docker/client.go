@@ -24,18 +24,18 @@ import (
 	"github.com/docker/docker/api/types/image"
 	"github.com/sirupsen/logrus"
 
+	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
-	"github.com/ocibuilder/ocibuilder/pkg/apis/ocibuilder/v1alpha1"
 )
 
-// Client is the client used for building with Docker using the ocibuilder
+// Client is the client used for building with Docker using the beval
 type Client struct {
 	APIClient client.APIClient
 	Logger    *logrus.Logger
 }
 
-// ImageBuild conducts an image build with Docker using the ocibuilder
+// ImageBuild conducts an image build with Docker using the beval
 func (cli Client) ImageBuild(options v1alpha1.OCIBuildOptions) (v1alpha1.OCIBuildResponse, error) {
 	apiCli := cli.APIClient
 	res, err := apiCli.ImageBuild(options.Ctx, options.Context, options.ImageBuildOptions)
@@ -47,7 +47,7 @@ func (cli Client) ImageBuild(options v1alpha1.OCIBuildOptions) (v1alpha1.OCIBuil
 	}, nil
 }
 
-// ImagePull conducts an image pull with Docker using the ocibuilder
+// ImagePull conducts an image pull with Docker using the beval
 func (cli Client) ImagePull(options v1alpha1.OCIPullOptions) (v1alpha1.OCIPullResponse, error) {
 	apiCli := cli.APIClient
 	res, err := apiCli.ImagePull(options.Ctx, options.Ref, options.ImagePullOptions)
@@ -59,7 +59,7 @@ func (cli Client) ImagePull(options v1alpha1.OCIPullOptions) (v1alpha1.OCIPullRe
 	}, nil
 }
 
-// ImagePush conducts an image push with Docker using the ocibuilder
+// ImagePush conducts an image push with Docker using the beval
 func (cli Client) ImagePush(options v1alpha1.OCIPushOptions) (v1alpha1.OCIPushResponse, error) {
 	apiCli := cli.APIClient
 	res, err := apiCli.ImagePush(options.Ctx, options.Ref, options.ImagePushOptions)
@@ -71,7 +71,7 @@ func (cli Client) ImagePush(options v1alpha1.OCIPushOptions) (v1alpha1.OCIPushRe
 	}, nil
 }
 
-// ImageRemove conducts an image remove with Docker using the ocibuilder
+// ImageRemove conducts an image remove with Docker using the beval
 func (cli Client) ImageRemove(options v1alpha1.OCIRemoveOptions) (v1alpha1.OCIRemoveResponse, error) {
 	apiCli := cli.APIClient
 	res, err := apiCli.ImageRemove(options.Ctx, options.Image, options.ImageRemoveOptions)
@@ -83,7 +83,7 @@ func (cli Client) ImageRemove(options v1alpha1.OCIRemoveOptions) (v1alpha1.OCIRe
 	}, nil
 }
 
-// ImageInspect conducts an inspect of a built image with Docker using the ocibuilder
+// ImageInspect conducts an inspect of a built image with Docker using the beval
 func (cli Client) ImageInspect(imageId string) (types.ImageInspect, error) {
 	apiCli := cli.APIClient
 	res, _, err := apiCli.ImageInspectWithRaw(context.Background(), imageId)
@@ -93,7 +93,7 @@ func (cli Client) ImageInspect(imageId string) (types.ImageInspect, error) {
 	return res, nil
 }
 
-// ImageHistory conducts an image history call of a built image with Docker using the ocibuilder
+// ImageHistory conducts an image history call of a built image with Docker using the beval
 func (cli Client) ImageHistory(imageId string) ([]image.HistoryResponseItem, error) {
 	apiCli := cli.APIClient
 	res, err := apiCli.ImageHistory(context.Background(), imageId)
@@ -103,7 +103,7 @@ func (cli Client) ImageHistory(imageId string) ([]image.HistoryResponseItem, err
 	return res, nil
 }
 
-// RegistryLogin conducts a registry login with Docker using the ocibuilder
+// RegistryLogin conducts a registry login with Docker using the beval
 func (cli Client) RegistryLogin(options v1alpha1.OCILoginOptions) (v1alpha1.OCILoginResponse, error) {
 	apiCli := cli.APIClient
 	res, err := apiCli.RegistryLogin(options.Ctx, options.AuthConfig)

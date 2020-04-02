@@ -19,7 +19,7 @@ package store
 import (
 	"time"
 
-	"github.com/ocibuilder/gofeas"
+	"github.com/beval/gofeas"
 )
 
 // MetadataStore is a data storage interface
