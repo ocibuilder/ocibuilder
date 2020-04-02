@@ -19,7 +19,7 @@ package main
 import (
 	"os"
 
-	"github.com/beval/beval/ocictl/cmd"
+	"github.com/beval/beval/bevalctl/cmd"
 	"github.com/beval/beval/pkg/util"
 )
 
@@ -28,7 +28,7 @@ var log = util.GetLogger(false)
 func main() {
 	cmd := cmd.NewRootCmd(os.Args[1:])
 	if err := cmd.Execute(); err != nil {
-		log.WithError(err).Errorln("error in executing ocictl root command...")
+		log.WithError(err).Errorln("error in executing bevalctl root command...")
 		os.Exit(1)
 	}
 }

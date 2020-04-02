@@ -1,45 +1,45 @@
-### ocictl login
+### bevalctl login
 
 - Login to the registry
 
 ```
-ocictl login -d <PATH_TO_FILE> --builder=docker
-ocictl login -d <PATH_TO_FILE> --builder=buildah
+bevalctl login -d <PATH_TO_FILE> --builder=docker
+bevalctl login -d <PATH_TO_FILE> --builder=buildah
 ```
 
 under the hood, it returns the output of `docker login -u testuser -p testpassword <registry>` or/and `buildah login -u testuser -p testpassword <registry>`. `<registry>` value is fetched from `login.yaml` or `beval.yaml`
 
-### ocictl build
+### bevalctl build
 
-- Build the image via docker or buildah via ocictl
+- Build the image via docker or buildah via bevalctl
 
 (Build an image using local Dockerfiles)
 
 ```
-ocictl build -n <BUILD_NAME> -d <PATH_TO_FILE> --builder=docker
-ocictl build -n <BUILD_NAME> -d <PATH_TO_FILE> --builder=buildah
+bevalctl build -n <BUILD_NAME> -d <PATH_TO_FILE> --builder=docker
+bevalctl build -n <BUILD_NAME> -d <PATH_TO_FILE> --builder=buildah
 ```
 
 under the hood, it returns the output of `docker build -t <image_name> .` and `buildah bud -t <image_name> .` and builds the image. (or could be `docker build -f <path-to-Dockerfile> .` and `buildah bud -f <path-to-Dockerfile> .` and builds the image). `<BUILD_NAME>` is name of the build and `<PATH_TO_FILE>` is path to spec file.
 
-### ocictl pull
+### bevalctl pull
 
-3] Pull the image via docker or buildah via ocictl
+3] Pull the image via docker or buildah via bevalctl
 
 ```
-ocictl pull -i <REGISTRY-NAME>/<IMAGE-NAME>:<TAG-VERSION> -d <PATH_TO_FILE> --builder=docker
-ocictl pull -i <REGISTRY-NAME>/<IMAGE-NAME>:<TAG-VERSION> -d <PATH_TO_FILE> --builder=buildah
+bevalctl pull -i <REGISTRY-NAME>/<IMAGE-NAME>:<TAG-VERSION> -d <PATH_TO_FILE> --builder=docker
+bevalctl pull -i <REGISTRY-NAME>/<IMAGE-NAME>:<TAG-VERSION> -d <PATH_TO_FILE> --builder=buildah
 ```
 
 under the hood, it returns the output of `docker pull <REGISTRY-NAME>/<IMAGE-NAME>:<TAG-VERSION>`or/and `buildah pull <REGISTRY-NAME>/<IMAGE-NAME>:<TAG-VERSION>`. `<REGISTRY-NAME>` value should match with the one in `beval.yaml` or `login.yaml`
 
-### ocictl push
+### bevalctl push
 
-5] Push images via docker or buildah via ocictl
+5] Push images via docker or buildah via bevalctl
 
 ```
-ocictl push -d <PATH_TO_FILE> --builder=docker
-ocictl push -d <PATH_TO_FILE> --builder=buildah
+bevalctl push -d <PATH_TO_FILE> --builder=docker
+bevalctl push -d <PATH_TO_FILE> --builder=buildah
 ```
 
 under the hood, it returns the output of `docker push <REGISTRY-NAME>/<IMAGE-NAME>:<TAG-VERSION>` or/and `buildah push <REGISTRY-NAME>/<IMAGE-NAME>:<TAG-VERSION>`. `<REGISTRY-NAME>`, `<IMAGE-NAME>` and `<TAG-VERSION>` is fetched from `beval.yaml` or `push.yaml`

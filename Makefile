@@ -1,7 +1,7 @@
 PACKAGE=github.com/beval/beval/provenance
 CURRENT_DIR=$(shell pwd)
 DIST_DIR=${CURRENT_DIR}/dist
-OCICTL_DIR=${DIST_DIR}/ocictl
+bevalctl_DIR=${DIST_DIR}/bevalctl
 
 VERSION                = $(shell cat ${CURRENT_DIR}/VERSION)
 BUILD_DATE             = $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
@@ -35,35 +35,35 @@ beval:
 beval-linux:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 make beval
 
-.PHONY: ocictl
-ocictl: $(OCICTL_DIR)/ocictl
+.PHONY: bevalctl
+bevalctl: $(bevalctl_DIR)/bevalctl
 
-$(OCICTL_DIR)/ocictl:
-	packr build -v -ldflags '${LDFLAGS}' -o $@ ${CURRENT_DIR}/ocictl/main.go
+$(bevalctl_DIR)/bevalctl:
+	packr build -v -ldflags '${LDFLAGS}' -o $@ ${CURRENT_DIR}/bevalctl/main.go
 
-.PHONY: ocictl-linux
-ocictl-linux:
+.PHONY: bevalctl-linux
+bevalctl-linux:
 	make clean
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 make ocictl
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 make bevalctl
 
-.PHONY: ocictl-mac
-ocictl-mac:
+.PHONY: bevalctl-mac
+bevalctl-mac:
 	make clean
-	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 make ocictl
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 make bevalctl
 
-.PHONY: ocictl-package-linux
-ocictl-package-linux:
-	make ocictl-linux
-	cp README.md ./dist/ocictl
-	cp LICENSE ./dist/ocictl
-	cd dist; tar -czvf ocictl-linux-amd64.tar.gz ./ocictl
+.PHONY: bevalctl-package-linux
+bevalctl-package-linux:
+	make bevalctl-linux
+	cp README.md ./dist/bevalctl
+	cp LICENSE ./dist/bevalctl
+	cd dist; tar -czvf bevalctl-linux-amd64.tar.gz ./bevalctl
 
-.PHONY: ocictl-package-mac
-ocictl-package-mac:
-	make ocictl-mac
-	cp README.md ./dist/ocictl
-	cp LICENSE ./dist/ocictl
-	cd dist; tar -czvf ocictl-mac-amd64.tar.gz ./ocictl
+.PHONY: bevalctl-package-mac
+bevalctl-package-mac:
+	make bevalctl-mac
+	cp README.md ./dist/bevalctl
+	cp LICENSE ./dist/bevalctl
+	cd dist; tar -czvf bevalctl-mac-amd64.tar.gz ./bevalctl
 
 .PHONY: codegen
 test:

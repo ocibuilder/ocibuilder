@@ -23,7 +23,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/beval/beval/ocictl/pkg/utils"
+	"github.com/beval/beval/bevalctl/pkg/utils"
 	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
 	"github.com/beval/beval/pkg/common"
 	"github.com/beval/beval/pkg/util"

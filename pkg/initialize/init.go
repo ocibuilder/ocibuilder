@@ -26,14 +26,14 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// Initializer is the struct for holding the state for the ocictl init command
+// Initializer is the struct for holding the state for the bevalctl init command
 type Initializer struct {
 	Box    packr.Box
 	Dry    bool
 	Logger *logrus.Logger
 }
 
-// Basic handles a basic ocictl init, creating a documented beval.yaml specification to be modified
+// Basic handles a basic bevalctl init, creating a documented beval.yaml specification to be modified
 func (i Initializer) Basic() error {
 	box := i.Box
 	log := i.Logger

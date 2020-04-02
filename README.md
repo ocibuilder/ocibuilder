@@ -8,7 +8,7 @@
 
 ## What is the beval?
 
-The **beval** offers a command line tool called the **ocictl** to build, push and pull [OCI](https://www.opencontainers.org/) compliant images through declarative specifications, allowing you to pick between [Buildah](https://github.com/containers/buildah) or [Docker](https://docs.docker.com/) as the container build tool.
+The **beval** offers a command line tool called the **bevalctl** to build, push and pull [OCI](https://www.opencontainers.org/) compliant images through declarative specifications, allowing you to pick between [Buildah](https://github.com/containers/buildah) or [Docker](https://docs.docker.com/) as the container build tool.
 
 <p align="center">
   <img src="https://github.com/beval/docs/blob/master/assets/oci-gopher.png?raw=true" alt="Logo"/>
@@ -32,9 +32,9 @@ The **beval** offers a command line tool called the **ocictl** to build, push an
 
 ## Install
 
-Binary downloads of the `ocictl` are available on the [Releases page](https://github.com/beval/beval/releases).
+Binary downloads of the `bevalctl` are available on the [Releases page](https://github.com/beval/beval/releases).
 
-You can use the `install.sh` script to install the latest version of `ocictl`:
+You can use the `install.sh` script to install the latest version of `bevalctl`:
 
 ```bash
 curl https://raw.githubusercontent.com/beval/beval/master/install.sh | sh
@@ -42,8 +42,8 @@ curl https://raw.githubusercontent.com/beval/beval/master/install.sh | sh
 
 This requires `GOPATH` to be set, with bin added to your `PATH`.
 
-The latest images with Buildah and Docker pre-installed alongside the ocictl is available on our
-[Dockerhub repository](https://cloud.docker.com/u/beval/repository/docker/beval/ocictl).
+The latest images with Buildah and Docker pre-installed alongside the bevalctl is available on our
+[Dockerhub repository](https://cloud.docker.com/u/beval/repository/docker/beval/bevalctl).
 
 Read the full [installation guide](https://beval.github.io/docs/installation/) available in our docs.
 

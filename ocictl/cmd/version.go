@@ -38,7 +38,7 @@ func newVersionCmd(out io.Writer) *cobra.Command {
 		},
 	}
 	f := cmd.Flags()
-	f.BoolVarP(&vc.verbose, "verbose", "v", false, "Detailed output of ocictl version")
+	f.BoolVarP(&vc.verbose, "verbose", "v", false, "Detailed output of bevalctl version")
 
 	return cmd
 }

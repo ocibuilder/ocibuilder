@@ -1,7 +1,7 @@
 build:
   steps:
     - metadata:
-        name: beval/ocictl
+        name: beval/bevalctl
       stages:
         - metadata:
             name: binary
@@ -10,7 +10,7 @@ build:
           cmd:
             - docker:
                 inline:
-                  - COPY dist/ocictl/ocictl /bin/ocictl
+                  - COPY dist/bevalctl/bevalctl /bin/bevalctl
         - metadata:
             name: build
           base:
@@ -19,7 +19,7 @@ build:
           cmd:
             - docker:
                 inline:
-                  - COPY --from=binary /bin/ocictl /bin
+                  - COPY --from=binary /bin/bevalctl /bin
       tag: TAG_REPLACED
 
 login:
@@ -31,7 +31,7 @@ login:
 
 push:
   - registry: docker.io
-    image: beval/ocictl
+    image: beval/bevalctl
     tag: TAG_REPLACED
 
 params:

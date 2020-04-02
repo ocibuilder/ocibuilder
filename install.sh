@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # This install script is intended to download and install the latest available
-# release of the ocictl from beval.
+# release of the bevalctl from beval.
 #
 # It attempts to identify the current platform and an error will be thrown if
 # the platform is not supported.
@@ -16,7 +16,7 @@ set -e
 
 RELEASES_URL="https://github.com/beval/beval/releases"
 LATEST_VERSION=$(curl --silent "$RELEASES_URL/latest" | sed 's#.*tag/\(.*\)\".*#\1#')
-DOWNLOAD_BIN="ocictl/ocictl"
+DOWNLOAD_BIN="bevalctl/bevalctl"
 
 downloadTar() {
     url="$DOWNLOAD_URL"
@@ -73,11 +73,11 @@ fi
 echo "Will install into $INSTALL_DIRECTORY"
 
 if [ $OS = "darwin" ]; then
-    DOWNLOAD_URL="$RELEASES_URL/download/$LATEST_VERSION/ocictl-darwin-amd64.tar.gz"
+    DOWNLOAD_URL="$RELEASES_URL/download/$LATEST_VERSION/bevalctl-darwin-amd64.tar.gz"
 fi
 
 if [ $OS = "linux" ]; then
-    DOWNLOAD_URL="$RELEASES_URL/download/$LATEST_VERSION/ocictl-linux-amd64.tar.gz"
+    DOWNLOAD_URL="$RELEASES_URL/download/$LATEST_VERSION/bevalctl-linux-amd64.tar.gz"
 fi
 echo "Downloading from $DOWNLOAD_URL"
 

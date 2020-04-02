@@ -31,15 +31,15 @@ const rootDesc = `
 \____/\___/_/\___/\__/_/   
                            
                          
-The ocictl is a tool offered by beval for pulling, building and
+The bevalctl is a tool offered by beval for pulling, building and
 pushing your images using your specified build framework.
 `
 
-// NewRootCmd is the root command for the ocictl
+// NewRootCmd is the root command for the bevalctl
 func NewRootCmd(args []string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "ocictl",
-		Short: "The ocictl provided by beval",
+		Use:   "bevalctl",
+		Short: "The bevalctl provided by beval",
 		Long:  rootDesc,
 	}
 	flags := cmd.PersistentFlags()

@@ -86,14 +86,14 @@ jobs:
           command: cp -rf /go/src/github.com/beval/beval/vendor /home/circleci/.go_workspace/src/github.com/beval/beval
       - run:
           name: Build Linux Artifact
-          command: make ocictl-linux
+          command: make bevalctl-linux
       - run:
           name: Run e2e tests
           command: |
             go get -u github.com/onsi/ginkgo/ginkgo
             go get -u github.com/onsi/gomega/...
             ginkgo -v ./testing/e2e
-  # build runs the build of the linux and mac ocictl artifacts and persists the packages to the circleci workspace
+  # build runs the build of the linux and mac bevalctl artifacts and persists the packages to the circleci workspace
   build:
     docker:
       - image: golang:1.13.7
@@ -107,40 +107,40 @@ jobs:
       - run: go get -u github.com/gobuffalo/packr/packr
       - run:
           name: Build Linux Artifact
-          command: make ocictl-package-linux
+          command: make bevalctl-package-linux
       - persist_to_workspace:
           root: .
           paths:
-            - ./dist/ocictl-linux-amd64.tar.gz
-            - ./dist/ocictl/ocictl
+            - ./dist/bevalctl-linux-amd64.tar.gz
+            - ./dist/bevalctl/bevalctl
       - run:
           name: Build Mac Artifact
-          command: make ocictl-package-mac
+          command: make bevalctl-package-mac
       - persist_to_workspace:
           root: .
           paths:
-            - ./dist/ocictl-mac-amd64.tar.gz
-  # push_container pushes the ocictl container to the beval docker registry when a new tag is added to beval
+            - ./dist/bevalctl-mac-amd64.tar.gz
+  # push_container pushes the bevalctl container to the beval docker registry when a new tag is added to beval
   push_container:
     docker:
-      - image: beval/ocictl:0.1.1
+      - image: beval/bevalctl:0.1.1
     steps:
       - setup_remote_docker
       - checkout
       - attach_workspace:
           at: .
       - run:
-          name: Run Ocictl Build
+          name: Run bevalctl Build
           command: |
             export OCI_TAG=$(cat ./VERSION)
             echo $OCI_TAG
-            ocictl build
+            bevalctl build
       - run:
           name: Run Docker Push
           command: |
             export OCI_TAG=$(cat ./VERSION)
             echo $OCI_TAG
-            ocictl push
+            bevalctl push
   # push_bin pushes both the linux and mac binaries to a github release when a new tag is added to beval
   push_bin:
     environment:

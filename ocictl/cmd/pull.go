@@ -23,7 +23,7 @@ import (
 	"github.com/beval/beval/pkg/oci"
 	"github.com/beval/beval/pkg/util"
 
-	"github.com/beval/beval/ocictl/pkg/utils"
+	"github.com/beval/beval/bevalctl/pkg/utils"
 	"github.com/beval/beval/pkg/apis/beval/v1alpha1"
 	"github.com/beval/beval/pkg/buildah"
 	"github.com/beval/beval/pkg/docker"

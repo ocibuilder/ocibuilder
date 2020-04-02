@@ -36,7 +36,7 @@ In general, this project follows Go project conventions, please read the [Contri
 
 - Clone the project under `$GOPATH/src/github.com/beval/beval/`
 - Run `dep ensure --vendor-only` or `dep ensure -v` to install package dependencies
-- Build ctl binary using `make ocictl`, this will create `ocictl` cmd under `dist/`. Similarly, `make beval` will create package level binary.
+- Build ctl binary using `make bevalctl`, this will create `bevalctl` cmd under `dist/`. Similarly, `make beval` will create package level binary.
 
 ### Run tests
 

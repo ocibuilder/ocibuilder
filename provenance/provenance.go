@@ -102,7 +102,7 @@ func GetProvenance() Provenance {
 // Print prints the provenance of the beval
 func (v Provenance) Print(w io.Writer) {
 	if _, err := fmt.Fprintf(w, "%s\n", v.Version); err != nil {
-		logrus.WithError(err).Errorln("error printing ocictl version")
+		logrus.WithError(err).Errorln("error printing bevalctl version")
 	}
 }
 
@@ -114,6 +114,6 @@ func (v Provenance) PrintVerbose(w io.Writer) {
 		v.GitCommit,
 		v.OS,
 		v.Platform); err != nil {
-		logrus.WithError(err).Errorln("error printing ocictl verbose version")
+		logrus.WithError(err).Errorln("error printing bevalctl verbose version")
 	}
 }

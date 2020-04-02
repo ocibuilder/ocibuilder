@@ -9,12 +9,12 @@ import (
 	"github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("ocictl docker", func() {
+var _ = Describe("bevalctl docker", func() {
 	var session *gexec.Session
-	var ocictlPath string
+	var bevalctlPath string
 
 	BeforeEach(func() {
-		ocictlPath = utils.BuildOcictl()
+		bevalctlPath = utils.Buildbevalctl()
 	})
 
 	AfterSuite(func() {
@@ -25,13 +25,13 @@ var _ = Describe("ocictl docker", func() {
 	})
 
 	It("exits with status code 0", func() {
-		session = utils.RunOcictl(ocictlPath, nil)
+		session = utils.Runbevalctl(bevalctlPath, nil)
 		Eventually(session).Should(gexec.Exit(0))
 	})
 
 	It("completes a build and exits with status code 0", func() {
 		args := []string{"build", "-p", utils.BuildPath}
-		session = utils.RunOcictl(ocictlPath, args)
+		session = utils.Runbevalctl(bevalctlPath, args)
 		Eventually(func() *gexec.Session {
 			return session
 		}, 30).Should(gexec.Exit(0))
@@ -39,7 +39,7 @@ var _ = Describe("ocictl docker", func() {
 
 	It("completes a build with an overlay and exits with status code 0", func() {
 		args := []string{"build", "-p", utils.BuildPath, "--overlay", utils.OverlayPath}
-		session = utils.RunOcictl(ocictlPath, args)
+		session = utils.Runbevalctl(bevalctlPath, args)
 		Eventually(func() *gexec.Session {
 			return session
 		}, 30).Should(gexec.Exit(0))
@@ -51,7 +51,7 @@ var _ = Describe("ocictl docker", func() {
 
 	It("completes a push and exits with status code 0", func() {
 		args := []string{"push", "-p", utils.BuildPath}
-		session = utils.RunOcictl(ocictlPath, args)
+		session = utils.Runbevalctl(bevalctlPath, args)
 		Eventually(func() *gexec.Session {
 			return session
 		}, 20).Should(gexec.Exit(0))
@@ -59,7 +59,7 @@ var _ = Describe("ocictl docker", func() {
 
 	It("completes a pull and exits with status code 0", func() {
 		args := []string{"pull", "-i", utils.ImageName, "-p", utils.BuildPath}
-		session = utils.RunOcictl(ocictlPath, args)
+		session = utils.Runbevalctl(bevalctlPath, args)
 		Eventually(func() *gexec.Session {
 			return session
 		}, 15).Should(gexec.Exit(0))
@@ -67,7 +67,7 @@ var _ = Describe("ocictl docker", func() {
 
 	It("completes an init and exits with status code 0", func() {
 		args := []string{"init"}
-		session = utils.RunOcictl(ocictlPath, args)
+		session = utils.Runbevalctl(bevalctlPath, args)
 		Eventually(func() *gexec.Session {
 			return session
 		}, 2).Should(gexec.Exit(0))
@@ -75,7 +75,7 @@ var _ = Describe("ocictl docker", func() {
 
 	It("completes a version and exits with status code 0", func() {
 		args := []string{"version"}
-		session = utils.RunOcictl(ocictlPath, args)
+		session = utils.Runbevalctl(bevalctlPath, args)
 		Eventually(session).Should(gexec.Exit(0))
 	}, 1)
 

@@ -7,22 +7,22 @@ import (
 	"github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("ocictl buildah", func() {
+var _ = Describe("bevalctl buildah", func() {
 	var session *gexec.Session
-	var ocictlPath string
+	var bevalctlPath string
 
 	BeforeEach(func() {
-		ocictlPath = utils.BuildOcictl()
+		bevalctlPath = utils.Buildbevalctl()
 	})
 
 	It("exits with status code 0", func() {
-		session = utils.RunOcictl(ocictlPath, nil)
+		session = utils.Runbevalctl(bevalctlPath, nil)
 		Eventually(session).Should(gexec.Exit(0))
 	})
 
 	It("completes a build and exits with status code 0", func() {
 		args := []string{"build", "-b", "buildah", "-p", "./resources/go-test-service", "-d"}
-		session = utils.RunOcictl(ocictlPath, args)
+		session = utils.Runbevalctl(bevalctlPath, args)
 		Eventually(func() *gexec.Session {
 			return session
 		}, 25).Should(gexec.Exit(0))
@@ -30,7 +30,7 @@ var _ = Describe("ocictl buildah", func() {
 
 	It("completes a push and exits with status code 0", func() {
 		args := []string{"push", "-b", "buildah", "-p", "./resources/go-test-service", "-d"}
-		session = utils.RunOcictl(ocictlPath, args)
+		session = utils.Runbevalctl(bevalctlPath, args)
 		Eventually(func() *gexec.Session {
 			return session
 		}, 25).Should(gexec.Exit(0))
@@ -38,7 +38,7 @@ var _ = Describe("ocictl buildah", func() {
 
 	It("completes a pull and exits with status code 0", func() {
 		args := []string{"pull", "-b", "buildah", "-i", "bevale2e/go-test-service:v0.1.0", "-p", "./resources/go-test-service", "-d"}
-		session = utils.RunOcictl(ocictlPath, args)
+		session = utils.Runbevalctl(bevalctlPath, args)
 		Eventually(func() *gexec.Session {
 			return session
 		}, 25).Should(gexec.Exit(0))
