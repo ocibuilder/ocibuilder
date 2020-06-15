@@ -2,7 +2,7 @@ version: 2
 jobs:
   install_dep:
     docker:
-      - image: golang:1.14.3-alpine
+      - image: golang:1.14.4-alpine
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
@@ -24,7 +24,7 @@ jobs:
   # lint is the initial job which lints the codebase using standard golangci-lint linter
   lint:
     docker:
-      - image: golang:1.14.3-alpine
+      - image: golang:1.14.4-alpine
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
@@ -38,7 +38,7 @@ jobs:
   # test runs the ocibuilder unit tests and stores test results in TEMP_RESULTS
   test:
     docker:
-      - image: golang:1.14.3
+      - image: golang:1.14.4
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
@@ -96,7 +96,7 @@ jobs:
   # build runs the build of the linux and mac ocictl artifacts and persists the packages to the circleci workspace
   build:
     docker:
-      - image: golang:1.14.3
+      - image: golang:1.14.4
     working_directory: /go/src/github.com/ocibuilder/ocibuilder
     steps:
       - checkout
