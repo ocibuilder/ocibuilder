@@ -119,7 +119,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - ./dist/ocictl-mac-amd64.tar.gz
+            - ./dist/ocictl-darwin-amd64.tar.gz
   # push_container pushes the ocictl container to the ocibuilder docker registry when a new tag is added to ocibuilder
   push_container:
     docker:
