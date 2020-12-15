@@ -63,7 +63,7 @@ ocictl-package-mac:
 	make ocictl-mac
 	cp README.md ./dist/ocictl
 	cp LICENSE ./dist/ocictl
-	cd dist; tar -czvf ocictl-mac-amd64.tar.gz ./ocictl
+	cd dist; tar -czvf ocictl-darwin-amd64.tar.gz ./ocictl
 
 .PHONY: codegen
 test:
